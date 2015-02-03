@@ -18,4 +18,10 @@ Activate the virtualenv:
 user@host ~/pugdebug$ source env/bin/activate
 ```
 
+## Fedora
 
+Install the following packages
+
+```
+user@host ~/pugdebug$ sudo yum install gcc-c++ python-qt5 python-qt5-devel qt-creator
+```
