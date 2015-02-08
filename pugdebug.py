@@ -14,15 +14,19 @@ __author__="robertbasic"
 import sys
 
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from pugdebug import gui
+from pugdebug.gui import PugdebugMainWindow
+
+class Pugdebug():
+
+    def __init__(self, argv):
+        self.app = QApplication(argv)
+
+        self.main_window = PugdebugMainWindow()
+
+    def run(self):
+        self.main_window.show()
+        sys.exit(self.app.exec_())
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-
-    window = QMainWindow()
-
-    main_window = gui.PugdebugMain(window)
-
-    window.show()
-
-    sys.exit(app.exec_())
+    pugdebug = Pugdebug(sys.argv)
+    pugdebug.run()
