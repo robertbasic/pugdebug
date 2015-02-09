@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
 from pugdebug.models import PugdebugFileBrowser
+from pugdebug.viewers import *
 
 class PugdebugMainWindow(QMainWindow):
 
@@ -34,16 +35,18 @@ class PugdebugMainWindow(QMainWindow):
         self.setup_gui_elements()
 
     def setup_gui_elements(self):
-        self.setup_workarea_window()
         self.setup_file_browser_window()
         self.setup_settings_window()
 
-    def setup_workarea_window(self):
+        self.setup_workarea_window()
 
+    def setup_workarea_window(self):
+        self.workarea_window = PugdebugWorkareaWindow(self)
+        self.central_widget_layout.addWidget(self.workarea_window, 0, 1, 1, 1)
 
     def setup_file_browser_window(self):
-        self.file_browser = PugdebugFileBrowserWindow(self)
-        self.central_widget_layout.addWidget(self.file_browser, 0, 0, 1, 1)
+        self.file_browser_window = PugdebugFileBrowserWindow(self)
+        self.central_widget_layout.addWidget(self.file_browser_window, 0, 0, 1, 1)
 
     def setup_settings_window(self):
         self.settings_window = PugdebugSettingsWindow(self)
@@ -62,6 +65,25 @@ class PugdebugAbstractWindow(QWidget):
         self.parent = parent
 
         self.setLayout(self.layout)
+
+
+class PugdebugWorkareaWindow(QWidget):
+
+    def __init__(self, parent):
+        super(PugdebugWorkareaWindow, self).__init__(parent)
+
+        self.file_viewer = PugdebugFileViewer()
+        self.variable_viewer = PugdebugVariableViewer()
+        self.stacktrace_viewer = PugdebugStacktraceViewer()
+        self.breakpoint_viewer = PugdebugBreakpointViewer()
+
+        layout = QGridLayout()
+        self.setLayout(layout)
+
+        layout.addWidget(self.file_viewer, 0, 0, 1, 1)
+        layout.addWidget(self.variable_viewer, 0, 1, 1, 1)
+        layout.addWidget(self.stacktrace_viewer, 1, 0, 1, 1)
+        layout.addWidget(self.breakpoint_viewer, 1, 1, 1, 1)
 
 
 class PugdebugFileBrowserWindow(PugdebugAbstractWindow):
