@@ -10,22 +10,17 @@
 __author__="robertbasic"
 
 import os
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QFileSystemModel, QTreeView
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
-class PugdebugFileBrowser(QWidget):
+class PugdebugFileBrowser(QFileSystemModel):
 
     def __init__(self):
         super(PugdebugFileBrowser, self).__init__()
 
-        tree = QTreeView(self)
-
         home_path = os.path.expanduser('~')
 
-        self.model = QFileSystemModel()
-        self.model.setRootPath(home_path)
+        self.setRootPath(home_path)
 
-        index = self.model.index(home_path)
-
-        tree.setModel(self.model)
-        tree.setRootIndex(index)
+        self.start_index = self.index(home_path)

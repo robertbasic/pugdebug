@@ -24,7 +24,7 @@ class Pugdebug():
         self.main_window = PugdebugMainWindow()
 
     def run(self):
-        self.main_window.show()
+        self.main_window.showMaximized()
         sys.exit(self.app.exec_())
 
 if __name__ == "__main__":
