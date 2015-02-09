@@ -53,20 +53,6 @@ class PugdebugMainWindow(QMainWindow):
         self.central_widget_layout.addWidget(self.settings_window, 1, 0, 1, 1)
 
 
-class PugdebugAbstractWindow(QWidget):
-
-    parent = None
-
-    layout = QGridLayout()
-
-    def __init__(self, parent):
-        super(PugdebugAbstractWindow, self).__init__()
-
-        self.parent = parent
-
-        self.setLayout(self.layout)
-
-
 class PugdebugWorkareaWindow(QWidget):
 
     def __init__(self, parent):
@@ -86,7 +72,7 @@ class PugdebugWorkareaWindow(QWidget):
         layout.addWidget(self.breakpoint_viewer, 1, 1, 1, 1)
 
 
-class PugdebugFileBrowserWindow(PugdebugAbstractWindow):
+class PugdebugFileBrowserWindow(QWidget):
 
     def __init__(self, parent):
         super(PugdebugFileBrowserWindow, self).__init__(parent)
@@ -98,10 +84,13 @@ class PugdebugFileBrowserWindow(PugdebugAbstractWindow):
         tree.setModel(model)
         tree.setRootIndex(model.start_index)
 
-        self.layout.addWidget(tree, 0, 0, 1, 1)
+        layout = QGridLayout()
+        self.setLayout(layout)
+
+        layout.addWidget(tree, 0, 0, 1, 1)
 
 
-class PugdebugSettingsWindow(PugdebugAbstractWindow):
+class PugdebugSettingsWindow(QWidget):
 
     layout = QFormLayout()
 
@@ -112,4 +101,7 @@ class PugdebugSettingsWindow(PugdebugAbstractWindow):
         port_number.setRange(1, 65535)
         port_number.setValue(9000)
 
-        self.layout.addRow("Port:", port_number)
+        layout = QFormLayout()
+        self.setLayout(layout)
+
+        layout.addRow("Port:", port_number)
