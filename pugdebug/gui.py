@@ -34,22 +34,40 @@ class PugdebugMainWindow(QMainWindow):
         self.setup_gui_elements()
 
     def setup_gui_elements(self):
-        self.setup_file_browser()
+        self.setup_workarea_window()
+        self.setup_file_browser_window()
         self.setup_settings_window()
 
-    def setup_file_browser(self):
-        self.file_browser = PugdebugFileBrowserWindow()
+    def setup_workarea_window(self):
+
+
+    def setup_file_browser_window(self):
+        self.file_browser = PugdebugFileBrowserWindow(self)
         self.central_widget_layout.addWidget(self.file_browser, 0, 0, 1, 1)
 
     def setup_settings_window(self):
-        self.settings_window = PugdebugSettingsWindow()
+        self.settings_window = PugdebugSettingsWindow(self)
         self.central_widget_layout.addWidget(self.settings_window, 1, 0, 1, 1)
 
 
-class PugdebugFileBrowserWindow(QWidget):
+class PugdebugAbstractWindow(QWidget):
 
-    def __init__(self):
-        super(PugdebugFileBrowserWindow, self).__init__()
+    parent = None
+
+    layout = QGridLayout()
+
+    def __init__(self, parent):
+        super(PugdebugAbstractWindow, self).__init__()
+
+        self.parent = parent
+
+        self.setLayout(self.layout)
+
+
+class PugdebugFileBrowserWindow(PugdebugAbstractWindow):
+
+    def __init__(self, parent):
+        super(PugdebugFileBrowserWindow, self).__init__(parent)
 
         tree = QTreeView(self)
 
@@ -58,20 +76,18 @@ class PugdebugFileBrowserWindow(QWidget):
         tree.setModel(model)
         tree.setRootIndex(model.start_index)
 
-        layout = QGridLayout()
-        self.setLayout(layout)
-        layout.addWidget(tree, 0, 0, 1, 1)
+        self.layout.addWidget(tree, 0, 0, 1, 1)
 
 
-class PugdebugSettingsWindow(QWidget):
+class PugdebugSettingsWindow(PugdebugAbstractWindow):
 
-    def __init__(self):
-        super(PugdebugSettingsWindow, self).__init__()
+    layout = QFormLayout()
+
+    def __init__(self, parent):
+        super(PugdebugSettingsWindow, self).__init__(parent)
 
         port_number = QSpinBox()
         port_number.setRange(1, 65535)
         port_number.setValue(9000)
 
-        layout = QFormLayout()
-        self.setLayout(layout)
-        layout.addRow("Port:", port_number)
+        self.layout.addRow("Port:", port_number)
