@@ -21,6 +21,8 @@ class PugdebugFileBrowser(QFileSystemModel):
 
         home_path = os.path.expanduser('~')
 
-        self.setRootPath(home_path)
+        root_path = "%s/www/pxdebug" % home_path
 
-        self.start_index = self.index(home_path)
+        self.setRootPath(home_path )
+
+        self.start_index = self.index(root_path)

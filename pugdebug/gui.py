@@ -42,7 +42,7 @@ class PugdebugMainWindow(QMainWindow):
 
     def setup_workarea_window(self):
         self.workarea_window = PugdebugWorkareaWindow(self)
-        self.central_widget_layout.addWidget(self.workarea_window, 0, 1, 1, 1)
+        self.central_widget_layout.addWidget(self.workarea_window, 0, 1, 2, 1)
 
     def setup_file_browser_window(self):
         self.file_browser_window = PugdebugFileBrowserWindow(self)
@@ -77,17 +77,32 @@ class PugdebugFileBrowserWindow(QWidget):
     def __init__(self, parent):
         super(PugdebugFileBrowserWindow, self).__init__(parent)
 
-        tree = QTreeView(self)
-
         model = PugdebugFileBrowser()
 
-        tree.setModel(model)
-        tree.setRootIndex(model.start_index)
+        self.tree = QTreeView(self)
 
+        self.tree.setModel(model)
+        self.tree.setRootIndex(model.start_index)
+
+        self.setup_looks()
+
+
+    def setup_looks(self):
         layout = QGridLayout()
         self.setLayout(layout)
 
-        layout.addWidget(tree, 0, 0, 1, 1)
+        layout.addWidget(self.tree, 0, 0, 1, 1)
+
+        self.setMaximumWidth(300)
+
+        font = QFont('mono')
+        font.setStyleHint(QFont.Monospace)
+        font.setPixelSize(12)
+        self.tree.setFont(font)
+
+        self.tree.setColumnHidden(1, True)
+        self.tree.setColumnHidden(2, True)
+        self.tree.setColumnHidden(3, True)
 
 
 class PugdebugSettingsWindow(QWidget):
