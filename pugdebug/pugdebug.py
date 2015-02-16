@@ -20,6 +20,18 @@ class Pugdebug(QApplication):
         super(Pugdebug, self).__init__(argv)
 
         self.main_window = PugdebugMainWindow()
+        self.file_browser = self.main_window.get_file_browser()
+
+        self.connect_signals()
+
+    def connect_signals(self):
+        self.connect_file_browser()
+
+    def connect_file_browser(self):
+        self.file_browser.activated.connect(self.file_browser_item_activated)
+
+    def file_browser_item_activated(self, index):
+        print(self.file_browser.model().filePath(index))
 
     def run(self):
         self.main_window.showMaximized()
