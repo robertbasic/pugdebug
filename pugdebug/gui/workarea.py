@@ -9,9 +9,7 @@
 
 __author__="robertbasic"
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PyQt5.QtWidgets import QWidget, QGridLayout
 
 from pugdebug.gui.files import PugdebugFileViewer
 from pugdebug.gui.variables import PugdebugVariableViewer
