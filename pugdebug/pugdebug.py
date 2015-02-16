@@ -1,5 +1,3 @@
-#! python
-
 # -*- coding: utf-8 -*-
 
 """
@@ -13,20 +11,16 @@ __author__="robertbasic"
 
 import sys
 
-from PyQt5.QtWidgets import QApplication, QMainWindow
-from pugdebug.gui import PugdebugMainWindow
+from PyQt5.QtWidgets import QApplication
+from pugdebug.gui.main_window import PugdebugMainWindow
 
-class Pugdebug():
+class Pugdebug(QApplication):
 
     def __init__(self, argv):
-        self.app = QApplication(argv)
+        super(Pugdebug, self).__init__(argv)
 
         self.main_window = PugdebugMainWindow()
 
     def run(self):
         self.main_window.showMaximized()
-        sys.exit(self.app.exec_())
-
-if __name__ == "__main__":
-    pugdebug = Pugdebug(sys.argv)
-    pugdebug.run()
+        sys.exit(self.exec_())
