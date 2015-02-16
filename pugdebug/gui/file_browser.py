@@ -9,38 +9,31 @@
 
 __author__="robertbasic"
 
-from PyQt5.QtWidgets import QWidget, QTreeView, QGridLayout
+from PyQt5.QtWidgets import QWidget, QTreeView
 from PyQt5.QtGui import QFont
 
-from pugdebug.models.file_browser import PugdebugFileBrowser
+from pugdebug.models.file_browser import PugdebugFileBrowserModel
 
-class PugdebugFileBrowserWindow(QWidget):
+class PugdebugFileBrowser(QTreeView):
 
-    def __init__(self, parent):
-        super(PugdebugFileBrowserWindow, self).__init__(parent)
+    def __init__(self):
+        super(PugdebugFileBrowser, self).__init__()
 
-        model = PugdebugFileBrowser()
+        model = PugdebugFileBrowserModel()
 
-        self.tree = QTreeView(self)
-
-        self.tree.setModel(model)
-        self.tree.setRootIndex(model.start_index)
+        self.setModel(model)
+        self.setRootIndex(model.start_index)
 
         self.setup_looks()
 
     def setup_looks(self):
-        layout = QGridLayout()
-        self.setLayout(layout)
-
-        layout.addWidget(self.tree, 0, 0, 1, 1)
-
         self.setMaximumWidth(300)
 
         font = QFont('mono')
         font.setStyleHint(QFont.Monospace)
         font.setPixelSize(12)
-        self.tree.setFont(font)
+        self.setFont(font)
 
-        self.tree.setColumnHidden(1, True)
-        self.tree.setColumnHidden(2, True)
-        self.tree.setColumnHidden(3, True)
+        self.setColumnHidden(1, True)
+        self.setColumnHidden(2, True)
+        self.setColumnHidden(3, True)

@@ -11,7 +11,7 @@ __author__="robertbasic"
 
 from PyQt5.QtWidgets import QMainWindow, QGridLayout, QWidget
 
-from pugdebug.gui.file_browser import PugdebugFileBrowserWindow
+from pugdebug.gui.file_browser import PugdebugFileBrowser
 from pugdebug.gui.settings import PugdebugSettingsWindow
 from pugdebug.gui.workarea import PugdebugWorkareaWindow
 
@@ -42,9 +42,12 @@ class PugdebugMainWindow(QMainWindow):
         self.central_widget_layout.addWidget(self.workarea_window, 0, 1, 2, 1)
 
     def setup_file_browser_window(self):
-        self.file_browser_window = PugdebugFileBrowserWindow(self)
-        self.central_widget_layout.addWidget(self.file_browser_window, 0, 0, 1, 1)
+        self.file_browser = PugdebugFileBrowser()
+        self.central_widget_layout.addWidget(self.file_browser, 0, 0, 1, 1)
 
     def setup_settings_window(self):
         self.settings_window = PugdebugSettingsWindow(self)
         self.central_widget_layout.addWidget(self.settings_window, 1, 0, 1, 1)
+
+    def get_file_browser(self):
+        return self.file_browser

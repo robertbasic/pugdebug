@@ -13,10 +13,10 @@ import os
 
 from PyQt5.QtWidgets import QFileSystemModel
 
-class PugdebugFileBrowser(QFileSystemModel):
+class PugdebugFileBrowserModel(QFileSystemModel):
 
     def __init__(self):
-        super(PugdebugFileBrowser, self).__init__()
+        super(PugdebugFileBrowserModel, self).__init__()
 
         home_path = os.path.expanduser('~')
 
