@@ -28,6 +28,10 @@ class PugdebugDocuments():
 
         return document
 
+    def is_document_open(self, path):
+        path_key = self.get_path_key(path)
+        return path_key in self.open_documents
+
     def get_path_key(self, path):
         path_key = hashlib.md5(path.encode('utf-8'))
         return path_key.hexdigest()

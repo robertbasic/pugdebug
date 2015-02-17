@@ -40,13 +40,14 @@ class Pugdebug(QApplication):
         self.open_document(path)
 
     def open_document(self, path):
-        document = self.documents.open_document(path)
+        if not self.documents.is_document_open(path):
+            document = self.documents.open_document(path)
 
-        doc = PugdebugDocument()
-        doc.appendPlainText(document.contents)
+            doc = PugdebugDocument()
+            doc.appendPlainText(document.contents)
 
-        tab_index = self.document_viewer.addTab(doc, document.filename)
-        self.document_viewer.setCurrentIndex(tab_index)
+            tab_index = self.document_viewer.addTab(doc, document.filename)
+            self.document_viewer.setCurrentIndex(tab_index)
 
     def run(self):
         self.main_window.showMaximized()
