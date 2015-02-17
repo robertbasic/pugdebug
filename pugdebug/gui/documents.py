@@ -11,9 +11,9 @@ __author__="robertbasic"
 
 from PyQt5.QtWidgets import QTabWidget
 
-class PugdebugFileViewer(QTabWidget):
+class PugdebugDocumentViewer(QTabWidget):
 
     def __init__(self):
-        super(PugdebugFileViewer, self).__init__()
+        super(PugdebugDocumentViewer, self).__init__()
 
         self.setTabsClosable(True)

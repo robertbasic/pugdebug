@@ -13,6 +13,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 from pugdebug.gui.main_window import PugdebugMainWindow
+from pugdebug.models.documents import PugdebugDocuments
 
 class Pugdebug(QApplication):
 
@@ -21,17 +22,26 @@ class Pugdebug(QApplication):
 
         self.main_window = PugdebugMainWindow()
         self.file_browser = self.main_window.get_file_browser()
+        self.document_viewer = self.main_window.get_document_viewer()
+
+        self.documents = PugdebugDocuments()
 
         self.connect_signals()
 
     def connect_signals(self):
-        self.connect_file_browser()
+        self.connect_file_browser_signals()
 
-    def connect_file_browser(self):
+    def connect_file_browser_signals(self):
         self.file_browser.activated.connect(self.file_browser_item_activated)
 
     def file_browser_item_activated(self, index):
-        print(self.file_browser.model().filePath(index))
+        path = self.file_browser.model().filePath(index)
+        self.open_document(path)
+
+    def open_document(self, path):
+        self.documents.open_document(path)
+        tab_index = self.document_viewer.addTab(path, path.encode('utf-8'))
+        self.document_viewer.setCurrentIndex(tab_index)
 
     def run(self):
         self.main_window.showMaximized()

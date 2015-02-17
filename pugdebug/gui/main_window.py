@@ -51,3 +51,6 @@ class PugdebugMainWindow(QMainWindow):
 
     def get_file_browser(self):
         return self.file_browser
+
+    def get_document_viewer(self):
+        return self.workarea_window.get_document_viewer()
