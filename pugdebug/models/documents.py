@@ -11,6 +11,8 @@ __author__="robertbasic"
 
 import hashlib
 
+from pugdebug.models.document import PugdebugDocument
+
 class PugdebugDocuments():
 
     open_documents = {}
@@ -21,6 +23,10 @@ class PugdebugDocuments():
     def open_document(self, path):
         path_key = self.get_path_key(path)
         self.open_documents[path_key] = path
+
+        document = PugdebugDocument(path)
+
+        return document
 
     def get_path_key(self, path):
         path_key = hashlib.md5(path.encode('utf-8'))

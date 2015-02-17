@@ -13,6 +13,7 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 from pugdebug.gui.main_window import PugdebugMainWindow
+from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
 
 class Pugdebug(QApplication):
@@ -39,8 +40,12 @@ class Pugdebug(QApplication):
         self.open_document(path)
 
     def open_document(self, path):
-        self.documents.open_document(path)
-        tab_index = self.document_viewer.addTab(path, path.encode('utf-8'))
+        document = self.documents.open_document(path)
+
+        doc = PugdebugDocument()
+        doc.appendPlainText(document.contents)
+
+        tab_index = self.document_viewer.addTab(doc, document.filename)
         self.document_viewer.setCurrentIndex(tab_index)
 
     def run(self):
