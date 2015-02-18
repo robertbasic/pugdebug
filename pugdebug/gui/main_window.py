@@ -9,7 +9,7 @@
 
 __author__="robertbasic"
 
-from PyQt5.QtWidgets import QMainWindow, QGridLayout, QWidget
+from PyQt5.QtWidgets import QMainWindow, QGridLayout, QWidget, QToolBar, QPushButton
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
 from pugdebug.gui.settings import PugdebugSettingsWindow
@@ -37,6 +37,8 @@ class PugdebugMainWindow(QMainWindow):
 
         self.setup_workarea_window()
 
+        self.setup_toolbar()
+
     def setup_workarea_window(self):
         self.workarea_window = PugdebugWorkareaWindow(self)
         self.central_widget_layout.addWidget(self.workarea_window, 0, 1, 2, 1)
@@ -48,6 +50,17 @@ class PugdebugMainWindow(QMainWindow):
     def setup_settings_window(self):
         self.settings_window = PugdebugSettingsWindow(self)
         self.central_widget_layout.addWidget(self.settings_window, 1, 0, 1, 1)
+
+    def setup_toolbar(self):
+        toolbar = QToolBar()
+
+        self.start_debug_action = toolbar.addAction("Start")
+        self.stop_debug_action = toolbar.addAction("Stop")
+        self.step_over_action = toolbar.addAction("Over")
+        self.step_in_action = toolbar.addAction("In")
+        self.step_out_action = toolbar.addAction("Out")
+
+        self.addToolBar(toolbar)
 
     def get_file_browser(self):
         return self.file_browser

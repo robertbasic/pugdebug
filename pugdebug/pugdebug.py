@@ -12,6 +12,7 @@ __author__="robertbasic"
 import sys
 
 from PyQt5.QtWidgets import QApplication
+from pugdebug.debugger import PugdebugDebugger
 from pugdebug.gui.main_window import PugdebugMainWindow
 from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
@@ -20,6 +21,8 @@ class Pugdebug(QApplication):
 
     def __init__(self, argv):
         super(Pugdebug, self).__init__(argv)
+
+        self.debugger = PugdebugDebugger()
 
         self.main_window = PugdebugMainWindow()
         self.file_browser = self.main_window.get_file_browser()
@@ -32,8 +35,17 @@ class Pugdebug(QApplication):
     def connect_signals(self):
         self.connect_file_browser_signals()
 
+        self.connect_toolbar_action_signals()
+
     def connect_file_browser_signals(self):
         self.file_browser.activated.connect(self.file_browser_item_activated)
+
+    def connect_toolbar_action_signals(self):
+        self.main_window.start_debug_action.triggered.connect(self.start_debug)
+        self.main_window.stop_debug_action.triggered.connect(self.stop_debug)
+        self.main_window.step_over_action.triggered.connect(self.step_over)
+        self.main_window.step_in_action.triggered.connect(self.step_in)
+        self.main_window.step_out_action.triggered.connect(self.step_out)
 
     def file_browser_item_activated(self, index):
         path = self.file_browser.model().filePath(index)
@@ -49,6 +61,21 @@ class Pugdebug(QApplication):
             self.document_viewer.add_tab(doc, document.filename, path)
         else:
             self.document_viewer.focus_tab(path)
+
+    def start_debug(self):
+        self.debugger.start_debug()
+
+    def stop_debug(self):
+        self.debugger.stop_debug()
+
+    def step_over(self):
+        self.debugger.step_over()
+
+    def step_in(self):
+        self.debugger.step_in()
+
+    def step_out(self):
+        self.debugger.step_out()
 
     def run(self):
         self.main_window.showMaximized()
