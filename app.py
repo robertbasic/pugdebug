@@ -13,8 +13,11 @@ __author__="robertbasic"
 
 import sys
 
+from PyQt5.QtWidgets import QApplication
 from pugdebug.pugdebug import Pugdebug
 
 if __name__ == "__main__":
-    pugdebug = Pugdebug(sys.argv)
+    app = QApplication(sys.argv)
+    pugdebug = Pugdebug()
     pugdebug.run()
+    app.exit(app.exec_())

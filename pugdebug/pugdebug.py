@@ -11,17 +11,14 @@ __author__="robertbasic"
 
 import sys
 
-from PyQt5.QtWidgets import QApplication
 from pugdebug.debugger import PugdebugDebugger
 from pugdebug.gui.main_window import PugdebugMainWindow
 from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
 
-class Pugdebug(QApplication):
+class Pugdebug():
 
-    def __init__(self, argv):
-        super(Pugdebug, self).__init__(argv)
-
+    def __init__(self):
         self.debugger = PugdebugDebugger()
 
         self.main_window = PugdebugMainWindow()
@@ -79,4 +76,3 @@ class Pugdebug(QApplication):
 
     def run(self):
         self.main_window.showMaximized()
-        sys.exit(self.exec_())
