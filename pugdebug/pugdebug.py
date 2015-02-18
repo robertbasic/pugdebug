@@ -15,6 +15,7 @@ from pugdebug.debugger import PugdebugDebugger
 from pugdebug.gui.main_window import PugdebugMainWindow
 from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
+from pugdebug.models.file_browser import PugdebugFileBrowser
 
 class Pugdebug():
 
@@ -27,7 +28,15 @@ class Pugdebug():
 
         self.documents = PugdebugDocuments()
 
+        self.setup_file_browser()
+
         self.connect_signals()
+
+    def setup_file_browser(self):
+        model = PugdebugFileBrowser(self.main_window)
+        self.file_browser.setModel(model)
+        self.file_browser.setRootIndex(model.start_index)
+        self.file_browser.hide_columns()
 
     def connect_signals(self):
         self.connect_file_browser_signals()

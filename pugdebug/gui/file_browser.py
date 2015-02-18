@@ -12,17 +12,11 @@ __author__="robertbasic"
 from PyQt5.QtWidgets import QWidget, QTreeView
 from PyQt5.QtGui import QFont
 
-from pugdebug.models.file_browser import PugdebugFileBrowserModel
 
 class PugdebugFileBrowser(QTreeView):
 
     def __init__(self):
         super(PugdebugFileBrowser, self).__init__()
-
-        model = PugdebugFileBrowserModel()
-
-        self.setModel(model)
-        self.setRootIndex(model.start_index)
 
         self.setup_looks()
 
@@ -34,6 +28,7 @@ class PugdebugFileBrowser(QTreeView):
         font.setPixelSize(12)
         self.setFont(font)
 
+    def hide_columns(self):
         self.setColumnHidden(1, True)
         self.setColumnHidden(2, True)
         self.setColumnHidden(3, True)

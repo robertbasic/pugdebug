@@ -13,15 +13,15 @@ import os
 
 from PyQt5.QtWidgets import QFileSystemModel
 
-class PugdebugFileBrowserModel(QFileSystemModel):
+class PugdebugFileBrowser(QFileSystemModel):
 
-    def __init__(self):
-        super(PugdebugFileBrowserModel, self).__init__()
+    def __init__(self, parent):
+        super(PugdebugFileBrowser, self).__init__(parent)
 
         home_path = os.path.expanduser('~')
 
         root_path = "%s/www/pxdebug" % home_path
 
-        self.setRootPath(home_path )
+        self.setRootPath(home_path)
 
         self.start_index = self.index(root_path)
