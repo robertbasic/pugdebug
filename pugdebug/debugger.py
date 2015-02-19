@@ -33,22 +33,12 @@ class PugdebugDebugger():
 
         try:
             server.bind(('', 9000))
-        except server.error as socketerror:
-            print(socketerror)
+            self.init_connection(server)
+        except OSError:
+            self.is_running = False
             print("Socket bind failed")
-
-        server.listen(5)
-
-        try:
-            print('Waiting for connection ...')
-            self.sock, self.address = server.accept()
-            self.sock.settimeout(None)
-            self.read_init_message()
-        except:
+        finally:
             server.close()
-            raise
-
-        server.close()
 
     def stop_debug(self):
         print('stop')
@@ -61,6 +51,15 @@ class PugdebugDebugger():
 
     def step_out(self):
         print('out')
+
+    def init_connection(self, server):
+        server.listen(5)
+
+        print('Waiting for connection ...')
+
+        self.sock, self.address = server.accept()
+        self.sock.settimeout(None)
+        self.read_init_message()
 
     def read_init_message(self):
         print(self.sock.recv(1024))
