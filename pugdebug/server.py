@@ -18,6 +18,8 @@ class PugdebugServer():
 
     is_connected = False
 
+    xdebug_encoding = 'iso-8859-1'
+
     def connect(self):
         self.is_connected = True
 
@@ -32,6 +34,11 @@ class PugdebugServer():
             print("Socket bind failed")
         finally:
             server.close()
+
+    def close(self):
+        self.is_connected = False
+        self.sock.close()
+        self.sock = None
 
     def init_connection(self, server):
         server.listen(5)
@@ -58,10 +65,15 @@ class PugdebugServer():
         while True:
             character = self.sock.recv(1)
 
-            if character.isdigit():
-                length = length + character.decode('utf-8')
+            if self.is_eof(character):
+                self.close()
 
-            if character.decode('utf-8') == '\0':
+            if character.isdigit():
+                length = length + character.decode(self.xdebug_encoding)
+
+            if character.decode(self.xdebug_encoding) == '\0':
+                if length == '':
+                    return 0
                 return int(length)
 
     def get_message_body(self, length):
@@ -70,8 +82,14 @@ class PugdebugServer():
         while length > 0:
             data = self.sock.recv(length)
 
-            body = body + data.decode('utf-8')
+            if self.is_eof(data):
+                self.close()
+
+            body = body + data.decode(self.xdebug_encoding)
 
             length = length - len(data)
 
         return body
+
+    def is_eof(self, data):
+        return data.decode(self.xdebug_encoding) == ''
