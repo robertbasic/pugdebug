@@ -73,8 +73,7 @@ class Pugdebug():
 
         self.open_document(current_file)
 
-        index = self.document_viewer.currentIndex()
-        doc = self.document_viewer.widget(index)
+        doc = self.document_viewer.get_current_document()
         doc.move_to_line(current_line)
 
     def start_debug(self):

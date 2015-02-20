@@ -34,3 +34,7 @@ class PugdebugDocumentViewer(QTabWidget):
 
         if tab_index is not None:
             self.setCurrentIndex(tab_index)
+
+    def get_current_document(self):
+        index = self.currentIndex()
+        return self.widget(index)
