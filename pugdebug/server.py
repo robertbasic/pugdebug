@@ -93,7 +93,19 @@ class PugdebugServer():
 
             length = length - len(data)
 
+        self.get_null()
+
         return body
+
+    def get_null(self):
+        while True:
+            character = self.sock.recv(1)
+
+            if self.is_eof(character):
+                self.close()
+
+            if character.decode(self.xdebug_encoding) == '\0':
+                return
 
     def is_eof(self, data):
         return data.decode(self.xdebug_encoding) == ''
