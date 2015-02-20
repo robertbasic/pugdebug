@@ -19,6 +19,8 @@ class PugdebugDebugger():
     server = None
     parser = None
 
+    transaction_id = 0
+
     def __init__(self):
         self.server = PugdebugServer()
         self.parser = PugdebugMessageParser()
@@ -36,6 +38,8 @@ class PugdebugDebugger():
 
     def step_in(self):
         print('in')
+        command = 'step_into -i %d' % self.get_transaction_id()
+        self.server.command(command)
 
     def step_out(self):
         print('out')
@@ -48,3 +52,7 @@ class PugdebugDebugger():
     def get_index_file(self):
         init_message = self.get_init_message()
         return init_message['fileuri'].replace('file://', '')
+
+    def get_transaction_id(self):
+        self.transaction_id += 1
+        return self.transaction_id

@@ -42,6 +42,9 @@ class PugdebugServer():
         self.sock.close()
         self.sock = None
 
+    def command(self, command):
+        self.sock.send(bytes(command + '\0', 'utf-8'))
+
     def init_connection(self, server):
         server.listen(5)
 
