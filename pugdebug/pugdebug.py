@@ -70,6 +70,8 @@ class Pugdebug():
 
     def start_debug(self):
         self.debugger.start_debug()
+        index_file = self.debugger.get_index_file()
+        self.open_document(index_file)
 
     def stop_debug(self):
         self.debugger.stop_debug()

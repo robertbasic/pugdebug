@@ -17,6 +17,7 @@ class PugdebugServer():
     address = None
 
     is_connected = False
+    init_message = ''
 
     xdebug_encoding = 'iso-8859-1'
 
@@ -31,6 +32,7 @@ class PugdebugServer():
             self.init_connection(server)
         except OSError:
             self.is_connected = False
+            print(OSError.strerror())
             print("Socket bind failed")
         finally:
             server.close()
@@ -50,8 +52,10 @@ class PugdebugServer():
         self.read_init_message()
 
     def read_init_message(self):
-        message = self.receive_message()
-        print(message)
+        self.init_message = self.receive_message()
+
+    def get_init_message(self):
+        return self.init_message
 
     def receive_message(self):
         length = self.get_message_length()

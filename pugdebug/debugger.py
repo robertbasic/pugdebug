@@ -12,13 +12,16 @@ __author__="robertbasic"
 import socket
 
 from pugdebug.server import PugdebugServer
+from pugdebug.message_parser import PugdebugMessageParser
 
 class PugdebugDebugger():
 
     server = None
+    parser = None
 
     def __init__(self):
         self.server = PugdebugServer()
+        self.parser = PugdebugMessageParser()
 
     def start_debug(self):
         if not self.server.is_connected:
@@ -35,3 +38,12 @@ class PugdebugDebugger():
 
     def step_out(self):
         print('out')
+
+    def get_init_message(self):
+        init_message = self.server.get_init_message()
+        init_message = self.parser.parse_init_message(init_message)
+        return init_message
+
+    def get_index_file(self):
+        init_message = self.get_init_message()
+        return init_message['fileuri'].replace('file://', '')
