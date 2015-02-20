@@ -29,6 +29,7 @@ class PugdebugDebugger():
 
     def stop_debug(self):
         print('stop')
+        self.server.close()
 
     def step_over(self):
         print('over')
