@@ -61,12 +61,21 @@ class Pugdebug():
         if not self.documents.is_document_open(path):
             document = self.documents.open_document(path)
 
-            doc = PugdebugDocument()
-            doc.appendPlainText(document.contents)
+            doc = PugdebugDocument(document.contents)
 
             self.document_viewer.add_tab(doc, document.filename, path)
         else:
             self.document_viewer.focus_tab(path)
+
+    def focus_current_line(self):
+        current_file = self.debugger.get_current_file()
+        current_line = self.debugger.get_current_line()
+
+        self.open_document(current_file)
+
+        index = self.document_viewer.currentIndex()
+        doc = self.document_viewer.widget(index)
+        doc.move_to_line(current_line)
 
     def start_debug(self):
         self.debugger.start_debug()

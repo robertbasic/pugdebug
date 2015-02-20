@@ -58,6 +58,12 @@ class PugdebugDebugger():
         init_message = self.get_init_message()
         return init_message['fileuri'].replace('file://', '')
 
+    def get_current_file(self):
+        return self.last_message['filename'].replace('file://', '')
+
+    def get_current_line(self):
+        return int(self.last_message['lineno'])
+
     def get_transaction_id(self):
         self.transaction_id += 1
         return self.transaction_id
