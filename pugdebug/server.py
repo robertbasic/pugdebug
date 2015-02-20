@@ -18,6 +18,7 @@ class PugdebugServer():
 
     is_connected = False
     init_message = ''
+    last_message = ''
 
     xdebug_encoding = 'iso-8859-1'
 
@@ -44,6 +45,7 @@ class PugdebugServer():
 
     def command(self, command):
         self.sock.send(bytes(command + '\0', 'utf-8'))
+        self.read_last_message()
 
     def init_connection(self, server):
         server.listen(5)
@@ -59,6 +61,12 @@ class PugdebugServer():
 
     def get_init_message(self):
         return self.init_message
+
+    def read_last_message(self):
+        self.last_message = self.receive_message()
+
+    def get_last_message(self):
+        return self.last_message
 
     def receive_message(self):
         length = self.get_message_length()

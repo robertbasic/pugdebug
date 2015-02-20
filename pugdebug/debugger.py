@@ -19,6 +19,8 @@ class PugdebugDebugger():
     server = None
     parser = None
 
+    last_message = ''
+
     transaction_id = 0
 
     def __init__(self):
@@ -40,6 +42,9 @@ class PugdebugDebugger():
         print('in')
         command = 'step_into -i %d' % self.get_transaction_id()
         self.server.command(command)
+
+        last_message = self.server.get_last_message()
+        self.last_message = self.parser.parse_continuation_message(last_message)
 
     def step_out(self):
         print('out')
