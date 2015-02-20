@@ -38,7 +38,7 @@ class PugdebugDebugger():
     def step_over(self):
         print('over')
 
-    def step_in(self):
+    def step_into(self):
         print('in')
         command = 'step_into -i %d' % self.get_transaction_id()
         self.server.command(command)

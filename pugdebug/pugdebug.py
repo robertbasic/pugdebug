@@ -50,7 +50,7 @@ class Pugdebug():
         self.main_window.start_debug_action.triggered.connect(self.start_debug)
         self.main_window.stop_debug_action.triggered.connect(self.stop_debug)
         self.main_window.step_over_action.triggered.connect(self.step_over)
-        self.main_window.step_in_action.triggered.connect(self.step_in)
+        self.main_window.step_into_action.triggered.connect(self.step_into)
         self.main_window.step_out_action.triggered.connect(self.step_out)
 
     def file_browser_item_activated(self, index):
@@ -70,10 +70,11 @@ class Pugdebug():
 
     def start_debug(self):
         self.debugger.start_debug()
+
         index_file = self.debugger.get_index_file()
         self.open_document(index_file)
 
-        self.step_in()
+        self.step_into()
 
     def stop_debug(self):
         self.debugger.stop_debug()
@@ -81,8 +82,10 @@ class Pugdebug():
     def step_over(self):
         self.debugger.step_over()
 
-    def step_in(self):
-        self.debugger.step_in()
+    def step_into(self):
+        self.debugger.step_into()
+
+        self.focus_current_line()
 
     def step_out(self):
         self.debugger.step_out()

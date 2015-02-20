@@ -57,7 +57,7 @@ class PugdebugMainWindow(QMainWindow):
         self.start_debug_action = toolbar.addAction("Start")
         self.stop_debug_action = toolbar.addAction("Stop")
         self.step_over_action = toolbar.addAction("Over")
-        self.step_in_action = toolbar.addAction("In")
+        self.step_into_action = toolbar.addAction("In")
         self.step_out_action = toolbar.addAction("Out")
 
         self.addToolBar(toolbar)
