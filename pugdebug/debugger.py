@@ -37,6 +37,11 @@ class PugdebugDebugger():
 
     def step_over(self):
         print('over')
+        command = 'step_over -i %d' % self.get_transaction_id()
+        self.server.command(command)
+
+        last_message = self.server.get_last_message()
+        self.last_message = self.parser.parse_continuation_message(last_message)
 
     def step_into(self):
         print('in')
@@ -48,6 +53,11 @@ class PugdebugDebugger():
 
     def step_out(self):
         print('out')
+        command = 'step_out -i %d' % self.get_transaction_id()
+        self.server.command(command)
+
+        last_message = self.server.get_last_message()
+        self.last_message = self.parser.parse_continuation_message(last_message)
 
     def get_init_message(self):
         init_message = self.server.get_init_message()

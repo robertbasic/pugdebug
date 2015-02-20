@@ -91,6 +91,8 @@ class Pugdebug():
     def step_over(self):
         self.debugger.step_over()
 
+        self.focus_current_line()
+
     def step_into(self):
         self.debugger.step_into()
 
@@ -98,6 +100,8 @@ class Pugdebug():
 
     def step_out(self):
         self.debugger.step_out()
+
+        self.focus_current_line()
 
     def run(self):
         self.main_window.showMaximized()
