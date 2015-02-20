@@ -23,8 +23,8 @@ class PugdebugMessageParser():
 
         xml = xml_parser.fromstring(message)
 
-        for attrib in (attrib for attrib in xml.attrib if attrib in ['fileuri', 'idekey']):
-            init_message[attrib] = xml.attrib[attrib]
+        attribs = ['fileuri', 'idekey']
+        init_message = self.get_attribs(xml, attribs, init_message)
 
         for element in xml.getchildren():
             tag_name = element.tag.replace(self.namespace, '')
@@ -37,3 +37,22 @@ class PugdebugMessageParser():
             init_message[tag_name] = tag_value
 
         return init_message
+
+    def parse_continuation_message(self, message):
+        continuation_message = {}
+
+        xml = xml_parser.fromstring(message)
+
+        attribs = ['command', 'transaction_id', 'status', 'reason']
+        continuation_message = self.get_attribs(xml, attribs, continuation_message)
+
+        attribs = ['filename', 'lineno']
+        continuation_message = self.get_attribs(xml[0], attribs, continuation_message)
+
+        return continuation_message
+
+    def get_attribs(self, xml, attribs, result):
+        for attrib in (attrib for attrib in xml.attrib if attrib in attribs):
+            result[attrib] = xml.attrib[attrib]
+
+        return result

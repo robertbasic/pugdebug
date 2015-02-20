@@ -35,3 +35,20 @@ class PugdebugMessageParserTest(unittest.TestCase):
         }
 
         self.assertEqual(expected, result)
+
+    def test_parse_step_in_message(self):
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="step_into" transaction_id="1" status="break" reason="ok"><xdebug:message filename="file:///home/robert/www/pxdebug/index.php" lineno="3"></xdebug:message></response>'
+
+        result = self.parser.parse_continuation_message(message)
+
+        expected = {
+            'command': 'step_into',
+            'transaction_id': '1',
+            'status': 'break',
+            'reason': 'ok',
+            'filename': 'file:///home/robert/www/pxdebug/index.php',
+            'lineno': '3'
+        }
+
+        self.assertEqual(expected, result)
