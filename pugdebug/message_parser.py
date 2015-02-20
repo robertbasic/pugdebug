@@ -46,8 +46,9 @@ class PugdebugMessageParser():
         attribs = ['command', 'transaction_id', 'status', 'reason']
         continuation_message = self.get_attribs(xml, attribs, continuation_message)
 
-        attribs = ['filename', 'lineno']
-        continuation_message = self.get_attribs(xml[0], attribs, continuation_message)
+        if len(xml.getchildren()) == 1:
+            attribs = ['filename', 'lineno']
+            continuation_message = self.get_attribs(xml[0], attribs, continuation_message)
 
         return continuation_message
 
