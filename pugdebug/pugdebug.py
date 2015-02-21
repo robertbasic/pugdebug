@@ -49,6 +49,7 @@ class Pugdebug():
     def connect_toolbar_action_signals(self):
         self.main_window.start_debug_action.triggered.connect(self.start_debug)
         self.main_window.stop_debug_action.triggered.connect(self.stop_debug)
+        self.main_window.run_debug_action.triggered.connect(self.run_debug)
         self.main_window.step_over_action.triggered.connect(self.step_over)
         self.main_window.step_into_action.triggered.connect(self.step_into)
         self.main_window.step_out_action.triggered.connect(self.step_out)
@@ -86,6 +87,11 @@ class Pugdebug():
 
     def stop_debug(self):
         self.debugger.stop_debug()
+
+    def run_debug(self):
+        self.debugger.run_debug()
+
+        self.focus_current_line()
 
     def step_over(self):
         self.debugger.step_over()

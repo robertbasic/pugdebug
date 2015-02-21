@@ -38,6 +38,14 @@ class PugdebugDebugger():
         print('stop')
         self.server.close()
 
+    def run_debug(self):
+        print('run')
+        command = 'run -i %d' % self.get_transaction_id()
+        self.server.command(command)
+
+        last_message = self.server.get_last_message()
+        self.last_message = self.parser.parse_continuation_message(last_message)
+
     def step_over(self):
         print('over')
         command = 'step_over -i %d' % self.get_transaction_id()
