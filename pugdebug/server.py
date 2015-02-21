@@ -22,6 +22,9 @@ class PugdebugServer():
 
     xdebug_encoding = 'iso-8859-1'
 
+    def __del__(self):
+        self.close()
+
     def connect(self):
         self.is_connected = True
 
