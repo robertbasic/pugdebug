@@ -39,9 +39,10 @@ class PugdebugServer():
             server.close()
 
     def close(self):
-        self.is_connected = False
-        self.sock.close()
-        self.sock = None
+        if self.sock is not None:
+            self.is_connected = False
+            self.sock.close()
+            self.sock = None
 
     def command(self, command):
         self.sock.send(bytes(command + '\0', 'utf-8'))
