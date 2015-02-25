@@ -63,7 +63,17 @@ class PugdebugMainWindow(QMainWindow):
         self.step_into_action = toolbar.addAction("In")
         self.step_out_action = toolbar.addAction("Out")
 
+        self.toggle_actions(False)
+
         self.addToolBar(toolbar)
+
+    def toggle_actions(self, enabled):
+        self.run_debug_action.setEnabled(enabled)
+        self.step_over_action.setEnabled(enabled)
+        self.step_into_action.setEnabled(enabled)
+        self.step_out_action.setEnabled(enabled)
+
+        self.start_debug_action.setEnabled(not enabled)
 
     def get_file_browser(self):
         return self.file_browser

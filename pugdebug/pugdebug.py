@@ -153,6 +153,8 @@ class Pugdebug():
         """
         self.main_window.set_statusbar_text("Debugging in progress...")
 
+        self.main_window.toggle_actions(True)
+
         self.focus_current_line()
 
         self.step_into()
@@ -163,6 +165,8 @@ class Pugdebug():
 
     def stop_debug(self):
         self.debugger.stop_debug()
+
+        self.main_window.toggle_actions(False)
 
         self.main_window.set_statusbar_text("Debugging stopped...")
 
