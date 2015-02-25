@@ -17,7 +17,6 @@ from PyQt5.QtNetwork import QTcpServer, QHostAddress
 class PugdebugServer(QTcpServer):
 
     sock = None
-    address = None
 
     is_init_message_read = False
 
@@ -46,7 +45,8 @@ class PugdebugServer(QTcpServer):
             self.sock.readyRead.connect(self.handle_ready_read)
 
     def command(self, command):
-        self.sock.write(bytes(command + '\0', 'utf-8'))
+        if not self.sock is None:
+            self.sock.write(bytes(command + '\0', 'utf-8'))
 
     def handle_ready_read(self):
         if not self.is_init_message_read:
