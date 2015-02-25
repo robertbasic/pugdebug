@@ -19,8 +19,6 @@ class PugdebugServer(QTcpServer):
     sock = None
     address = None
 
-    is_connected = False
-
     is_init_message_read = False
 
     init_message = ''
@@ -40,7 +38,6 @@ class PugdebugServer(QTcpServer):
         if self.isListening():
             return True
 
-        self.is_connected = True
         self.listen(QHostAddress.Any, 9000)
 
     def handle_new_connection(self):

@@ -41,7 +41,7 @@ class PugdebugDebugger(QObject):
         self.server.last_message_read_signal.connect(self.handle_last_message_read)
 
     def start_debug(self):
-        if not self.server.is_connected:
+        if not self.server.isListening():
             self.server.connect()
 
     def handle_init_message_read(self):
