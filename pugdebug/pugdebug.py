@@ -172,6 +172,11 @@ class Pugdebug():
         This handler should be called when one of the step
         commands is executed and the reply message from xdebug
         is read.
+
+        If the debugger is in a breaking state, focus the current line
+        in the current file.
+
+        If the debugger is in a stopping state, stop the debugging session.
         """
 
         if self.debugger.is_breaking():
