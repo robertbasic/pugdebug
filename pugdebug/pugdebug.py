@@ -151,12 +151,15 @@ class Pugdebug():
 
         Issue a step_into command to break at the first line.
         """
+        self.main_window.set_statusbar_text("Debugging in progress...")
+
         self.focus_current_line()
 
         self.step_into()
 
     def start_debug(self):
         self.debugger.start_debug()
+        self.main_window.set_statusbar_text("Waiting for connection...")
 
     def stop_debug(self):
         self.debugger.stop_debug()
@@ -168,6 +171,7 @@ class Pugdebug():
         commands is executed and the reply message from xdebug
         is read.
         """
+
         self.focus_current_line()
 
     def run_debug(self):

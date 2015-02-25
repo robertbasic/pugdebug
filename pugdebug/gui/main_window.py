@@ -39,6 +39,8 @@ class PugdebugMainWindow(QMainWindow):
 
         self.setup_toolbar()
 
+        self.set_statusbar_text("Idle...")
+
     def setup_workarea_window(self):
         self.workarea_window = PugdebugWorkareaWindow(self)
         self.central_widget_layout.addWidget(self.workarea_window, 0, 1, 2, 1)
@@ -68,3 +70,6 @@ class PugdebugMainWindow(QMainWindow):
 
     def get_document_viewer(self):
         return self.workarea_window.get_document_viewer()
+
+    def set_statusbar_text(self, text):
+        self.statusBar().showMessage(text)
