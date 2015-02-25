@@ -19,6 +19,9 @@ class PugdebugMessageParser():
         pass
 
     def parse_init_message(self, message):
+        if not message:
+            return {}
+
         init_message = {}
 
         xml = xml_parser.fromstring(message)
@@ -39,6 +42,9 @@ class PugdebugMessageParser():
         return init_message
 
     def parse_continuation_message(self, message):
+        if not message:
+            return {}
+
         continuation_message = {}
 
         xml = xml_parser.fromstring(message)
