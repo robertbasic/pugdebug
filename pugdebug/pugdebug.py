@@ -185,7 +185,8 @@ class Pugdebug():
 
         if self.debugger.is_breaking():
             self.focus_current_line()
-        elif self.debugger.is_stopping():
+        elif self.debugger.is_stopping() or \
+                (self.debugger.is_stopped() and self.debugger.is_session_active):
             self.stop_debug()
         elif self.debugger.is_stopped():
             self.debugger.cleanup()
