@@ -80,7 +80,8 @@ class PugdebugDebugger(QObject):
         self.step_command_signal.emit()
 
     def stop_debug(self):
-        self.server.close()
+        command = 'stop -i %d' % self.get_transaction_id()
+        self.server.command(command)
 
     def run_debug(self):
         command = 'run -i %d' % self.get_transaction_id()
