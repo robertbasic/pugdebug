@@ -73,6 +73,9 @@ class PugdebugServer(QTcpServer):
         return self.last_message
 
     def receive_message(self):
+        if self.sock is None:
+            return ''
+
         message = self.sock.readAll().data().decode(self.xdebug_encoding)
 
         message_parts = message.split("\0")
