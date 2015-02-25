@@ -43,6 +43,8 @@ class Pugdebug():
 
         self.connect_toolbar_action_signals()
 
+        self.connect_debugger_signals()
+
     def connect_file_browser_signals(self):
         self.file_browser.activated.connect(self.file_browser_item_activated)
 
@@ -53,6 +55,10 @@ class Pugdebug():
         self.main_window.step_over_action.triggered.connect(self.step_over)
         self.main_window.step_into_action.triggered.connect(self.step_into)
         self.main_window.step_out_action.triggered.connect(self.step_out)
+
+    def connect_debugger_signals(self):
+        self.debugger.debugging_started_signal.connect(self.handle_debugging_started)
+        self.debugger.step_command_signal.connect(self.handle_step_command)
 
     def file_browser_item_activated(self, index):
         path = self.file_browser.model().filePath(index)
@@ -80,10 +86,13 @@ class Pugdebug():
     def start_debug(self):
         self.debugger.start_debug()
 
-        index_file = self.debugger.get_index_file()
-        self.open_document(index_file)
+    def handle_debugging_started(self):
+        self.focus_current_line()
 
         self.step_into()
+
+    def handle_step_command(self):
+        self.focus_current_line()
 
     def stop_debug(self):
         self.debugger.stop_debug()
@@ -91,22 +100,14 @@ class Pugdebug():
     def run_debug(self):
         self.debugger.run_debug()
 
-        self.focus_current_line()
-
     def step_over(self):
         self.debugger.step_over()
-
-        self.focus_current_line()
 
     def step_into(self):
         self.debugger.step_into()
 
-        self.focus_current_line()
-
     def step_out(self):
         self.debugger.step_out()
-
-        self.focus_current_line()
 
     def run(self):
         self.main_window.showMaximized()
