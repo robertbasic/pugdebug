@@ -11,7 +11,10 @@ __author__="robertbasic"
 
 import socket
 
-class PugdebugServer():
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtNetwork import QTcpServer, QHostAddress
+
+class PugdebugServer(QTcpServer):
 
     sock = None
     address = None
@@ -22,47 +25,33 @@ class PugdebugServer():
 
     xdebug_encoding = 'iso-8859-1'
 
-    def __del__(self):
-        self.close()
+    init_message_read_signal = pyqtSignal()
+
+    def __init__(self):
+        super(PugdebugServer, self).__init__()
+
+        self.newConnection.connect(self.handle_new_connection)
 
     def connect(self):
+        if self.isListening():
+            return True
+
         self.is_connected = True
+        self.listen(QHostAddress.Any, 9000)
 
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server.settimeout(None)
-
-        try:
-            server.bind(('', 9000))
-            self.init_connection(server)
-        except OSError:
-            self.is_connected = False
-            print(OSError.strerror())
-            print("Socket bind failed")
-        finally:
-            server.close()
-
-    def close(self):
-        if self.sock is not None:
-            self.is_connected = False
-            self.sock.close()
-            self.sock = None
+    def handle_new_connection(self):
+        if self.hasPendingConnections():
+            self.sock = self.nextPendingConnection()
+            self.sock.readyRead.connect(self.handle_ready_read)
 
     def command(self, command):
         self.sock.send(bytes(command + '\0', 'utf-8'))
         self.read_last_message()
 
-    def init_connection(self, server):
-        server.listen(5)
-
-        print('Waiting for connection ...')
-
-        self.sock, self.address = server.accept()
-        self.sock.settimeout(None)
-        self.read_init_message()
-
-    def read_init_message(self):
+    def handle_ready_read(self):
         self.init_message = self.receive_message()
+
+        self.init_message_read_signal.emit()
 
     def get_init_message(self):
         return self.init_message
@@ -74,54 +63,8 @@ class PugdebugServer():
         return self.last_message
 
     def receive_message(self):
-        length = self.get_message_length()
-        body = self.get_message_body(length)
+        message = self.sock.readAll().data().decode(self.xdebug_encoding)
 
-        return body
+        message_parts = message.split("\0")
 
-    def get_message_length(self):
-        length = ''
-
-        while True:
-            character = self.sock.recv(1)
-
-            if self.is_eof(character):
-                self.close()
-
-            if character.isdigit():
-                length = length + character.decode(self.xdebug_encoding)
-
-            if character.decode(self.xdebug_encoding) == '\0':
-                if length == '':
-                    return 0
-                return int(length)
-
-    def get_message_body(self, length):
-        body = ''
-
-        while length > 0:
-            data = self.sock.recv(length)
-
-            if self.is_eof(data):
-                self.close()
-
-            body = body + data.decode(self.xdebug_encoding)
-
-            length = length - len(data)
-
-        self.get_null()
-
-        return body
-
-    def get_null(self):
-        while True:
-            character = self.sock.recv(1)
-
-            if self.is_eof(character):
-                self.close()
-
-            if character.decode(self.xdebug_encoding) == '\0':
-                return
-
-    def is_eof(self, data):
-        return data.decode(self.xdebug_encoding) == ''
+        return message_parts[1]
