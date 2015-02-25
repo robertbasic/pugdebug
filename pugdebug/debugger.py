@@ -119,7 +119,11 @@ class PugdebugDebugger(QObject):
 
     def get_index_file(self):
         init_message = self.get_init_message()
-        return init_message['fileuri'].replace('file://', '')
+
+        if 'fileuri' in init_message:
+            return init_message['fileuri'].replace('file://', '')
+
+        return ''
 
     def get_current_file(self):
         if 'filename' in self.last_message:
