@@ -11,7 +11,7 @@ __author__="robertbasic"
 
 import socket
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import QByteArray, pyqtSignal
 from PyQt5.QtNetwork import QTcpServer, QHostAddress
 
 class PugdebugServer(QTcpServer):
@@ -20,12 +20,16 @@ class PugdebugServer(QTcpServer):
     address = None
 
     is_connected = False
+
+    is_init_message_read = False
+
     init_message = ''
     last_message = ''
 
     xdebug_encoding = 'iso-8859-1'
 
     init_message_read_signal = pyqtSignal()
+    last_message_read_signal = pyqtSignal()
 
     def __init__(self):
         super(PugdebugServer, self).__init__()
@@ -45,13 +49,16 @@ class PugdebugServer(QTcpServer):
             self.sock.readyRead.connect(self.handle_ready_read)
 
     def command(self, command):
-        self.sock.send(bytes(command + '\0', 'utf-8'))
-        self.read_last_message()
+        self.sock.write(bytes(command + '\0', 'utf-8'))
 
     def handle_ready_read(self):
-        self.init_message = self.receive_message()
-
-        self.init_message_read_signal.emit()
+        if not self.is_init_message_read:
+            self.init_message = self.receive_message()
+            self.init_message_read_signal.emit()
+            self.is_init_message_read = True
+        else:
+            self.last_message = self.receive_message()
+            self.last_message_read_signal.emit()
 
     def get_init_message(self):
         return self.init_message
@@ -67,4 +74,6 @@ class PugdebugServer(QTcpServer):
 
         message_parts = message.split("\0")
 
-        return message_parts[1]
+        if len(message_parts) == 3:
+            return message_parts[1]
+        return ''
