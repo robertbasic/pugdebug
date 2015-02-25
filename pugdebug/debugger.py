@@ -11,10 +11,12 @@ __author__="robertbasic"
 
 import socket
 
+from PyQt5.QtCore import QObject, pyqtSignal
+
 from pugdebug.server import PugdebugServer
 from pugdebug.message_parser import PugdebugMessageParser
 
-class PugdebugDebugger():
+class PugdebugDebugger(QObject):
 
     server = None
     parser = None
@@ -26,13 +28,24 @@ class PugdebugDebugger():
 
     transaction_id = 0
 
+    debugging_started_signal = pyqtSignal()
+
     def __init__(self):
+        super(PugdebugDebugger, self).__init__()
+
         self.server = PugdebugServer()
         self.parser = PugdebugMessageParser()
+
+        self.server.init_message_read_signal.connect(self.handle_init_message_read)
 
     def start_debug(self):
         if not self.server.is_connected:
             self.server.connect()
+
+    def handle_init_message_read(self):
+        self.current_file = self.get_index_file()
+
+        self.debugging_started_signal.emit()
 
     def stop_debug(self):
         print('stop')
