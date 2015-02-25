@@ -122,6 +122,17 @@ class PugdebugDebugger(QObject):
 
         return self.current_line
 
+    def is_breaking(self):
+        return self.is_status('break')
+
+    def is_stopping(self):
+        return self.is_status('stopping')
+
+    def is_status(self, status):
+        if 'status' in self.last_message and self.last_message['status'] == status:
+            return True
+        return False
+
     def get_transaction_id(self):
         self.transaction_id += 1
         return self.transaction_id

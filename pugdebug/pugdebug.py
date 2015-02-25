@@ -164,6 +164,8 @@ class Pugdebug():
     def stop_debug(self):
         self.debugger.stop_debug()
 
+        self.main_window.set_statusbar_text("Debugging stopped...")
+
     def handle_step_command(self):
         """Handle step command
 
@@ -172,7 +174,10 @@ class Pugdebug():
         is read.
         """
 
-        self.focus_current_line()
+        if self.debugger.is_breaking():
+            self.focus_current_line()
+        elif self.debugger.is_stopping():
+            self.stop_debug()
 
     def run_debug(self):
         self.debugger.run_debug()
