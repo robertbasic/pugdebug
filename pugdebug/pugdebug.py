@@ -183,6 +183,8 @@ class Pugdebug():
             self.focus_current_line()
         elif self.debugger.is_stopping():
             self.stop_debug()
+        elif self.debugger.is_stopped():
+            self.debugger.cleanup()
 
     def run_debug(self):
         self.debugger.run_debug()

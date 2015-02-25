@@ -58,6 +58,19 @@ class PugdebugDebugger(QObject):
         if not self.server.isListening():
             self.server.connect()
 
+    def cleanup(self):
+        """Cleanup debugger when it's done
+        """
+
+        if self.server.isListening():
+            self.server.cleanup()
+            self.server.close()
+
+        self.last_message = ''
+        self.current_file = ''
+        self.current_line = 0
+        self.transaction_id = 0
+
     def handle_init_message_read(self):
         """Handle when the init message from xdebug is read
 
@@ -128,6 +141,9 @@ class PugdebugDebugger(QObject):
 
     def is_stopping(self):
         return self.is_status('stopping')
+
+    def is_stopped(self):
+        return self.is_status('stopped')
 
     def is_status(self, status):
         if 'status' in self.last_message and self.last_message['status'] == status:

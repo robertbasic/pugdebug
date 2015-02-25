@@ -39,6 +39,12 @@ class PugdebugServer(QTcpServer):
 
         self.listen(QHostAddress.Any, 9000)
 
+    def cleanup(self):
+        self.sock = None
+        self.is_init_message_read = False
+        self.init_message = ''
+        self.last_message = ''
+
     def handle_new_connection(self):
         if self.hasPendingConnections():
             self.sock = self.nextPendingConnection()
