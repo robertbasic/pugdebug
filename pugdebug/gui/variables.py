@@ -9,10 +9,17 @@
 
 __author__="robertbasic"
 
-from PyQt5.QtWidgets import QTextEdit
+from PyQt5.QtWidgets import QTableWidget, QHeaderView
 
-class PugdebugVariableViewer(QTextEdit):
+class PugdebugVariableViewer(QTableWidget):
 
     def __init__(self):
         super(PugdebugVariableViewer, self).__init__()
-        self.setText('var viewer')
+
+        self.setColumnCount(3)
+        self.setHorizontalHeaderLabels(['Name','Type','Value'])
+
+        header = self.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Interactive)
+        header.setDefaultSectionSize(200)
+        header.setStretchLastSection(True)
