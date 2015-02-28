@@ -158,8 +158,6 @@ class Pugdebug():
 
         self.main_window.toggle_actions(True)
 
-        self.focus_current_line()
-
         self.step_into()
 
     def start_debug(self):
