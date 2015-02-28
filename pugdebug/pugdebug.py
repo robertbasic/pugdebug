@@ -142,6 +142,9 @@ class Pugdebug():
         doc = self.document_viewer.get_current_document()
         doc.move_to_line(current_line)
 
+    def get_variables(self):
+        self.debugger.get_variables()
+
     def handle_debugging_started(self):
         """Handle when debugging starts
 
@@ -185,6 +188,9 @@ class Pugdebug():
 
         if self.debugger.is_breaking():
             self.focus_current_line()
+
+            self.get_variables()
+
         elif self.debugger.is_stopping() or \
                 (self.debugger.is_stopped() and self.debugger.is_session_active):
             self.stop_debug()

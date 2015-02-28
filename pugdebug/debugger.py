@@ -23,6 +23,8 @@ class PugdebugDebugger(QObject):
 
     is_session_active = False
 
+    last_command = None
+
     last_message = ''
 
     current_file = ''
@@ -49,7 +51,6 @@ class PugdebugDebugger(QObject):
         self.server = PugdebugServer()
         self.parser = PugdebugMessageParser()
 
-        self.server.init_message_read_signal.connect(self.handle_init_message_read)
         self.server.last_message_read_signal.connect(self.handle_last_message_read)
 
     def start_debug(self):
@@ -58,6 +59,7 @@ class PugdebugDebugger(QObject):
         If the server is not connected, connect it.
         """
         if not self.server.isListening():
+            self.last_command = 'init'
             self.server.connect()
 
     def cleanup(self):
@@ -68,6 +70,7 @@ class PugdebugDebugger(QObject):
             self.server.cleanup()
             self.server.close()
 
+        self.last_command = None
         self.last_message = ''
         self.current_file = ''
         self.current_line = 0
@@ -75,7 +78,21 @@ class PugdebugDebugger(QObject):
 
         self.is_session_active = False
 
-    def handle_init_message_read(self):
+    def handle_last_message_read(self):
+        """Handle when the latest message from xdebug is read
+
+        This should be called after a command is sent to xdebug
+        and a reply message is read.
+        """
+
+        if self.last_command == 'init':
+            self.handle_init_command()
+        elif self.last_command == 'continuation':
+            self.handle_continuation_command()
+        elif self.last_command == 'variables':
+            self.handle_variables_command()
+
+    def handle_init_command(self):
         """Handle when the init message from xdebug is read
 
         At this point the server should have established a TCP connection and
@@ -86,39 +103,48 @@ class PugdebugDebugger(QObject):
         self.is_session_active = True
         self.debugging_started_signal.emit()
 
-    def handle_last_message_read(self):
-        """Handle when the latest message from xdebug is read
-
-        This should be called after a command is sent to xdebug
-        and a reply message is read.
-        """
+    def handle_continuation_command(self):
         last_message = self.server.get_last_message()
         self.last_message = self.parser.parse_continuation_message(last_message)
 
         self.step_command_signal.emit()
 
+    def handle_variables_command(self):
+        last_message = self.server.get_last_message()
+        print(last_message)
+
     def stop_debug(self):
-        command = 'stop -i %d' % self.get_transaction_id()
-        self.server.command(command)
+        command = 'stop'
+        self.do_continuation_command(command)
 
     def run_debug(self):
-        command = 'run -i %d' % self.get_transaction_id()
-        self.server.command(command)
+        command = 'run'
+        self.do_continuation_command(command)
 
     def step_over(self):
-        command = 'step_over -i %d' % self.get_transaction_id()
-        self.server.command(command)
+        command = 'step_over'
+        self.do_continuation_command(command)
 
     def step_into(self):
-        command = 'step_into -i %d' % self.get_transaction_id()
-        self.server.command(command)
+        command = 'step_into'
+        self.do_continuation_command(command)
 
     def step_out(self):
-        command = 'step_out -i %d' % self.get_transaction_id()
+        command = 'step_out'
+        self.do_continuation_command(command)
+
+    def do_continuation_command(self, command):
+        self.last_command = 'continuation'
+        command = '%s -i %d' % (command, self.get_transaction_id())
+        self.server.command(command)
+
+    def get_variables(self):
+        self.last_command = 'variables'
+        command = 'context_names -i %d' % self.get_transaction_id()
         self.server.command(command)
 
     def get_init_message(self):
-        init_message = self.server.get_init_message()
+        init_message = self.server.get_last_message()
         init_message = self.parser.parse_init_message(init_message)
         return init_message
 

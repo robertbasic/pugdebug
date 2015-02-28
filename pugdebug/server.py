@@ -18,14 +18,10 @@ class PugdebugServer(QTcpServer):
 
     sock = None
 
-    is_init_message_read = False
-
-    init_message = ''
     last_message = ''
 
     xdebug_encoding = 'iso-8859-1'
 
-    init_message_read_signal = pyqtSignal()
     last_message_read_signal = pyqtSignal()
 
     def __init__(self):
@@ -41,8 +37,6 @@ class PugdebugServer(QTcpServer):
 
     def cleanup(self):
         self.sock = None
-        self.is_init_message_read = False
-        self.init_message = ''
         self.last_message = ''
 
     def handle_new_connection(self):
@@ -55,16 +49,8 @@ class PugdebugServer(QTcpServer):
             self.sock.write(bytes(command + '\0', 'utf-8'))
 
     def handle_ready_read(self):
-        if not self.is_init_message_read:
-            self.init_message = self.receive_message()
-            self.init_message_read_signal.emit()
-            self.is_init_message_read = True
-        else:
-            self.last_message = self.receive_message()
-            self.last_message_read_signal.emit()
-
-    def get_init_message(self):
-        return self.init_message
+        self.last_message = self.receive_message()
+        self.last_message_read_signal.emit()
 
     def read_last_message(self):
         self.last_message = self.receive_message()
