@@ -67,3 +67,22 @@ class PugdebugMessageParserTest(unittest.TestCase):
         }
 
         self.assertEqual(expected, result)
+
+    def test_parse_variable_message_context_names(self):
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="context_names" transaction_id="2"><context name="Locals" id="0"></context><context name="Superglobals" id="1"></context></response>'
+
+        result = self.parser.parse_variable_message(message)
+
+        expected = [
+            {
+                'name': 'Locals',
+                'id': '0'
+            },
+            {
+                'name': 'Superglobals',
+                'id': '1'
+            }
+        ]
+
+        self.assertEqual(expected, result)

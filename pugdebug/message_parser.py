@@ -58,6 +58,29 @@ class PugdebugMessageParser():
 
         return continuation_message
 
+    def parse_variable_message(self, message):
+        if not message:
+            return []
+
+        variable_message = []
+
+        xml = xml_parser.fromstring(message)
+
+        if 'command' in xml.attrib and xml.attrib['command'] == 'context_names':
+            variable_message = self.get_variable_contexts(xml)
+        else:
+            pass
+
+        return variable_message
+
+    def get_variable_contexts(self, xml):
+        result = []
+
+        for context in xml.getchildren():
+            result.append(self.get_attribs(context, ['name', 'id'], {}))
+
+        return result
+
     def get_attribs(self, xml, attribs, result):
         for attrib in (attrib for attrib in xml.attrib if attrib in attribs):
             result[attrib] = xml.attrib[attrib]
