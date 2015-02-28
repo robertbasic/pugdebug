@@ -68,11 +68,11 @@ class PugdebugMessageParserTest(unittest.TestCase):
 
         self.assertEqual(expected, result)
 
-    def test_parse_variable_message_context_names(self):
+    def test_parse_variable_contexts_message(self):
         message = '<?xml version="1.0" encoding="iso-8859-1"?>\
 <response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="context_names" transaction_id="2"><context name="Locals" id="0"></context><context name="Superglobals" id="1"></context></response>'
 
-        result = self.parser.parse_variable_message(message)
+        result = self.parser.parse_variable_contexts_message(message)
 
         expected = [
             {
@@ -82,6 +82,22 @@ class PugdebugMessageParserTest(unittest.TestCase):
             {
                 'name': 'Superglobals',
                 'id': '1'
+            }
+        ]
+
+        self.assertEqual(expected, result)
+
+    def test_parse_variables_simple_local(self):
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="context_get" transaction_id="2;" context="0"><property name="$i" fullname="$i" type="int"><![CDATA[1]]></property></response>'
+
+        result = self.parser.parse_variables_message(message)
+
+        expected = [
+            {
+                'fullname': '$i',
+                'type': 'int',
+                'value': '1'
             }
         ]
 
