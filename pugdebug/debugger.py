@@ -53,15 +53,6 @@ class PugdebugDebugger(QObject):
 
         self.server.last_message_read_signal.connect(self.handle_last_message_read)
 
-    def start_debug(self):
-        """Start a debugging session
-
-        If the server is not connected, connect it.
-        """
-        if not self.server.isListening():
-            self.last_command = 'init'
-            self.server.connect()
-
     def cleanup(self):
         """Cleanup debugger when it's done
         """
@@ -112,6 +103,15 @@ class PugdebugDebugger(QObject):
     def handle_variables_command(self):
         last_message = self.server.get_last_message()
         print(last_message)
+
+    def start_debug(self):
+        """Start a debugging session
+
+        If the server is not connected, connect it.
+        """
+        if not self.server.isListening():
+            self.last_command = 'init'
+            self.server.connect()
 
     def stop_debug(self):
         command = 'stop'
