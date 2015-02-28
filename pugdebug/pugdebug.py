@@ -102,6 +102,7 @@ class Pugdebug():
 
         self.debugger.debugging_started_signal.connect(self.handle_debugging_started)
         self.debugger.step_command_signal.connect(self.handle_step_command)
+        self.debugger.got_all_variables_signal.connect(self.handle_got_all_variables)
 
     def file_browser_item_activated(self, index):
         """Handle when file browser item gets activated
@@ -144,6 +145,10 @@ class Pugdebug():
 
     def get_variables(self):
         self.debugger.get_all_variables()
+
+    def handle_got_all_variables(self):
+        variables = self.debugger.get_variables()
+        print(variables)
 
     def handle_debugging_started(self):
         """Handle when debugging starts

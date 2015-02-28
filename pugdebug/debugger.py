@@ -30,10 +30,15 @@ class PugdebugDebugger(QObject):
     current_file = ''
     current_line = 0
 
+    number_of_contexts = 0
+    number_of_contexts_got = 0
+    variables = []
+
     transaction_id = 0
 
     debugging_started_signal = pyqtSignal()
     step_command_signal = pyqtSignal()
+    got_all_variables_signal = pyqtSignal()
 
     def __init__(self):
         """Init the debugger object
@@ -65,6 +70,9 @@ class PugdebugDebugger(QObject):
         self.last_message = ''
         self.current_file = ''
         self.current_line = 0
+        self.number_of_contexts = 0
+        self.number_of_contexts_got = 0
+        self.variables = []
         self.transaction_id = 0
 
         self.is_session_active = False
@@ -106,15 +114,22 @@ class PugdebugDebugger(QObject):
         last_message = self.server.get_last_message()
         last_message = self.parser.parse_variable_contexts_message(last_message)
 
+        self.number_of_contexts = len(last_message)
+
         for context in last_message:
             context_id = int(context['id'])
             self.get_variable_context(context_id)
 
     def handle_variables_command(self):
-        last_message = self.server.get_last_message()
-        last_message = self.parser.parse_variables_message(last_message)
+        self.number_of_contexts_got += 1
 
-        print(last_message)
+        last_message = self.server.get_last_message()
+        self.variables.append(self.parser.parse_variables_message(last_message))
+
+        if self.number_of_contexts == self.number_of_contexts_got:
+            self.number_of_contexts = 0
+            self.number_of_contexts_got = 0
+            self.got_all_variables_signal.emit()
 
     def start_debug(self):
         """Start a debugging session
@@ -162,6 +177,11 @@ class PugdebugDebugger(QObject):
         self.last_command = 'variables'
         command = 'context_get -c %d -i %d' % (context_id, self.get_transaction_id())
         self.server.command(command)
+
+    def get_variables(self):
+        variables = self.variables
+        self.variables = []
+        return variables
 
     def get_current_file(self):
         if 'filename' in self.last_message:
