@@ -80,6 +80,8 @@ class PugdebugDebugger(QObject):
             self.handle_init_command()
         elif self.last_command == 'continuation':
             self.handle_continuation_command()
+        elif self.last_command == 'variable_contexts':
+            self.handle_variable_contexts_command()
         elif self.last_command == 'variables':
             self.handle_variables_command()
 
@@ -100,8 +102,18 @@ class PugdebugDebugger(QObject):
 
         self.step_command_signal.emit()
 
+    def handle_variable_contexts_command(self):
+        last_message = self.server.get_last_message()
+        last_message = self.parser.parse_variable_contexts_message(last_message)
+
+        for context in last_message:
+            context_id = int(context['id'])
+            self.get_variable_context(context_id)
+
     def handle_variables_command(self):
         last_message = self.server.get_last_message()
+        last_message = self.parser.parse_variables_message(last_message)
+
         print(last_message)
 
     def start_debug(self):
@@ -138,9 +150,17 @@ class PugdebugDebugger(QObject):
         command = '%s -i %d' % (command, self.get_transaction_id())
         self.server.command(command)
 
-    def get_variables(self):
-        self.last_command = 'variables'
+    def get_all_variables(self):
+        self.get_variable_contexts()
+
+    def get_variable_contexts(self):
+        self.last_command = 'variable_contexts'
         command = 'context_names -i %d' % self.get_transaction_id()
+        self.server.command(command)
+
+    def get_variable_context(self, context_id):
+        self.last_command = 'variables'
+        command = 'context_get -c %d -i %d' % (context_id, self.get_transaction_id())
         self.server.command(command)
 
     def get_current_file(self):

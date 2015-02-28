@@ -143,7 +143,7 @@ class Pugdebug():
         doc.move_to_line(current_line)
 
     def get_variables(self):
-        self.debugger.get_variables()
+        self.debugger.get_all_variables()
 
     def handle_debugging_started(self):
         """Handle when debugging starts
