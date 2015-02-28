@@ -165,7 +165,7 @@ class PugdebugDebugger(QObject):
         command = '%s -i %d' % (command, self.get_transaction_id())
         self.server.command(command)
 
-    def get_all_variables(self):
+    def request_all_variables(self):
         self.get_variable_contexts()
 
     def get_variable_contexts(self):

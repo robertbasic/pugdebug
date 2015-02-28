@@ -98,6 +98,8 @@ class Pugdebug():
 
         Connect signal that gets emitted when a step command is executed and the reply message
         from xdebug is read.
+
+        Connect signal that gets emitted when all variables from xdebug are read.
         """
 
         self.debugger.debugging_started_signal.connect(self.handle_debugging_started)
@@ -144,9 +146,15 @@ class Pugdebug():
         doc.move_to_line(current_line)
 
     def get_variables(self):
-        self.debugger.get_all_variables()
+        """Get all variables
+
+        Sends a request to the debugger to get all variables.
+        """
+        self.debugger.request_all_variables()
 
     def handle_got_all_variables(self):
+        """Handle when all variables are retrieved from xdebug
+        """
         variables = self.debugger.get_variables()
         print(variables)
 
