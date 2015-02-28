@@ -143,25 +143,9 @@ class PugdebugDebugger(QObject):
         command = 'context_names -i %d' % self.get_transaction_id()
         self.server.command(command)
 
-    def get_init_message(self):
-        init_message = self.server.get_last_message()
-        init_message = self.parser.parse_init_message(init_message)
-        return init_message
-
-    def get_index_file(self):
-        init_message = self.get_init_message()
-
-        if 'fileuri' in init_message:
-            return init_message['fileuri'].replace('file://', '')
-
-        return ''
-
     def get_current_file(self):
         if 'filename' in self.last_message:
             self.current_file = self.last_message['filename'].replace('file://', '')
-
-        if self.current_file == '':
-            self.current_file = self.get_index_file()
 
         return self.current_file
 
