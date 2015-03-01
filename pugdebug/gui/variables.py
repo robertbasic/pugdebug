@@ -9,17 +9,23 @@
 
 __author__="robertbasic"
 
-from PyQt5.QtWidgets import QTableWidget, QHeaderView
+from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
-class PugdebugVariableViewer(QTableWidget):
+class PugdebugVariableViewer(QTreeWidget):
 
     def __init__(self):
         super(PugdebugVariableViewer, self).__init__()
 
         self.setColumnCount(3)
-        self.setHorizontalHeaderLabels(['Name','Type','Value'])
+        self.setHeaderLabels(['Name','Type','Value'])
 
-        header = self.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.Interactive)
-        header.setDefaultSectionSize(200)
-        header.setStretchLastSection(True)
+        self.setColumnWidth(0, 250)
+        self.setColumnWidth(1, 150)
+
+    def set_variables(self, variables):
+        self.clear()
+
+        for context in variables:
+            for variable in context:
+                item = QTreeWidgetItem([variable['fullname'], variable['type'], variable['value']])
+                self.addTopLevelItem(item)

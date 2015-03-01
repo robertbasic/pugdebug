@@ -33,6 +33,7 @@ class Pugdebug():
         self.main_window = PugdebugMainWindow()
         self.file_browser = self.main_window.get_file_browser()
         self.document_viewer = self.main_window.get_document_viewer()
+        self.variable_viewer = self.main_window.get_variable_viewer()
 
         self.documents = PugdebugDocuments()
 
@@ -156,7 +157,7 @@ class Pugdebug():
         """Handle when all variables are retrieved from xdebug
         """
         variables = self.debugger.get_variables()
-        print(variables)
+        self.variable_viewer.set_variables(variables)
 
     def handle_debugging_started(self):
         """Handle when debugging starts

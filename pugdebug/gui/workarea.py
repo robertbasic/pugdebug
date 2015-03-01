@@ -36,3 +36,6 @@ class PugdebugWorkareaWindow(QWidget):
 
     def get_document_viewer(self):
         return self.document_viewer
+
+    def get_variable_viewer(self):
+        return self.variable_viewer
