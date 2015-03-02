@@ -79,7 +79,7 @@ class PugdebugServer(QTcpServer):
         while True:
             character = self.sock.read(1)
 
-            if charachter.decode(self.xdebug_encoding) == '':
+            if character.decode(self.xdebug_encoding) == '':
                 self.disconnect()
 
             if character.isdigit():
