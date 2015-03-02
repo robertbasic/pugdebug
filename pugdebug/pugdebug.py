@@ -202,12 +202,11 @@ class Pugdebug():
             self.focus_current_line()
 
             self.get_variables()
-
-        elif self.debugger.is_stopping() or \
-                (self.debugger.is_stopped() and self.debugger.is_session_active):
-            self.stop_debug()
         elif self.debugger.is_stopped():
+            self.stop_debug()
             self.debugger.cleanup()
+        elif self.debugger.is_stopping():
+            self.stop_debug()
 
     def run_debug(self):
         self.debugger.run_debug()

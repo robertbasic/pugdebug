@@ -21,8 +21,6 @@ class PugdebugDebugger(QObject):
     server = None
     parser = None
 
-    is_session_active = False
-
     last_command = None
 
     last_message = ''
@@ -75,8 +73,6 @@ class PugdebugDebugger(QObject):
         self.variables = []
         self.transaction_id = 0
 
-        self.is_session_active = False
-
     def handle_last_message_read(self):
         """Handle when the latest message from xdebug is read
 
@@ -101,13 +97,11 @@ class PugdebugDebugger(QObject):
 
         Emit the custom debugging started signal.
         """
-        self.is_session_active = True
         self.debugging_started_signal.emit()
 
     def handle_continuation_command(self):
         last_message = self.server.get_last_message()
         self.last_message = self.parser.parse_continuation_message(last_message)
-
         self.step_command_signal.emit()
 
     def handle_variable_contexts_command(self):
