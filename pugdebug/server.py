@@ -64,10 +64,28 @@ class PugdebugServer(QTcpServer):
         if self.sock is None:
             return ''
 
-        message = self.sock.readAll().data().decode(self.xdebug_encoding)
+        message_length = self.get_message_length()
 
-        message_parts = message.split("\0")
+        message = self.sock.read(message_length).decode(self.xdebug_encoding)
 
-        if len(message_parts) == 3:
-            return message_parts[1]
-        return ''
+        # read that remaining null character in
+        self.sock.read(1)
+
+        return message
+
+    def get_message_length(self):
+        length = ''
+
+        while True:
+            character = self.sock.read(1)
+
+            if character.decode(self.xdebug_encoding) == '':
+                self.disconnect()
+
+            if character.isdigit():
+                length = length + character.decode(self.xdebug_encoding)
+
+            if character.decode(self.xdebug_encoding) == '\0':
+                if length == '':
+                    return 0
+                return int(length)
