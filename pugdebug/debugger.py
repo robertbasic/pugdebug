@@ -59,10 +59,8 @@ class PugdebugDebugger(QObject):
     def cleanup(self):
         """Cleanup debugger when it's done
         """
-
         if self.server.isListening():
-            self.server.cleanup()
-            self.server.close()
+            self.server.disconnect()
 
         self.last_command = None
         self.last_message = ''
