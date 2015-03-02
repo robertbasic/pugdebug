@@ -175,6 +175,8 @@ class Pugdebug():
         self.step_into()
 
     def start_debug(self):
+        self.variable_viewer.clear_variables()
+
         self.debugger.start_debug()
         self.main_window.set_statusbar_text("Waiting for connection...")
 

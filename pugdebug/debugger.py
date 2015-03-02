@@ -116,11 +116,11 @@ class PugdebugDebugger(QObject):
         self.number_of_contexts_got += 1
 
         last_message = self.server.get_last_message()
-        self.variables.append(self.parser.parse_variables_message(last_message))
+        last_message = self.parser.parse_variables_message(last_message)
+
+        self.variables.append(last_message)
 
         if self.number_of_contexts == self.number_of_contexts_got:
-            self.number_of_contexts = 0
-            self.number_of_contexts_got = 0
             self.got_all_variables_signal.emit()
 
     def start_debug(self):
@@ -172,6 +172,8 @@ class PugdebugDebugger(QObject):
 
     def get_variables(self):
         variables = self.variables
+        self.number_of_contexts = 0
+        self.number_of_contexts_got = 0
         self.variables = []
         return variables
 
