@@ -27,5 +27,6 @@ class PugdebugVariableViewer(QTreeWidget):
 
         for context in variables:
             for variable in context:
-                item = QTreeWidgetItem([variable['fullname'], variable['type'], variable['value']])
-                self.addTopLevelItem(item)
+                if variable['type'] != 'uninitialized':
+                    item = QTreeWidgetItem([variable['fullname'], variable['type'], variable['value']])
+                    self.addTopLevelItem(item)
