@@ -80,15 +80,24 @@ class PugdebugMessageParser():
 
         xml = xml_parser.fromstring(message)
 
-        attribs = ['fullname', 'type']
-        for variable in xml.getchildren():
-            var = {}
-            var = self.get_attribs(variable, attribs, var)
-            var['value'] = variable.text
-
-            variables.append(var)
+        variables = self.get_variables(xml, variables)
 
         return variables
+
+    def get_variables(self, parent, result):
+        attribs = ['name', 'type', 'encoding']
+        for child in parent.getchildren():
+            var = {}
+            var = self.get_attribs(child, attribs, var)
+
+            if var['type'] == 'array':
+                var['variables'] = self.get_variables(child, [])
+            else:
+                var['value'] = child.text
+
+            result.append(var)
+
+        return result
 
     def get_attribs(self, xml, attribs, result):
         for attrib in (attrib for attrib in xml.attrib if attrib in attribs):

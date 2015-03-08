@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="context_get" transaction_id="8" context="1">
+    <property name="$_COOKIE" fullname="$_COOKIE" address="139913706646672" type="array" children="0" numchildren="0" page="0" pagesize="32">
+    </property>
+    <property name="$_ENV" fullname="$_ENV" address="139913706647120" type="array" children="0" numchildren="0" page="0" pagesize="32">
+    </property>
+    <property name="$_FILES" fullname="$_FILES" address="139913706646896" type="array" children="0" numchildren="0" page="0" pagesize="32">
+    </property>
+    <property name="$_GET" fullname="$_GET" address="139913706644912" type="array" children="1" numchildren="1" page="0" pagesize="32">
+        <property name="XDEBUG_SESSION_START" fullname="$_GET[&#39;XDEBUG_SESSION_START&#39;]" address="139913706645592" type="string" size="1" encoding="base64"><![CDATA[MQ==]]></property>
+    </property>
+    <property name="$_POST" fullname="$_POST" address="139913706646448" type="array" children="0" numchildren="0" page="0" pagesize="32">
+    </property>
+    <property name="$_REQUEST" fullname="$_REQUEST" address="139913706647344" type="array" children="1" numchildren="1" page="0" pagesize="32">
+        <property name="XDEBUG_SESSION_START" fullname="$_REQUEST[&#39;XDEBUG_SESSION_START&#39;]" address="139913706645592" type="string" size="1" encoding="base64"><![CDATA[MQ==]]></property>
+    </property>
+    <property name="$_SERVER" fullname="$_SERVER" address="139913706647760" type="array" children="1" numchildren="30" page="0" pagesize="32">
+        <property name="UNIQUE_ID" fullname="$_SERVER[&#39;UNIQUE_ID&#39;]" address="139913706648360" type="string" size="27" encoding="base64"><![CDATA[VlBBajZpYWgxVGtGQGlDVzFuNzhCZ0FBQUFB]]></property>
+        <property name="HTTP_HOST" fullname="$_SERVER[&#39;HTTP_HOST&#39;]" address="139913706648776" type="string" size="9" encoding="base64"><![CDATA[bG9jYWxob3N0]]></property>
+        <property name="HTTP_USER_AGENT" fullname="$_SERVER[&#39;HTTP_USER_AGENT&#39;]" address="139913706649272" type="string" size="76" encoding="base64"><![CDATA[TW96aWxsYS81LjAgKFgxMTsgRmVkb3JhOyBMaW51eCB4ODZfNjQ7IHJ2OjM2LjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvMzYuMA==]]></property>
+        <property name="HTTP_ACCEPT" fullname="$_SERVER[&#39;HTTP_ACCEPT&#39;]" address="139913706649736" type="string" size="63" encoding="base64"><![CDATA[dGV4dC9odG1sLGFwcGxpY2F0aW9uL3hodG1sK3htbCxhcHBsaWNhdGlvbi94bWw7cT0wLjksKi8qO3E9MC44]]></property>
+        <property name="HTTP_ACCEPT_LANGUAGE" fullname="$_SERVER[&#39;HTTP_ACCEPT_LANGUAGE&#39;]" address="139913706650112" type="string" size="14" encoding="base64"><![CDATA[ZW4tVVMsZW47cT0wLjU=]]></property>
+        <property name="HTTP_ACCEPT_ENCODING" fullname="$_SERVER[&#39;HTTP_ACCEPT_ENCODING&#39;]" address="139913706650496" type="string" size="13" encoding="base64"><![CDATA[Z3ppcCwgZGVmbGF0ZQ==]]></property>
+        <property name="HTTP_CONNECTION" fullname="$_SERVER[&#39;HTTP_CONNECTION&#39;]" address="139913706650872" type="string" size="10" encoding="base64"><![CDATA[a2VlcC1hbGl2ZQ==]]></property>
+        <property name="PATH" fullname="$_SERVER[&#39;PATH&#39;]" address="139913706651312" type="string" size="49" encoding="base64"><![CDATA[L3Vzci9sb2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbg==]]></property>
+        <property name="SERVER_SIGNATURE" fullname="$_SERVER[&#39;SERVER_SIGNATURE&#39;]" address="139913706651792" type="string" size="0" encoding="base64"><![CDATA[]]></property>
+        <property name="SERVER_SOFTWARE" fullname="$_SERVER[&#39;SERVER_SOFTWARE&#39;]" address="139913706652392" type="string" size="52" encoding="base64"><![CDATA[QXBhY2hlLzIuNC4xMCAoRmVkb3JhKSBPcGVuU1NMLzEuMC4xay1maXBzIFBIUC81LjYuNg==]]></property>
+        <property name="SERVER_NAME" fullname="$_SERVER[&#39;SERVER_NAME&#39;]" address="139913706652760" type="string" size="9" encoding="base64"><![CDATA[bG9jYWxob3N0]]></property>
+        <property name="SERVER_ADDR" fullname="$_SERVER[&#39;SERVER_ADDR&#39;]" address="139913706653128" type="string" size="9" encoding="base64"><![CDATA[MTI3LjAuMC4x]]></property>
+        <property name="SERVER_PORT" fullname="$_SERVER[&#39;SERVER_PORT&#39;]" address="139913706653496" type="string" size="2" encoding="base64"><![CDATA[ODA=]]></property>
+        <property name="REMOTE_ADDR" fullname="$_SERVER[&#39;REMOTE_ADDR&#39;]" address="139913706653864" type="string" size="9" encoding="base64"><![CDATA[MTI3LjAuMC4x]]></property>
+        <property name="DOCUMENT_ROOT" fullname="$_SERVER[&#39;DOCUMENT_ROOT&#39;]" address="139913706654264" type="string" size="24" encoding="base64"><![CDATA[L2hvbWUvcm9iZXJ0L3d3dy9weGRlYnVn]]></property>
+        <property name="REQUEST_SCHEME" fullname="$_SERVER[&#39;REQUEST_SCHEME&#39;]" address="139913706654632" type="string" size="4" encoding="base64"><![CDATA[aHR0cA==]]></property>
+        <property name="CONTEXT_PREFIX" fullname="$_SERVER[&#39;CONTEXT_PREFIX&#39;]" address="139913706655240" type="string" size="0" encoding="base64"><![CDATA[]]></property>
+        <property name="CONTEXT_DOCUMENT_ROOT" fullname="$_SERVER[&#39;CONTEXT_DOCUMENT_ROOT&#39;]" address="139913706655920" type="string" size="24" encoding="base64"><![CDATA[L2hvbWUvcm9iZXJ0L3d3dy9weGRlYnVn]]></property>
+        <property name="SERVER_ADMIN" fullname="$_SERVER[&#39;SERVER_ADMIN&#39;]" address="139913706656272" type="string" size="19" encoding="base64"><![CDATA[d2VibWFzdGVyQGxvY2FsaG9zdA==]]></property>
+        <property name="SCRIPT_FILENAME" fullname="$_SERVER[&#39;SCRIPT_FILENAME&#39;]" address="139913706656688" type="string" size="34" encoding="base64"><![CDATA[L2hvbWUvcm9iZXJ0L3d3dy9weGRlYnVnL2luZGV4LnBocA==]]></property>
+        <property name="REMOTE_PORT" fullname="$_SERVER[&#39;REMOTE_PORT&#39;]" address="139913706657056" type="string" size="5" encoding="base64"><![CDATA[NTg3MDI=]]></property>
+        <property name="GATEWAY_INTERFACE" fullname="$_SERVER[&#39;GATEWAY_INTERFACE&#39;]" address="139913706657432" type="string" size="7" encoding="base64"><![CDATA[Q0dJLzEuMQ==]]></property>
+        <property name="SERVER_PROTOCOL" fullname="$_SERVER[&#39;SERVER_PROTOCOL&#39;]" address="139913706657808" type="string" size="8" encoding="base64"><![CDATA[SFRUUC8xLjE=]]></property>
+        <property name="REQUEST_METHOD" fullname="$_SERVER[&#39;REQUEST_METHOD&#39;]" address="139913706658176" type="string" size="3" encoding="base64"><![CDATA[R0VU]]></property>
+        <property name="QUERY_STRING" fullname="$_SERVER[&#39;QUERY_STRING&#39;]" address="139913706658560" type="string" size="22" encoding="base64"><![CDATA[WERFQlVHX1NFU1NJT05fU1RBUlQ9MQ==]]></property>
+        <property name="REQUEST_URI" fullname="$_SERVER[&#39;REQUEST_URI&#39;]" address="139913706658960" type="string" size="24" encoding="base64"><![CDATA[Lz9YREVCVUdfU0VTU0lPTl9TVEFSVD0x]]></property>
+        <property name="SCRIPT_NAME" fullname="$_SERVER[&#39;SCRIPT_NAME&#39;]" address="139913706659328" type="string" size="10" encoding="base64"><![CDATA[L2luZGV4LnBocA==]]></property>
+        <property name="PHP_SELF" fullname="$_SERVER[&#39;PHP_SELF&#39;]" address="139913706659696" type="string" size="10" encoding="base64"><![CDATA[L2luZGV4LnBocA==]]></property>
+        <property name="REQUEST_TIME_FLOAT" fullname="$_SERVER[&#39;REQUEST_TIME_FLOAT&#39;]" address="139913706659848" type="float"><![CDATA[1425023978.289]]></property>
+        <property name="REQUEST_TIME" fullname="$_SERVER[&#39;REQUEST_TIME&#39;]" address="139913706660008" type="int"><![CDATA[1425023978]]></property>
+    </property>
+</response>
