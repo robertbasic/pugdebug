@@ -9,6 +9,7 @@
 
 __author__="robertbasic"
 
+import base64
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
 class PugdebugVariableViewer(QTreeWidget):
@@ -27,6 +28,35 @@ class PugdebugVariableViewer(QTreeWidget):
 
         for context in variables:
             for variable in context:
-                if variable['type'] != 'uninitialized':
-                    item = QTreeWidgetItem([variable['fullname'], variable['type'], variable['value']])
-                    self.addTopLevelItem(item)
+                self.add_variable(variable)
+
+    def add_variable(self, variable, parent=None):
+        if variable['type'] == 'uninitialized':
+            return
+
+        if 'value' in variable:
+            value = variable['value']
+
+            if 'encoding' in variable and value is not None:
+                value = base64.b64decode(value).decode()
+
+            if value is None:
+                value = 'NULL'
+
+            args = [variable['name'], variable['type'], value]
+        else:
+            args = [variable['name'], variable['type'], ' ... ']
+
+        if parent is None:
+            item = QTreeWidgetItem(args)
+        else:
+            item = QTreeWidgetItem(parent, args)
+
+        if 'variables' in variable:
+            for subvar in variable['variables']:
+                self.add_variable(subvar, item)
+
+        if parent is None:
+            self.addTopLevelItem(item)
+        else:
+            parent.addChild(item)
