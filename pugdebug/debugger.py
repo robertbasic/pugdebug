@@ -78,14 +78,16 @@ class PugdebugDebugger(QObject):
         and a reply message is read.
         """
 
+        last_message = self.server.get_last_message()
+
         if self.last_command == 'init':
             self.handle_init_command()
         elif self.last_command == 'continuation':
-            self.handle_continuation_command()
+            self.handle_continuation_command(last_message)
         elif self.last_command == 'variable_contexts':
-            self.handle_variable_contexts_command()
+            self.handle_variable_contexts_command(last_message)
         elif self.last_command == 'variables':
-            self.handle_variables_command()
+            self.handle_variables_command(last_message)
 
     def handle_init_command(self):
         """Handle when the init message from xdebug is read
@@ -97,13 +99,11 @@ class PugdebugDebugger(QObject):
         """
         self.debugging_started_signal.emit()
 
-    def handle_continuation_command(self):
-        last_message = self.server.get_last_message()
+    def handle_continuation_command(self, last_message):
         self.last_message = self.parser.parse_continuation_message(last_message)
         self.step_command_signal.emit()
 
-    def handle_variable_contexts_command(self):
-        last_message = self.server.get_last_message()
+    def handle_variable_contexts_command(self, last_message):
         last_message = self.parser.parse_variable_contexts_message(last_message)
 
         self.number_of_contexts = len(last_message)
@@ -112,10 +112,9 @@ class PugdebugDebugger(QObject):
             context_id = int(context['id'])
             self.get_variable_context(context_id)
 
-    def handle_variables_command(self):
+    def handle_variables_command(self, last_message):
         self.number_of_contexts_got += 1
 
-        last_message = self.server.get_last_message()
         last_message = self.parser.parse_variables_message(last_message)
 
         self.variables.append(last_message)
