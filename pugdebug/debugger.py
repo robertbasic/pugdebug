@@ -154,7 +154,7 @@ class PugdebugDebugger(QObject):
     def do_continuation_command(self, command):
         self.last_command = 'continuation'
         command = '%s -i %d' % (command, self.get_transaction_id())
-        self.server.command(command)
+        self.server.send_command(command)
 
     def request_all_variables(self):
         self.get_variable_contexts()
@@ -162,12 +162,12 @@ class PugdebugDebugger(QObject):
     def get_variable_contexts(self):
         self.last_command = 'variable_contexts'
         command = 'context_names -i %d' % self.get_transaction_id()
-        self.server.command(command)
+        self.server.send_command(command)
 
     def get_variable_context(self, context_id):
         self.last_command = 'variables'
         command = 'context_get -c %d -i %d' % (context_id, self.get_transaction_id())
-        self.server.command(command)
+        self.server.send_command(command)
 
     def get_variables(self):
         variables = self.variables

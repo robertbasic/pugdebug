@@ -46,7 +46,7 @@ class PugdebugServer(QTcpServer):
             self.sock = self.nextPendingConnection()
             self.sock.readyRead.connect(self.handle_ready_read)
 
-    def command(self, command):
+    def send_command(self, command):
         if not self.sock is None:
             self.sock.write(bytes(command + '\0', 'utf-8'))
 
