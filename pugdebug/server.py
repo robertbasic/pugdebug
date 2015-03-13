@@ -11,52 +11,58 @@ __author__="robertbasic"
 
 import socket
 
-from PyQt5.QtCore import QByteArray, pyqtSignal, QThread, QMutex
+from PyQt5.QtCore import QThread, QMutex, pyqtSignal
+
+from pugdebug.message_parser import PugdebugMessageParser
 
 class PugdebugServer(QThread):
 
     mutex = None
-    action = None
+
     sock = None
 
-    transaction_id = 0
+    parser = None
 
-    last_message = ''
+    action = None
+
+    transaction_id = 0
 
     xdebug_encoding = 'iso-8859-1'
 
     thread_finished_signal = pyqtSignal(type([]))
-    server_connected_signal = pyqtSignal()
-    server_stepped_signal = pyqtSignal()
-    server_got_variables_signal = pyqtSignal()
+    server_connected_signal = pyqtSignal(type({}))
+    server_stepped_signal = pyqtSignal(type({}))
+    server_got_variables_signal = pyqtSignal(object)
 
     def __init__(self):
         super(PugdebugServer, self).__init__()
 
         self.mutex = QMutex()
+        self.parser = PugdebugMessageParser()
+
         self.thread_finished_signal.connect(self.handle_thread_finished)
 
     def run(self):
         self.mutex.lock()
 
         if self.action == 'connect':
-            self.__connect_server()
+            response = self.__connect_server()
         elif self.action == 'step_into':
-            self.__step_into()
+            response = self.__step_into()
         elif self.action == 'variables':
-            self.__get_variables()
+            response = self.__get_variables()
 
-        self.thread_finished_signal.emit([])
+        self.thread_finished_signal.emit([response])
 
         self.mutex.unlock()
 
-    def handle_thread_finished(self):
+    def handle_thread_finished(self, thread_result):
         if self.action == 'connect':
-            self.server_connected_signal.emit()
+            self.server_connected_signal.emit(thread_result.pop())
         elif self.action == 'step_into':
-            self.server_stepped_signal.emit()
+            self.server_stepped_signal.emit(thread_result.pop())
         elif self.action == 'variables':
-            self.server_got_variables_signal.emit()
+            self.server_got_variables_signal.emit(thread_result.pop())
 
     def connect(self):
         self.action = 'connect'
@@ -82,14 +88,18 @@ class PugdebugServer(QThread):
         socket_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         socket_server.settimeout(None)
 
+        response = None
+
         try:
             socket_server.bind(('', 9000))
-            self.__init_connection(socket_server)
+            response = self.__init_connection(socket_server)
         except OSError:
             print(OSError.strerror())
             print("Socket bind failed")
         finally:
             socket_server.close()
+
+        return response
 
     def __init_connection(self, socket_server):
         socket_server.listen(5)
@@ -97,6 +107,8 @@ class PugdebugServer(QThread):
         self.sock, address = socket_server.accept()
         self.sock.settimeout(None)
         response = self.__receive_message()
+
+        init_message = self.parser.parse_init_message(response)
 
         comm = 'feature_set -i %d -n max_depth -v 1023' % self.__get_transaction_id()
         response = self.__command(comm)
@@ -107,19 +119,33 @@ class PugdebugServer(QThread):
         comm = 'feature_set -i %d -n max_data -v -1' % self.__get_transaction_id()
         response = self.__command(comm)
 
+        return init_message
+
     def __step_into(self):
         comm = 'step_into -i %d' % self.__get_transaction_id()
         response = self.__command(comm)
+
+        response = self.parser.parse_continuation_message(response)
+
+        return response
 
     def __get_variables(self):
         comm = 'context_names -i %d' % self.__get_transaction_id()
         response = self.__command(comm)
 
-        comm = 'context_get -i %d -c 0' % self.__get_transaction_id()
-        response = self.__command(comm)
+        contexts = self.parser.parse_variable_contexts_message(response)
 
-        comm = 'context_get -i %d -c 1' % self.__get_transaction_id()
-        response = self.__command(comm)
+        variables = {}
+
+        for context in contexts:
+            context_id = int(context['id'])
+            comm = 'context_get -i %d -c %d' % (self.__get_transaction_id(), context_id)
+            response = self.__command(comm)
+
+            var = self.parser.parse_variables_message(response)
+            variables[context['name']] = var
+
+        return variables
 
     def __command(self, command):
         self.sock.send(bytes(command + '\0', 'utf-8'))

@@ -14,12 +14,10 @@ import socket
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from pugdebug.server import PugdebugServer
-from pugdebug.message_parser import PugdebugMessageParser
 
 class PugdebugDebugger(QObject):
 
     server = None
-    parser = None
 
     last_message = ''
 
@@ -36,15 +34,11 @@ class PugdebugDebugger(QObject):
         Create a PugdebugServer object used to communicate with xdebug client
         through TCP.
 
-        Create a PugdebugMessageParser object used to parse the xml responses
-        from xdebug.
-
         Connect signals to slots.
         """
         super(PugdebugDebugger, self).__init__()
 
         self.server = PugdebugServer()
-        self.parser = PugdebugMessageParser()
 
         self.server.server_connected_signal.connect(self.handle_server_connected)
         self.server.server_stepped_signal.connect(self.handle_server_stepped)
@@ -66,7 +60,7 @@ class PugdebugDebugger(QObject):
     def handle_server_stepped(self):
         self.get_variables()
 
-    def handle_server_got_variables(self):
+    def handle_server_got_variables(self, variables):
         self.got_all_variables_signal.emit()
 
     def start_debug(self):
