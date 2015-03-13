@@ -31,6 +31,7 @@ class PugdebugServer(QThread):
 
     thread_finished_signal = pyqtSignal(type([]))
     server_connected_signal = pyqtSignal(type({}))
+    server_stopped_signal = pyqtSignal()
     server_stepped_signal = pyqtSignal(type({}))
     server_got_variables_signal = pyqtSignal(object)
 
@@ -47,6 +48,8 @@ class PugdebugServer(QThread):
 
         if self.action == 'connect':
             response = self.__connect_server()
+        elif self.action == 'stop':
+            response = self.__stop()
         elif self.action == 'step_into':
             response = self.__step_into()
         elif self.action == 'variables':
@@ -59,6 +62,8 @@ class PugdebugServer(QThread):
     def handle_thread_finished(self, thread_result):
         if self.action == 'connect':
             self.server_connected_signal.emit(thread_result.pop())
+        elif self.action == 'stop':
+            self.server_stopped_signal.emit()
         elif self.action == 'step_into':
             self.server_stepped_signal.emit(thread_result.pop())
         elif self.action == 'variables':
@@ -74,6 +79,10 @@ class PugdebugServer(QThread):
     def disconnect(self):
         self.sock.close()
         self.sock = None
+
+    def stop(self):
+        self.action = 'stop'
+        self.start()
 
     def step_into(self):
         self.action = 'step_into'
@@ -120,6 +129,12 @@ class PugdebugServer(QThread):
         response = self.__command(comm)
 
         return init_message
+
+    def __stop(self):
+        comm = 'stop -i %d' % self.__get_transaction_id()
+        response = self.__command(comm)
+
+        return True
 
     def __step_into(self):
         comm = 'step_into -i %d' % self.__get_transaction_id()
