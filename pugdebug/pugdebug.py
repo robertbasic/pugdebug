@@ -153,10 +153,9 @@ class Pugdebug():
         """
         self.debugger.request_all_variables()
 
-    def handle_got_all_variables(self):
+    def handle_got_all_variables(self, variables):
         """Handle when all variables are retrieved from xdebug
         """
-        variables = self.debugger.get_variables()
         self.variable_viewer.set_variables(variables)
 
     def handle_debugging_started(self):
@@ -202,8 +201,6 @@ class Pugdebug():
 
         if self.debugger.is_breaking():
             self.focus_current_line()
-
-            self.get_variables()
         elif self.debugger.is_stopped():
             self.stop_debug()
             self.debugger.cleanup()

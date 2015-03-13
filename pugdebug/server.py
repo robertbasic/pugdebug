@@ -11,76 +11,175 @@ __author__="robertbasic"
 
 import socket
 
-from PyQt5.QtCore import QByteArray, pyqtSignal
-from PyQt5.QtNetwork import QTcpServer, QHostAddress
+from PyQt5.QtCore import QThread, QMutex, pyqtSignal
 
-class PugdebugServer(QTcpServer):
+from pugdebug.message_parser import PugdebugMessageParser
+
+class PugdebugServer(QThread):
+
+    mutex = None
 
     sock = None
 
-    last_message = ''
+    parser = None
+
+    action = None
+
+    transaction_id = 0
 
     xdebug_encoding = 'iso-8859-1'
 
-    last_message_read_signal = pyqtSignal()
+    thread_finished_signal = pyqtSignal(type([]))
+    server_connected_signal = pyqtSignal(type({}))
+    server_stopped_signal = pyqtSignal()
+    server_stepped_signal = pyqtSignal(type({}))
+    server_got_variables_signal = pyqtSignal(object)
 
     def __init__(self):
         super(PugdebugServer, self).__init__()
 
-        self.newConnection.connect(self.handle_new_connection)
+        self.mutex = QMutex()
+        self.parser = PugdebugMessageParser()
+
+        self.thread_finished_signal.connect(self.handle_thread_finished)
+
+    def run(self):
+        self.mutex.lock()
+
+        if self.action == 'connect':
+            response = self.__connect_server()
+        elif self.action == 'stop':
+            response = self.__stop()
+        elif self.action == 'step_into':
+            response = self.__step_into()
+        elif self.action == 'variables':
+            response = self.__get_variables()
+
+        self.thread_finished_signal.emit([response])
+
+        self.mutex.unlock()
+
+    def handle_thread_finished(self, thread_result):
+        if self.action == 'connect':
+            self.server_connected_signal.emit(thread_result.pop())
+        elif self.action == 'stop':
+            self.server_stopped_signal.emit()
+        elif self.action == 'step_into':
+            self.server_stepped_signal.emit(thread_result.pop())
+        elif self.action == 'variables':
+            self.server_got_variables_signal.emit(thread_result.pop())
 
     def connect(self):
-        if self.isListening():
-            return True
+        self.action = 'connect'
+        self.start()
 
-        self.listen(QHostAddress.Any, 9000)
+    def is_connected(self):
+        return self.sock is not None
 
     def disconnect(self):
+        self.sock.close()
         self.sock = None
-        self.last_message = ''
 
-        self.close()
+    def stop(self):
+        self.action = 'stop'
+        self.start()
 
-    def handle_new_connection(self):
-        if self.hasPendingConnections():
-            self.sock = self.nextPendingConnection()
-            self.sock.readyRead.connect(self.handle_ready_read)
+    def step_into(self):
+        self.action = 'step_into'
+        self.start()
 
-    def send_command(self, command):
-        if not self.sock is None:
-            self.sock.write(bytes(command + '\0', 'utf-8'))
+    def get_variables(self):
+        self.action = 'variables'
+        self.start()
 
-    def handle_ready_read(self):
-        self.last_message = self.receive_message()
-        self.last_message_read_signal.emit()
+    def __connect_server(self):
+        socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        socket_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        socket_server.settimeout(None)
 
-    def read_last_message(self):
-        self.last_message = self.receive_message()
+        response = None
 
-    def get_last_message(self):
-        return self.last_message
+        try:
+            socket_server.bind(('', 9000))
+            response = self.__init_connection(socket_server)
+        except OSError:
+            print(OSError.strerror())
+            print("Socket bind failed")
+        finally:
+            socket_server.close()
 
-    def receive_message(self):
-        if self.sock is None:
-            return ''
+        return response
 
-        message_length = self.get_message_length()
+    def __init_connection(self, socket_server):
+        socket_server.listen(5)
 
-        message = self.sock.read(message_length).decode(self.xdebug_encoding)
+        self.sock, address = socket_server.accept()
+        self.sock.settimeout(None)
+        response = self.__receive_message()
 
-        # read that remaining null character in
-        self.sock.read(1)
+        init_message = self.parser.parse_init_message(response)
 
-        return message
+        comm = 'feature_set -i %d -n max_depth -v 9' % self.__get_transaction_id()
+        response = self.__command(comm)
 
-    def get_message_length(self):
+        comm = 'feature_set -i %d -n max_children -v 512' % self.__get_transaction_id()
+        response = self.__command(comm)
+
+        comm = 'feature_set -i %d -n max_data -v 4096' % self.__get_transaction_id()
+        response = self.__command(comm)
+
+        return init_message
+
+    def __stop(self):
+        comm = 'stop -i %d' % self.__get_transaction_id()
+        response = self.__command(comm)
+
+        return True
+
+    def __step_into(self):
+        comm = 'step_into -i %d' % self.__get_transaction_id()
+        response = self.__command(comm)
+
+        response = self.parser.parse_continuation_message(response)
+
+        return response
+
+    def __get_variables(self):
+        comm = 'context_names -i %d' % self.__get_transaction_id()
+        response = self.__command(comm)
+
+        contexts = self.parser.parse_variable_contexts_message(response)
+
+        variables = {}
+
+        for context in contexts:
+            context_id = int(context['id'])
+            comm = 'context_get -i %d -c %d' % (self.__get_transaction_id(), context_id)
+            response = self.__command(comm)
+
+            var = self.parser.parse_variables_message(response)
+            variables[context['name']] = var
+
+        return variables
+
+    def __command(self, command):
+        self.sock.send(bytes(command + '\0', 'utf-8'))
+        return self.__receive_message()
+
+    def __receive_message(self):
+        length = self.__get_message_length()
+        body = self.__get_message_body(length)
+
+        return body
+
+    def __get_message_length(self):
         length = ''
 
         while True:
-            character = self.sock.read(1)
+            character = self.sock.recv(1)
 
-            if character.decode(self.xdebug_encoding) == '':
-                self.disconnect()
+            if self.__is_eof(character):
+                self.close()
 
             if character.isdigit():
                 length = length + character.decode(self.xdebug_encoding)
@@ -89,3 +188,37 @@ class PugdebugServer(QTcpServer):
                 if length == '':
                     return 0
                 return int(length)
+
+    def __get_message_body(self, length):
+        body = ''
+
+        while length > 0:
+            data = self.sock.recv(length)
+
+            if self.__is_eof(data):
+                self.close()
+
+            body = body + data.decode(self.xdebug_encoding)
+
+            length = length - len(data)
+
+        self.__get_null()
+
+        return body
+
+    def __get_null(self):
+        while True:
+            character = self.sock.recv(1)
+
+            if self.__is_eof(character):
+                self.close()
+
+            if character.decode(self.xdebug_encoding) == '\0':
+                return
+
+    def __is_eof(self, data):
+        return data.decode(self.xdebug_encoding) == ''
+
+    def __get_transaction_id(self):
+        self.transaction_id += 1
+        return self.transaction_id
