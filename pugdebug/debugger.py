@@ -21,18 +21,10 @@ class PugdebugDebugger(QObject):
     server = None
     parser = None
 
-    last_command = None
-
     last_message = ''
 
     current_file = ''
     current_line = 0
-
-    number_of_contexts = 0
-    number_of_contexts_got = 0
-    variables = []
-
-    transaction_id = 0
 
     debugging_started_signal = pyqtSignal()
     step_command_signal = pyqtSignal()
@@ -54,127 +46,53 @@ class PugdebugDebugger(QObject):
         self.server = PugdebugServer()
         self.parser = PugdebugMessageParser()
 
-        self.server.last_message_read_signal.connect(self.handle_last_message_read)
+        self.server.server_connected_signal.connect(self.handle_server_connected)
+        self.server.server_stepped_signal.connect(self.handle_server_stepped)
+        self.server.server_got_variables_signal.connect(self.handle_server_got_variables)
 
     def cleanup(self):
         """Cleanup debugger when it's done
         """
-        if self.server.isListening():
+        if self.server.is_connected():
             self.server.disconnect()
 
-        self.last_command = None
         self.last_message = ''
         self.current_file = ''
         self.current_line = 0
-        self.number_of_contexts = 0
-        self.number_of_contexts_got = 0
-        self.variables = []
-        self.transaction_id = 0
 
-    def handle_last_message_read(self):
-        """Handle when the latest message from xdebug is read
-
-        This should be called after a command is sent to xdebug
-        and a reply message is read.
-        """
-
-        last_message = self.server.get_last_message()
-
-        if self.last_command == 'init':
-            self.handle_init_command()
-        elif self.last_command == 'continuation':
-            self.handle_continuation_command(last_message)
-        elif self.last_command == 'variable_contexts':
-            self.handle_variable_contexts_command(last_message)
-        elif self.last_command == 'variables':
-            self.handle_variables_command(last_message)
-
-    def handle_init_command(self):
-        """Handle when the init message from xdebug is read
-
-        At this point the server should have established a TCP connection and
-        the init message from xdebug client should be received.
-
-        Emit the custom debugging started signal.
-        """
+    def handle_server_connected(self):
         self.debugging_started_signal.emit()
 
-    def handle_continuation_command(self, last_message):
-        self.last_message = self.parser.parse_continuation_message(last_message)
-        self.step_command_signal.emit()
+    def handle_server_stepped(self):
+        self.get_variables()
 
-    def handle_variable_contexts_command(self, last_message):
-        last_message = self.parser.parse_variable_contexts_message(last_message)
-
-        self.number_of_contexts = len(last_message)
-
-        for context in last_message:
-            context_id = int(context['id'])
-            self.get_variable_context(context_id)
-
-    def handle_variables_command(self, last_message):
-        self.number_of_contexts_got += 1
-
-        last_message = self.parser.parse_variables_message(last_message)
-
-        self.variables.append(last_message)
-
-        if self.number_of_contexts == self.number_of_contexts_got:
-            self.got_all_variables_signal.emit()
+    def handle_server_got_variables(self):
+        self.got_all_variables_signal.emit()
 
     def start_debug(self):
         """Start a debugging session
 
         If the server is not connected, connect it.
         """
-        if not self.server.isListening():
-            self.last_command = 'init'
-            self.server.connect()
+        self.server.connect()
 
     def stop_debug(self):
-        command = 'stop'
-        self.do_continuation_command(command)
+        self.server.stop()
 
     def run_debug(self):
-        command = 'run'
-        self.do_continuation_command(command)
+        self.server.step_run()
 
     def step_over(self):
-        command = 'step_over'
-        self.do_continuation_command(command)
+        self.server.step_over()
 
     def step_into(self):
-        command = 'step_into'
-        self.do_continuation_command(command)
+        self.server.step_into()
 
     def step_out(self):
-        command = 'step_out'
-        self.do_continuation_command(command)
-
-    def do_continuation_command(self, command):
-        self.last_command = 'continuation'
-        command = '%s -i %d' % (command, self.get_transaction_id())
-        self.server.send_command(command)
-
-    def request_all_variables(self):
-        self.get_variable_contexts()
-
-    def get_variable_contexts(self):
-        self.last_command = 'variable_contexts'
-        command = 'context_names -i %d' % self.get_transaction_id()
-        self.server.send_command(command)
-
-    def get_variable_context(self, context_id):
-        self.last_command = 'variables'
-        command = 'context_get -c %d -i %d' % (context_id, self.get_transaction_id())
-        self.server.send_command(command)
+        self.server.step_out()
 
     def get_variables(self):
-        variables = self.variables
-        self.number_of_contexts = 0
-        self.number_of_contexts_got = 0
-        self.variables = []
-        return variables
+        self.server.get_variables()
 
     def get_current_file(self):
         if 'filename' in self.last_message:
@@ -201,7 +119,3 @@ class PugdebugDebugger(QObject):
         if 'status' in self.last_message and self.last_message['status'] == status:
             return True
         return False
-
-    def get_transaction_id(self):
-        self.transaction_id += 1
-        return self.transaction_id

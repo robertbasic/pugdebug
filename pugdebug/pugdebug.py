@@ -156,8 +156,7 @@ class Pugdebug():
     def handle_got_all_variables(self):
         """Handle when all variables are retrieved from xdebug
         """
-        variables = self.debugger.get_variables()
-        self.variable_viewer.set_variables(variables)
+        #self.variable_viewer.set_variables(variables)
 
     def handle_debugging_started(self):
         """Handle when debugging starts
