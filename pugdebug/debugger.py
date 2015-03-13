@@ -26,7 +26,7 @@ class PugdebugDebugger(QObject):
 
     debugging_started_signal = pyqtSignal()
     step_command_signal = pyqtSignal()
-    got_all_variables_signal = pyqtSignal()
+    got_all_variables_signal = pyqtSignal(object)
 
     def __init__(self):
         """Init the debugger object
@@ -64,7 +64,7 @@ class PugdebugDebugger(QObject):
         self.get_variables()
 
     def handle_server_got_variables(self, variables):
-        self.got_all_variables_signal.emit()
+        self.got_all_variables_signal.emit(variables)
 
     def start_debug(self):
         """Start a debugging session

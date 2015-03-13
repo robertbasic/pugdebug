@@ -26,9 +26,15 @@ class PugdebugVariableViewer(QTreeWidget):
     def set_variables(self, variables):
         self.clear()
 
-        for context in variables:
-            for variable in context:
+        if 'Locals' in variables:
+            for variable in variables['Locals']:
                 self.add_variable(variable)
+
+        if 'Superglobals' in variables:
+            item = QTreeWidgetItem(['Superglobals', '', ''])
+            self.addTopLevelItem(item)
+            for variable in variables['Superglobals']:
+                self.add_variable(variable, item)
 
     def add_variable(self, variable, parent=None):
         if variable['type'] == 'uninitialized':
