@@ -55,10 +55,16 @@ class Thread(QThread):
 
     thread_finished = pyqtSignal()
 
+    tid = 0
+
     def __init__(self):
         super(Thread, self).__init__()
 
         self.mutex = QMutex()
+
+    def get_tid(self):
+        self.tid += 1
+        return self.tid
 
     def run(self):
         self.mutex.lock()
@@ -87,22 +93,22 @@ class Thread(QThread):
             socket_server.close()
 
     def __step_into(self):
-        comm = 'step_into -i 4'
+        comm = 'step_into -i %d' % self.get_tid()
         self.__command(comm)
         message = self.__receive_message()
         print(message)
 
-        comm = 'context_names -i 5'
+        comm = 'context_names -i %d' % self.get_tid()
         self.__command(comm)
         message = self.__receive_message()
         print(message)
 
-        comm = 'context_get -i 6 -c 0'
+        comm = 'context_get -i %d -c 0' % self.get_tid()
         self.__command(comm)
         message = self.__receive_message()
         print(message)
 
-        comm = 'context_get -i 7 -c 1'
+        comm = 'context_get -i %d -c 1' % self.get_tid()
         self.__command(comm)
         message = self.__receive_message()
         print(message)
@@ -116,14 +122,14 @@ class Thread(QThread):
         self.sock.settimeout(None)
         message = self.__receive_message()
 
-        comm = 'feature_set -i 1 -n max_depth -v 1023'
+        comm = 'feature_set -i %d -n max_depth -v 1023' % self.get_tid()
         self.__command(comm)
         message = self.__receive_message()
 
-        comm = 'feature_set -i 2 -n max_children -v -1'
+        comm = 'feature_set -i %d -n max_children -v -1' % self.get_tid()
         self.__command(comm)
         message = self.__receive_message()
-        comm = 'feature_set -i 3 -n max_data -v -1'
+        comm = 'feature_set -i %d -n max_data -v -1' % self.get_tid()
         self.__command(comm)
         message = self.__receive_message()
 
