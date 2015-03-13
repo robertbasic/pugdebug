@@ -16,56 +16,23 @@ import sys, socket
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-class Server(QObject):
+class Server(QThread):
 
-    thread = None
+    mutex = None
+    action = None
+    sock = None
+    xdebug_encoding = 'iso-8859-1'
+    tid = 0
 
+    thread_finished = pyqtSignal(type([]))
     server_connected = pyqtSignal()
 
     def __init__(self):
         super(Server, self).__init__()
 
-        self.thread = Thread()
-
-        self.thread.thread_finished.connect(self.on_thread_finished)
-
-    def connect(self):
-        self.thread.action = 'connect'
-        self.thread.start()
-
-    def step_into(self):
-        self.thread.action = 'step_into'
-        self.thread.start()
-
-    def on_thread_finished(self, args):
-        print(args)
-        if self.thread.action == 'connect':
-            self.server_connected.emit()
-        elif self.thread.action == 'step_into':
-            print('done stepping into')
-
-class Thread(QThread):
-
-    mutex = None
-
-    action = None
-
-    sock = None
-
-    xdebug_encoding = 'iso-8859-1'
-
-    thread_finished = pyqtSignal(type([]))
-
-    tid = 0
-
-    def __init__(self):
-        super(Thread, self).__init__()
-
         self.mutex = QMutex()
 
-    def get_tid(self):
-        self.tid += 1
-        return self.tid
+        self.thread_finished.connect(self.on_thread_finished)
 
     def run(self):
         self.mutex.lock()
@@ -78,6 +45,25 @@ class Thread(QThread):
         self.thread_finished.emit(['some', 'data'])
 
         self.mutex.unlock()
+
+    def get_tid(self):
+        self.tid += 1
+        return self.tid
+
+    def connect(self):
+        self.action = 'connect'
+        self.start()
+
+    def step_into(self):
+        self.action = 'step_into'
+        self.start()
+
+    def on_thread_finished(self, args):
+        print(args)
+        if self.action == 'connect':
+            self.server_connected.emit()
+        elif self.action == 'step_into':
+            print('done stepping into')
 
     def __connect_server(self):
         socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
