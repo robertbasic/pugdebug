@@ -37,7 +37,8 @@ class Server(QObject):
         self.thread.action = 'step_into'
         self.thread.start()
 
-    def on_thread_finished(self):
+    def on_thread_finished(self, args):
+        print(args)
         if self.thread.action == 'connect':
             self.server_connected.emit()
         elif self.thread.action == 'step_into':
@@ -53,7 +54,7 @@ class Thread(QThread):
 
     xdebug_encoding = 'iso-8859-1'
 
-    thread_finished = pyqtSignal()
+    thread_finished = pyqtSignal(type([]))
 
     tid = 0
 
@@ -74,7 +75,7 @@ class Thread(QThread):
         elif self.action == 'step_into':
             self.__step_into()
 
-        self.thread_finished.emit()
+        self.thread_finished.emit(['some', 'data'])
 
         self.mutex.unlock()
 
