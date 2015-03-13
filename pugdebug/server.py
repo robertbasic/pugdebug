@@ -110,13 +110,13 @@ class PugdebugServer(QThread):
 
         init_message = self.parser.parse_init_message(response)
 
-        comm = 'feature_set -i %d -n max_depth -v 1023' % self.__get_transaction_id()
+        comm = 'feature_set -i %d -n max_depth -v 9' % self.__get_transaction_id()
         response = self.__command(comm)
 
-        comm = 'feature_set -i %d -n max_children -v -1' % self.__get_transaction_id()
+        comm = 'feature_set -i %d -n max_children -v 512' % self.__get_transaction_id()
         response = self.__command(comm)
 
-        comm = 'feature_set -i %d -n max_data -v -1' % self.__get_transaction_id()
+        comm = 'feature_set -i %d -n max_data -v 4096' % self.__get_transaction_id()
         response = self.__command(comm)
 
         return init_message
