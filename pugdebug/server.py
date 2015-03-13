@@ -96,39 +96,34 @@ class PugdebugServer(QThread):
 
         self.sock, address = socket_server.accept()
         self.sock.settimeout(None)
-        message = self.__receive_message()
+        response = self.__receive_message()
 
         comm = 'feature_set -i %d -n max_depth -v 1023' % self.__get_transaction_id()
-        self.__command(comm)
-        message = self.__receive_message()
+        response = self.__command(comm)
 
         comm = 'feature_set -i %d -n max_children -v -1' % self.__get_transaction_id()
-        self.__command(comm)
-        message = self.__receive_message()
+        response = self.__command(comm)
+
         comm = 'feature_set -i %d -n max_data -v -1' % self.__get_transaction_id()
-        self.__command(comm)
-        message = self.__receive_message()
+        response = self.__command(comm)
 
     def __step_into(self):
         comm = 'step_into -i %d' % self.__get_transaction_id()
-        self.__command(comm)
-        message = self.__receive_message()
+        response = self.__command(comm)
 
     def __get_variables(self):
         comm = 'context_names -i %d' % self.__get_transaction_id()
-        self.__command(comm)
-        message = self.__receive_message()
+        response = self.__command(comm)
 
         comm = 'context_get -i %d -c 0' % self.__get_transaction_id()
-        self.__command(comm)
-        message = self.__receive_message()
+        response = self.__command(comm)
 
         comm = 'context_get -i %d -c 1' % self.__get_transaction_id()
-        self.__command(comm)
-        message = self.__receive_message()
+        response = self.__command(comm)
 
     def __command(self, command):
         self.sock.send(bytes(command + '\0', 'utf-8'))
+        return self.__receive_message()
 
     def __receive_message(self):
         length = self.__get_message_length()
