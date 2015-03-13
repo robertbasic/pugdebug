@@ -19,7 +19,7 @@ class PugdebugDebugger(QObject):
 
     server = None
 
-    last_message = ''
+    step_result = ''
 
     current_file = ''
     current_line = 0
@@ -50,14 +50,17 @@ class PugdebugDebugger(QObject):
         if self.server.is_connected():
             self.server.disconnect()
 
-        self.last_message = ''
+        self.step_result = ''
         self.current_file = ''
         self.current_line = 0
 
     def handle_server_connected(self):
         self.debugging_started_signal.emit()
 
-    def handle_server_stepped(self):
+    def handle_server_stepped(self, step_result):
+        self.step_result = step_result
+        self.step_command_signal.emit()
+
         self.get_variables()
 
     def handle_server_got_variables(self, variables):
@@ -89,14 +92,14 @@ class PugdebugDebugger(QObject):
         self.server.get_variables()
 
     def get_current_file(self):
-        if 'filename' in self.last_message:
-            self.current_file = self.last_message['filename'].replace('file://', '')
+        if 'filename' in self.step_result:
+            self.current_file = self.step_result['filename'].replace('file://', '')
 
         return self.current_file
 
     def get_current_line(self):
-        if 'lineno' in self.last_message:
-            self.current_line = int(self.last_message['lineno'])
+        if 'lineno' in self.step_result:
+            self.current_line = int(self.step_result['lineno'])
 
         return self.current_line
 
@@ -110,6 +113,6 @@ class PugdebugDebugger(QObject):
         return self.is_status('stopped')
 
     def is_status(self, status):
-        if 'status' in self.last_message and self.last_message['status'] == status:
+        if 'status' in self.step_result and self.step_result['status'] == status:
             return True
         return False
