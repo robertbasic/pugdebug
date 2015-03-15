@@ -200,7 +200,6 @@ class Pugdebug():
             self.debugger.get_variables()
         elif self.debugger.is_stopped():
             self.stop_debug()
-            self.debugger.cleanup()
         elif self.debugger.is_stopping():
             self.stop_debug()
 
