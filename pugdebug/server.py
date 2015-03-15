@@ -52,6 +52,10 @@ class PugdebugServer(QThread):
             response = self.__stop()
         elif self.action == 'step_into':
             response = self.__step_into()
+        elif self.action == 'step_over':
+            response = self.__step_over()
+        elif self.action == 'step_out':
+            response = self.__step_out()
         elif self.action == 'variables':
             response = self.__get_variables()
 
@@ -65,6 +69,10 @@ class PugdebugServer(QThread):
         elif self.action == 'stop':
             self.server_stopped_signal.emit()
         elif self.action == 'step_into':
+            self.server_stepped_signal.emit(thread_result.pop())
+        elif self.action == 'step_over':
+            self.server_stepped_signal.emit(thread_result.pop())
+        elif self.action == 'step_out':
             self.server_stepped_signal.emit(thread_result.pop())
         elif self.action == 'variables':
             self.server_got_variables_signal.emit(thread_result.pop())
@@ -86,6 +94,14 @@ class PugdebugServer(QThread):
 
     def step_into(self):
         self.action = 'step_into'
+        self.start()
+
+    def step_over(self):
+        self.action = 'step_over'
+        self.start()
+
+    def step_out(self):
+        self.action = 'step_out'
         self.start()
 
     def get_variables(self):
@@ -138,6 +154,22 @@ class PugdebugServer(QThread):
 
     def __step_into(self):
         comm = 'step_into -i %d' % self.__get_transaction_id()
+        response = self.__command(comm)
+
+        response = self.parser.parse_continuation_message(response)
+
+        return response
+
+    def __step_over(self):
+        comm = 'step_over -i %d' % self.__get_transaction_id()
+        response = self.__command(comm)
+
+        response = self.parser.parse_continuation_message(response)
+
+        return response
+
+    def __step_out(self):
+        comm = 'step_out -i %d' % self.__get_transaction_id()
         response = self.__command(comm)
 
         response = self.parser.parse_continuation_message(response)
