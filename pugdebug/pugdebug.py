@@ -104,6 +104,7 @@ class Pugdebug():
         """
 
         self.debugger.debugging_started_signal.connect(self.handle_debugging_started)
+        self.debugger.debugging_stopped_signal.connect(self.handle_debugging_stopped)
         self.debugger.step_command_signal.connect(self.handle_step_command)
         self.debugger.got_all_variables_signal.connect(self.handle_got_all_variables)
 
@@ -146,13 +147,6 @@ class Pugdebug():
         doc = self.document_viewer.get_current_document()
         doc.move_to_line(current_line)
 
-    def get_variables(self):
-        """Get all variables
-
-        Sends a request to the debugger to get all variables.
-        """
-        self.debugger.request_all_variables()
-
     def handle_got_all_variables(self, variables):
         """Handle when all variables are retrieved from xdebug
         """
@@ -182,6 +176,8 @@ class Pugdebug():
     def stop_debug(self):
         self.debugger.stop_debug()
 
+    def handle_debugging_stopped(self):
+        self.debugger.cleanup()
         self.main_window.toggle_actions(False)
 
         self.main_window.set_statusbar_text("Debugging stopped...")

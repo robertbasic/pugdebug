@@ -25,6 +25,7 @@ class PugdebugDebugger(QObject):
     current_line = 0
 
     debugging_started_signal = pyqtSignal()
+    debugging_stopped_signal = pyqtSignal()
     step_command_signal = pyqtSignal()
     got_all_variables_signal = pyqtSignal(object)
 
@@ -41,6 +42,7 @@ class PugdebugDebugger(QObject):
         self.server = PugdebugServer()
 
         self.server.server_connected_signal.connect(self.handle_server_connected)
+        self.server.server_stopped_signal.connect(self.handle_server_stopped)
         self.server.server_stepped_signal.connect(self.handle_server_stepped)
         self.server.server_got_variables_signal.connect(self.handle_server_got_variables)
 
@@ -56,6 +58,9 @@ class PugdebugDebugger(QObject):
 
     def handle_server_connected(self):
         self.debugging_started_signal.emit()
+
+    def handle_server_stopped(self):
+        self.debugging_stopped_signal.emit()
 
     def handle_server_stepped(self, step_result):
         self.step_result = step_result
