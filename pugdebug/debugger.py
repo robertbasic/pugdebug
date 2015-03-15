@@ -66,8 +66,6 @@ class PugdebugDebugger(QObject):
         self.step_result = step_result
         self.step_command_signal.emit()
 
-        self.get_variables()
-
     def handle_server_got_variables(self, variables):
         self.got_all_variables_signal.emit(variables)
 
