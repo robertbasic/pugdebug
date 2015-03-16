@@ -50,6 +50,8 @@ class PugdebugServer(QThread):
             response = self.__connect_server()
         elif self.action == 'stop':
             response = self.__stop()
+        elif self.action == 'step_run':
+            response = self.__step_run()
         elif self.action == 'step_into':
             response = self.__step_into()
         elif self.action == 'step_over':
@@ -68,6 +70,8 @@ class PugdebugServer(QThread):
             self.server_connected_signal.emit(thread_result.pop())
         elif self.action == 'stop':
             self.server_stopped_signal.emit()
+        elif self.action == 'step_run':
+            self.server_stepped_signal.emit(thread_result.pop())
         elif self.action == 'step_into':
             self.server_stepped_signal.emit(thread_result.pop())
         elif self.action == 'step_over':
@@ -90,6 +94,10 @@ class PugdebugServer(QThread):
 
     def stop(self):
         self.action = 'stop'
+        self.start()
+
+    def step_run(self):
+        self.action = 'step_run'
         self.start()
 
     def step_into(self):
@@ -151,6 +159,14 @@ class PugdebugServer(QThread):
         response = self.__command(comm)
 
         return True
+
+    def __step_run(self):
+        comm = 'run -i %d' % self.__get_transaction_id()
+        response = self.__command(comm)
+
+        response = self.parser.parse_continuation_message(response)
+
+        return response
 
     def __step_into(self):
         comm = 'step_into -i %d' % self.__get_transaction_id()
