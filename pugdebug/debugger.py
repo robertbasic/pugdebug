@@ -56,19 +56,6 @@ class PugdebugDebugger(QObject):
         self.current_file = ''
         self.current_line = 0
 
-    def handle_server_connected(self):
-        self.debugging_started_signal.emit()
-
-    def handle_server_stopped(self):
-        self.debugging_stopped_signal.emit()
-
-    def handle_server_stepped(self, step_result):
-        self.step_result = step_result
-        self.step_command_signal.emit()
-
-    def handle_server_got_variables(self, variables):
-        self.got_all_variables_signal.emit(variables)
-
     def start_debug(self):
         """Start a debugging session
 
@@ -76,8 +63,24 @@ class PugdebugDebugger(QObject):
         """
         self.server.connect()
 
+    def handle_server_connected(self):
+        """Handle when server gets connected
+
+        Emit a debugging started signal.
+        """
+        self.debugging_started_signal.emit()
+
     def stop_debug(self):
+        """Stop a debugging session
+        """
         self.server.stop()
+
+    def handle_server_stopped(self):
+        """Handle when server gets disconnected
+
+        Emit a debugging stopped signal.
+        """
+        self.debugging_stopped_signal.emit()
 
     def run_debug(self):
         self.server.step_run()
@@ -91,8 +94,24 @@ class PugdebugDebugger(QObject):
     def step_out(self):
         self.server.step_out()
 
+    def handle_server_stepped(self, step_result):
+        """Handle when server executes a step command
+
+        Save the result of the step command and emit
+        a step command signal.
+        """
+        self.step_result = step_result
+        self.step_command_signal.emit()
+
     def get_variables(self):
         self.server.get_variables()
+
+    def handle_server_got_variables(self, variables):
+        """Handle when server recieves all variables
+
+        Emit a signal with all variables received.
+        """
+        self.got_all_variables_signal.emit(variables)
 
     def get_current_file(self):
         if 'filename' in self.step_result:
