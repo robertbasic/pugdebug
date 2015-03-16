@@ -143,58 +143,49 @@ class PugdebugServer(QThread):
 
         init_message = self.parser.parse_init_message(response)
 
-        comm = 'feature_set -i %d -n max_depth -v 9' % self.__get_transaction_id()
-        response = self.__command(comm)
+        command = 'feature_set -i %d -n max_depth -v 9' % self.__get_transaction_id()
+        response = self.__send_command(command)
 
-        comm = 'feature_set -i %d -n max_children -v 512' % self.__get_transaction_id()
-        response = self.__command(comm)
+        command = 'feature_set -i %d -n max_children -v 512' % self.__get_transaction_id()
+        response = self.__send_command(command)
 
-        comm = 'feature_set -i %d -n max_data -v 4096' % self.__get_transaction_id()
-        response = self.__command(comm)
+        command = 'feature_set -i %d -n max_data -v 4096' % self.__get_transaction_id()
+        response = self.__send_command(command)
 
         return init_message
 
     def __stop(self):
-        comm = 'stop -i %d' % self.__get_transaction_id()
-        response = self.__command(comm)
+        command = 'stop -i %d' % self.__get_transaction_id()
+        response = self.__send_command(command)
 
         return True
 
     def __step_run(self):
-        comm = 'run -i %d' % self.__get_transaction_id()
-        response = self.__command(comm)
-
-        response = self.parser.parse_continuation_message(response)
-
-        return response
+        command = 'run -i %d' % self.__get_transaction_id()
+        return self.__do_step_command(command)
 
     def __step_into(self):
-        comm = 'step_into -i %d' % self.__get_transaction_id()
-        response = self.__command(comm)
-
-        response = self.parser.parse_continuation_message(response)
-
-        return response
+        command = 'step_into -i %d' % self.__get_transaction_id()
+        return self.__do_step_command(command)
 
     def __step_over(self):
-        comm = 'step_over -i %d' % self.__get_transaction_id()
-        response = self.__command(comm)
-
-        response = self.parser.parse_continuation_message(response)
-
-        return response
+        command = 'step_over -i %d' % self.__get_transaction_id()
+        return self.__do_step_command(command)
 
     def __step_out(self):
-        comm = 'step_out -i %d' % self.__get_transaction_id()
-        response = self.__command(comm)
+        command = 'step_out -i %d' % self.__get_transaction_id()
+        return self.__do_step_command(command)
+
+    def __do_step_command(self, command):
+        response = self.__send_command(command)
 
         response = self.parser.parse_continuation_message(response)
 
         return response
 
     def __get_variables(self):
-        comm = 'context_names -i %d' % self.__get_transaction_id()
-        response = self.__command(comm)
+        command = 'context_names -i %d' % self.__get_transaction_id()
+        response = self.__send_command(command)
 
         contexts = self.parser.parse_variable_contexts_message(response)
 
@@ -202,15 +193,15 @@ class PugdebugServer(QThread):
 
         for context in contexts:
             context_id = int(context['id'])
-            comm = 'context_get -i %d -c %d' % (self.__get_transaction_id(), context_id)
-            response = self.__command(comm)
+            command = 'context_get -i %d -c %d' % (self.__get_transaction_id(), context_id)
+            response = self.__send_command(command)
 
             var = self.parser.parse_variables_message(response)
             variables[context['name']] = var
 
         return variables
 
-    def __command(self, command):
+    def __send_command(self, command):
         self.sock.send(bytes(command + '\0', 'utf-8'))
         return self.__receive_message()
 
