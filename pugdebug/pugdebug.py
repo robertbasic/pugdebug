@@ -94,11 +94,11 @@ class Pugdebug():
     def connect_debugger_signals(self):
         """Connect debugger signals
 
-        Connect signal that gets emitted when the debugging is started, when the TCP connection
-        is established and the initial message from xdebug is read.
+        Connect signal that gets emitted when the debugging is started.
 
-        Connect signal that gets emitted when a step command is executed and the reply message
-        from xdebug is read.
+        Connect signal that gets emmitted when the debugging is stopped.
+
+        Connect signal that gets emitted when a step command is execute.
 
         Connect signal that gets emitted when all variables from xdebug are read.
         """
@@ -147,10 +147,11 @@ class Pugdebug():
         doc = self.document_viewer.get_current_document()
         doc.move_to_line(current_line)
 
-    def handle_got_all_variables(self, variables):
-        """Handle when all variables are retrieved from xdebug
-        """
-        self.variable_viewer.set_variables(variables)
+    def start_debug(self):
+        self.variable_viewer.clear()
+
+        self.debugger.start_debug()
+        self.main_window.set_statusbar_text("Waiting for connection...")
 
     def handle_debugging_started(self):
         """Handle when debugging starts
@@ -167,16 +168,15 @@ class Pugdebug():
 
         self.step_into()
 
-    def start_debug(self):
-        self.variable_viewer.clear()
-
-        self.debugger.start_debug()
-        self.main_window.set_statusbar_text("Waiting for connection...")
-
     def stop_debug(self):
         self.debugger.stop_debug()
 
     def handle_debugging_stopped(self):
+        """Handle when debugging stops
+
+        This handler should be called when the connection to
+        xdebug is terminated.
+        """
         self.debugger.cleanup()
         self.main_window.toggle_actions(False)
 
@@ -214,6 +214,11 @@ class Pugdebug():
 
     def step_out(self):
         self.debugger.step_out()
+
+    def handle_got_all_variables(self, variables):
+        """Handle when all variables are retrieved from xdebug
+        """
+        self.variable_viewer.set_variables(variables)
 
     def run(self):
         self.main_window.showMaximized()
