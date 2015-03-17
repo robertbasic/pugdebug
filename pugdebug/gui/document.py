@@ -17,6 +17,8 @@ class PugdebugDocument(QPlainTextEdit):
     def __init__(self, contents):
         super(PugdebugDocument, self).__init__()
 
+        self.setReadOnly(True)
+
         self.cursorPositionChanged.connect(self.highlight)
 
         self.appendPlainText(contents)
