@@ -25,6 +25,15 @@ class PugdebugDocument(QPlainTextEdit):
 
         self.move_to_line(0)
 
+    def mousePressEvent(self, event):
+        pass
+
+    def mouseDoubleClickEvent(self, event):
+        pass
+
+    def contextMenuEvent(self, event):
+        pass
+
     def move_to_line(self, line):
         line = line - 1
         if line < 0:
