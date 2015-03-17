@@ -25,3 +25,8 @@ class PugdebugFileBrowser(QFileSystemModel):
         self.setRootPath(home_path)
 
         self.start_index = self.index(root_path)
+
+    def get_file_path(self, model_index):
+        if not self.isDir(model_index):
+            return self.filePath(model_index)
+        return None

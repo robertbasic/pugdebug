@@ -113,8 +113,9 @@ class Pugdebug():
 
         Find the path of the activated item and open that document.
         """
-        path = self.file_browser.model().filePath(index)
-        self.open_document(path)
+        path = self.file_browser.model().get_file_path(index)
+        if path is not None:
+            self.open_document(path)
 
     def open_document(self, path):
         """Open a document
