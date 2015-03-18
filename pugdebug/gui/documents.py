@@ -20,8 +20,8 @@ class PugdebugDocumentViewer(QTabWidget):
 
         self.setTabsClosable(True)
 
-    def add_tab(self, document, filename, path):
-        tab_index = self.addTab(document, filename)
+    def add_tab(self, document_widget, filename, path):
+        tab_index = self.addTab(document_widget, filename)
         self.setCurrentIndex(tab_index)
 
         self.tabs[tab_index] = path

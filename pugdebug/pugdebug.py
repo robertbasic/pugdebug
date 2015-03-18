@@ -126,11 +126,11 @@ class Pugdebug():
         If the document is already open, focus the tab with that document.
         """
         if not self.documents.is_document_open(path):
-            document = self.documents.open_document(path)
+            document_model = self.documents.open_document(path)
 
-            doc = PugdebugDocument(document.contents)
+            document_widget = PugdebugDocument(document_model)
 
-            self.document_viewer.add_tab(doc, document.filename, path)
+            self.document_viewer.add_tab(document_widget, document_model.filename, path)
         else:
             self.document_viewer.focus_tab(path)
 
@@ -145,8 +145,8 @@ class Pugdebug():
 
         self.open_document(current_file)
 
-        doc = self.document_viewer.get_current_document()
-        doc.move_to_line(current_line)
+        document_widget = self.document_viewer.get_current_document()
+        document_widget.move_to_line(current_line)
 
     def start_debug(self):
         self.variable_viewer.clear()
