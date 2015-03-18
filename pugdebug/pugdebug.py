@@ -61,6 +61,7 @@ class Pugdebug():
         """
 
         self.connect_file_browser_signals()
+        self.connect_document_viewer_signals()
 
         self.connect_toolbar_action_signals()
 
@@ -73,6 +74,9 @@ class Pugdebug():
         slot that gets called when a file browser item is activated.
         """
         self.file_browser.activated.connect(self.file_browser_item_activated)
+
+    def connect_document_viewer_signals(self):
+        self.document_viewer.tabCloseRequested.connect(self.close_document)
 
     def connect_toolbar_action_signals(self):
         """Connect toolbar action signals
@@ -133,6 +137,18 @@ class Pugdebug():
             self.document_viewer.add_tab(document_widget, document_model.filename, path)
         else:
             self.document_viewer.focus_tab(path)
+
+    def close_document(self, tab_index):
+        """Close a document
+
+        Get the document from the tab.
+        Delete the document.
+        Remove the tab.
+        """
+        document_widget = self.document_viewer.get_document(tab_index)
+        self.documents.close_document(document_widget.document_model.path)
+        document_widget.deleteLater()
+        self.document_viewer.close_tab(tab_index)
 
     def focus_current_line(self):
         """Focus the current line
