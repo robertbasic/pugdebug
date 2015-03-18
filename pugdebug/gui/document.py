@@ -14,14 +14,18 @@ from PyQt5.QtGui import QColor, QTextFormat, QTextCursor
 
 class PugdebugDocument(QPlainTextEdit):
 
-    def __init__(self, contents):
+    document_model = None
+
+    def __init__(self, document_model):
         super(PugdebugDocument, self).__init__()
+
+        self.document_model = document_model
 
         self.setReadOnly(True)
 
         self.cursorPositionChanged.connect(self.highlight)
 
-        self.appendPlainText(contents)
+        self.appendPlainText(document_model.contents)
 
         self.move_to_line(0)
 
