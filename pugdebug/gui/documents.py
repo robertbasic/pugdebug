@@ -26,6 +26,22 @@ class PugdebugDocumentViewer(QTabWidget):
 
         self.tabs[tab_index] = path
 
+    def close_tab(self, tab_index):
+        self.removeTab(tab_index)
+
+        self.tabs.pop(tab_index, None)
+
+        tabs = {}
+
+        # Reindex the tabs
+        number_of_tabs = len(self.tabs)
+        if number_of_tabs > 0:
+            for index in range(0, number_of_tabs):
+                document_widget = self.widget(index)
+                tabs[index] = document_widget.document_model.path
+
+        self.tabs = tabs
+
     def focus_tab(self, path):
         tab_index = None
         for i, p in self.tabs.items():
@@ -37,4 +53,7 @@ class PugdebugDocumentViewer(QTabWidget):
 
     def get_current_document(self):
         index = self.currentIndex()
+        return self.widget(index)
+
+    def get_document(self, index):
         return self.widget(index)
