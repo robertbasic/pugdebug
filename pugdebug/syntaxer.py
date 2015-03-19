@@ -16,7 +16,7 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
 
     phpBlock = ['<\?php', '\?>']
 
-    keywords = ['public', 'function']
+    keywords = ['public', 'function', 'foreach']
 
     functions = ['echo']
 
