@@ -10,6 +10,7 @@
 __author__="robertbasic"
 
 from PyQt5.QtWidgets import QMainWindow, QGridLayout, QWidget, QToolBar, QPushButton
+from PyQt5.QtGui import QFont
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
 from pugdebug.gui.settings import PugdebugSettingsWindow
@@ -32,6 +33,7 @@ class PugdebugMainWindow(QMainWindow):
         self.setup_gui_elements()
 
     def setup_gui_elements(self):
+        self.setup_fonts()
         self.setup_file_browser_window()
         self.setup_settings_window()
 
@@ -40,6 +42,12 @@ class PugdebugMainWindow(QMainWindow):
         self.setup_toolbar()
 
         self.set_statusbar_text("Idle...")
+
+    def setup_fonts(self):
+        font = QFont('mono')
+        font.setStyleHint(QFont.Monospace)
+        font.setPixelSize(12)
+        self.setFont(font)
 
     def setup_workarea_window(self):
         self.workarea_window = PugdebugWorkareaWindow(self)

@@ -18,15 +18,7 @@ class PugdebugFileBrowser(QTreeView):
     def __init__(self):
         super(PugdebugFileBrowser, self).__init__()
 
-        self.setup_looks()
-
-    def setup_looks(self):
         self.setMaximumWidth(300)
-
-        font = QFont('mono')
-        font.setStyleHint(QFont.Monospace)
-        font.setPixelSize(12)
-        self.setFont(font)
 
     def hide_columns(self):
         self.setColumnHidden(1, True)
