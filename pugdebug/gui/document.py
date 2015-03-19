@@ -12,12 +12,17 @@ __author__="robertbasic"
 from PyQt5.QtWidgets import QPlainTextEdit, QTextEdit
 from PyQt5.QtGui import QColor, QTextFormat, QTextCursor
 
+from pugdebug.syntaxer import PugdebugSyntaxer
+
 class PugdebugDocument(QPlainTextEdit):
 
     document_model = None
 
+    syntaxer = None
+
     def __init__(self, document_model):
         super(PugdebugDocument, self).__init__()
+
 
         self.document_model = document_model
 
@@ -28,6 +33,8 @@ class PugdebugDocument(QPlainTextEdit):
         self.appendPlainText(document_model.contents)
 
         self.move_to_line(0)
+
+        self.syntaxer = PugdebugSyntaxer(self.document())
 
     def mousePressEvent(self, event):
         pass
