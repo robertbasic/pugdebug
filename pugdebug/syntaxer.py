@@ -14,6 +14,41 @@ from PyQt5.QtGui import QSyntaxHighlighter, QColor, QTextCharFormat
 
 class PugdebugSyntaxer(QSyntaxHighlighter):
 
+    rules = None
+    formats = None
+
+    def __init__(self, document, rules):
+        QSyntaxHighlighter.__init__(self, document)
+        self.rules = rules
+        self.formats = rules.get_formats()
+
+    def highlightBlock(self, text):
+        for regex, nth, fmt in self.rules.get_rules():
+            # index is the start of the highlighted part
+            index = regex.indexIn(text, 0)
+
+            while index >= 0:
+                index = regex.pos(nth)
+                length = len(regex.cap(nth))
+                format = self.getFormat(fmt)
+                self.setFormat(index, length, format)
+                index = regex.indexIn(text, index+length)
+
+    def getFormat(self, format):
+        color = QColor()
+        color.setRed(self.formats[format]['color'][0])
+        color.setGreen(self.formats[format]['color'][1])
+        color.setBlue(self.formats[format]['color'][2])
+        format = QTextCharFormat()
+        format.setForeground(color)
+
+        return format
+
+    def parse(self, string):
+        pass
+
+class PugdebugSyntaxerRules():
+
     phpBlock = ['<\?php', '\?>']
 
     keywords = ['public', 'function', 'foreach']
@@ -41,9 +76,7 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
         }
     }
 
-    def __init__(self, document):
-        QSyntaxHighlighter.__init__(self, document)
-
+    def __init__(self):
         rules = []
         rules += [(r'%s' % p, 0, 'phpBlock')
                 for p in self.phpBlock]
@@ -69,27 +102,8 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
         self.rules = [(QRegExp(pat), index, format)
                     for(pat, index, format) in rules]
 
-    def highlightBlock(self, text):
-        for regex, nth, fmt in self.rules:
-            # index is the start of the highlighted part
-            index = regex.indexIn(text, 0)
+    def get_rules(self):
+        return self.rules
 
-            while index >= 0:
-                index = regex.pos(nth)
-                length = len(regex.cap(nth))
-                format = self.getFormat(fmt)
-                self.setFormat(index, length, format)
-                index = regex.indexIn(text, index+length)
-
-    def getFormat(self, format):
-        color = QColor()
-        color.setRed(self.formats[format]['color'][0])
-        color.setGreen(self.formats[format]['color'][1])
-        color.setBlue(self.formats[format]['color'][2])
-        format = QTextCharFormat()
-        format.setForeground(color)
-
-        return format
-
-    def parse(self, string):
-        pass
+    def get_formats(self):
+        return self.formats
