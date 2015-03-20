@@ -38,11 +38,11 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
         """
         matches_ = []
 
-        if text == '':
-            return
-
         if self.previousBlockState() > 0:
             self.setCurrentBlockState(self.previousBlockState())
+
+        if text == '':
+            return
 
         rules = self.rules.get_rules()
 
