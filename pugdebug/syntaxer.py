@@ -12,7 +12,7 @@ __author__="robertbasic"
 import os
 import json
 
-from PyQt5.QtCore import QRegExp
+from PyQt5.QtCore import QRegularExpression
 from PyQt5.QtGui import QSyntaxHighlighter, QColor, QTextCharFormat
 
 class PugdebugSyntaxer(QSyntaxHighlighter):
@@ -20,22 +20,78 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
     rules = None
     formats = None
 
+    in_php_block = 1
+    in_block_comment = 2
+
     def __init__(self, document, rules):
         QSyntaxHighlighter.__init__(self, document)
         self.rules = rules
         self.formats = rules.get_formats()
 
     def highlightBlock(self, text):
-        for regex, nth, fmt in self.rules.get_rules():
-            # index is the start of the highlighted part
-            index = regex.indexIn(text, 0)
+        """
+        If not in PHP block, only look for PHP blocks.
 
-            while index >= 0:
-                index = regex.pos(nth)
-                length = len(regex.cap(nth))
-                format = self.getFormat(fmt)
-                self.setFormat(index, length, format)
-                index = regex.indexIn(text, index+length)
+        If in block comment, match everything as comment
+
+        If line has line comment, match everything from // or # as comment
+        """
+        matches_ = []
+
+        if self.previousBlockState() > 0:
+            self.setCurrentBlockState(self.previousBlockState())
+
+        rules = self.rules.get_rules()
+
+        if not self.is_current_block_in_state(self.in_php_block):
+            rules = self.rules.get_php_rules()
+
+        for pattern, format, options in rules:
+            regex = QRegularExpression(pattern)
+            if options is not None:
+                regex.setPatternOptions(options)
+
+            if self.is_current_block_in_state(self.in_block_comment) and format != 'comments':
+                m = {
+                    'start': 0,
+                    'end': len(text) - 1,
+                    'length': len(text),
+                    'format': 'comments'
+                }
+                matches_.append(m)
+                continue
+
+            matches = regex.globalMatch(text)
+
+            while matches.hasNext():
+                match = matches.next()
+
+                if match.hasMatch():
+
+                    if match.capturedTexts().pop() == '<?php':
+                        self.set_current_block(self.in_php_block)
+
+                    if match.capturedTexts().pop() == '?>':
+                        self.set_current_block(-1)
+
+                    if match.capturedTexts().pop().startswith('/*'):
+                        self.set_current_block(self.in_block_comment)
+
+                    if match.capturedTexts().pop().endswith('*/'):
+                        self.unset_current_block(self.in_block_comment)
+
+                    m = {
+                        'start': match.capturedStart(),
+                        'end': match.capturedEnd(),
+                        'length': match.capturedLength(),
+                        'format': format
+                    }
+                    matches_.append(m)
+
+        if len(matches_) > 0:
+            for match in matches_:
+                format = self.getFormat(match['format'])
+                self.setFormat(match['start'], match['length'], format)
 
     def getFormat(self, format):
         color = QColor()
@@ -47,8 +103,34 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
 
         return format
 
-    def parse(self, string):
-        pass
+    def is_current_block_in_state(self, block_state):
+        state = self.currentBlockState()
+        if state < 0:
+            return False
+        has_state = (state & (1 << block_state))
+        return has_state > 0
+
+    def set_current_block(self, block_state):
+        if block_state < 0:
+            state = block_state
+        else:
+            state = self.previousBlockState()
+            if state < 0:
+                state = 0
+            state |= 1 << block_state
+
+        self.setCurrentBlockState(state)
+
+    def unset_current_block(self, block_state):
+        if block_state < 0:
+            state = block_state
+        else:
+            state = self.previousBlockState()
+            if state < 0:
+                state = 0
+            state &= ~(1 << block_state)
+
+        self.setCurrentBlockState(state)
 
 class PugdebugSyntaxerRules():
 
@@ -92,29 +174,33 @@ class PugdebugSyntaxerRules():
             self.functions = json.load(functions_json)
 
         rules = []
-        rules += [(r'%s' % p, 0, 'phpBlock')
-                for p in self.phpBlock]
 
-        rules += [(r'%s' % k, 0, 'keywords')
-                for k in self.keywords]
-
-        rules += [(r'%s' % f, 0, 'functions')
-                for f in self.functions]
-
-        # $variables
-        rules += [(r'\$[\w]*', 0, 'variables')]
+        rules += self.get_php_rules()
 
         # comments
-        rules += [(r'#[^\n]*', 0, 'comments')]
-        rules += [(r'//[^\n]*', 0, 'comments')]
-        rules += [(r'/\*+.*\*+/', 0, 'comments')]
+        rules += [(r'#[^\n]*', 'comments', None)]
+        rules += [(r'//[^\n]*', 'comments', None)]
+        rules += [(r'/\*+', 'comments', None)]
+        rules += [(r'\*+/', 'comments', None)]
+
+        # $variables
+        rules += [(r'\$[\w]*', 'variables', None)]
+
+        rules += [(r'\b%s\b' % k,'keywords', None) for k in self.keywords]
+
+        rules += [(r'\b%s\b' % f, 'functions', None) for f in self.functions]
+
 
         # strings
-        rules += [(r'".*"', 0, 'strings')]
-        rules += [(r"'.*'", 0, 'strings')]
+        rules += [(r'"[^"]*"', 'strings', None)]
+        rules += [(r"'[^']*'", 'strings', None)]
 
-        self.rules = [(QRegExp(pat), index, format)
-                    for(pat, index, format) in rules]
+        self.rules = [(pattern, format, options)
+                    for(pattern, format, options) in rules]
+
+    def get_php_rules(self):
+        return [(r'%s' % p, 'phpBlock', None)
+                for p in self.phpBlock]
 
     def get_rules(self):
         return self.rules
