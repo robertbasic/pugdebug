@@ -9,6 +9,9 @@
 
 __author__="robertbasic"
 
+import os
+import json
+
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QSyntaxHighlighter, QColor, QTextCharFormat
 
@@ -51,9 +54,9 @@ class PugdebugSyntaxerRules():
 
     phpBlock = ['<\?php', '\?>']
 
-    keywords = ['public', 'function', 'foreach']
+    keywords = []
 
-    functions = ['echo']
+    functions = []
 
     formats = {
         'phpBlock': {
@@ -77,6 +80,17 @@ class PugdebugSyntaxerRules():
     }
 
     def __init__(self):
+        path = self.get_syntaxer_rules_path()
+
+        keywords_path = "%s/php_keywords.json" % path
+        functions_path = "%s/php_functions.json" % path
+
+        with open(keywords_path) as keywords_json:
+            self.keywords = json.load(keywords_json)
+
+        with open(functions_path) as functions_json:
+            self.functions = json.load(functions_json)
+
         rules = []
         rules += [(r'%s' % p, 0, 'phpBlock')
                 for p in self.phpBlock]
@@ -107,3 +121,6 @@ class PugdebugSyntaxerRules():
 
     def get_formats(self):
         return self.formats
+
+    def get_syntaxer_rules_path(self):
+        return "%s/pugdebug/syntaxer/" % os.getcwd()
