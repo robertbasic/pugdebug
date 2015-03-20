@@ -36,6 +36,7 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
 
         If line has line comment, match everything from // or # as comment
         """
+        # @TODO <?php $x = 'a'; ?>
         matches_ = []
 
         if self.previousBlockState() > 0:
