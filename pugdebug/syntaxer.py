@@ -46,19 +46,22 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
         if not self.is_current_block_in_state(self.in_php_block):
             rules = self.rules.get_php_rules()
 
+        if self.is_current_block_in_state(self.in_block_comment):
+            rules = self.rules.get_block_comment_rules()
+            m = {
+                'start': 0,
+                'end': len(text) - 1,
+                'length': len(text),
+                'format': 'comments'
+            }
+            matches_.append(m)
+
         for pattern, format, options in rules:
             regex = QRegularExpression(pattern)
             if options is not None:
                 regex.setPatternOptions(options)
 
             if self.is_current_block_in_state(self.in_block_comment) and format != 'comments':
-                m = {
-                    'start': 0,
-                    'end': len(text) - 1,
-                    'length': len(text),
-                    'format': 'comments'
-                }
-                matches_.append(m)
                 continue
 
             matches = regex.globalMatch(text)
@@ -190,8 +193,7 @@ class PugdebugSyntaxerRules():
         # comments
         rules += [(r'#[^\n]*', 'comments', None)]
         rules += [(r'//[^\n]*', 'comments', None)]
-        rules += [(r'/\*+', 'comments', None)]
-        rules += [(r'\*+/', 'comments', None)]
+        rules += self.get_block_comment_rules()
 
         self.rules = [(pattern, format, options)
                     for(pattern, format, options) in rules]
@@ -199,6 +201,12 @@ class PugdebugSyntaxerRules():
     def get_php_rules(self):
         return [(r'%s' % p, 'phpBlock', None)
                 for p in self.phpBlock]
+
+    def get_block_comment_rules(self):
+        return [
+            (r'/\*+', 'comments', None),
+            (r'\*+/', 'comments', None)
+        ]
 
     def get_rules(self):
         return self.rules
