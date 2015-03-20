@@ -59,6 +59,14 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
             }
             matches_.append(m)
 
+        matches_ = self.get_matches(text, rules, matches_)
+
+        if len(matches_) > 0:
+            for match in matches_:
+                format = self.getFormat(match['format'])
+                self.setFormat(match['start'], match['length'], format)
+
+    def get_matches(self, text, rules, matches_):
         for pattern, format, options in rules:
             regex = QRegularExpression(pattern)
             if options is not None:
@@ -93,10 +101,7 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
                     }
                     matches_.append(m)
 
-        if len(matches_) > 0:
-            for match in matches_:
-                format = self.getFormat(match['format'])
-                self.setFormat(match['start'], match['length'], format)
+        return matches_
 
     def getFormat(self, format):
         color = QColor()
