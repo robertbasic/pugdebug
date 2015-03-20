@@ -67,7 +67,6 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
                 match = matches.next()
 
                 if match.hasMatch():
-
                     if match.capturedTexts().pop() == '<?php':
                         self.set_current_block(self.in_php_block)
 
@@ -177,12 +176,6 @@ class PugdebugSyntaxerRules():
 
         rules += self.get_php_rules()
 
-        # comments
-        rules += [(r'#[^\n]*', 'comments', None)]
-        rules += [(r'//[^\n]*', 'comments', None)]
-        rules += [(r'/\*+', 'comments', None)]
-        rules += [(r'\*+/', 'comments', None)]
-
         # $variables
         rules += [(r'\$[\w]*', 'variables', None)]
 
@@ -190,10 +183,15 @@ class PugdebugSyntaxerRules():
 
         rules += [(r'\b%s\b' % f, 'functions', None) for f in self.functions]
 
-
         # strings
         rules += [(r'"[^"]*"', 'strings', None)]
         rules += [(r"'[^']*'", 'strings', None)]
+
+        # comments
+        rules += [(r'#[^\n]*', 'comments', None)]
+        rules += [(r'//[^\n]*', 'comments', None)]
+        rules += [(r'/\*+', 'comments', None)]
+        rules += [(r'\*+/', 'comments', None)]
 
         self.rules = [(pattern, format, options)
                     for(pattern, format, options) in rules]
