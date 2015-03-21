@@ -48,6 +48,8 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
         rules = self.rules.get_rules()
 
         if not self.is_current_block_in_state(self.in_php_block):
+            if text.find('<?php') < 0:
+                return
             rules = self.rules.get_php_rules()
 
         if self.is_current_block_in_state(self.in_block_comment):
