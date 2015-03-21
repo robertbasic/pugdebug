@@ -190,9 +190,11 @@ class PugdebugSyntaxerRules():
         # $variables
         rules += [(r'\$[\w]*', 'variables', None)]
 
-        rules += [(r'\b%s\b' % k,'keywords', None) for k in self.keywords]
+        keywords = r'\b' + r'\b|\b'.join(self.keywords) + r'\b'
+        rules += [(keywords, 'keywords', None)]
 
-        rules += [(r'\b%s\b' % f, 'functions', None) for f in self.functions]
+        functions = r'\b' + r'\b|\b'.join(self.functions) + r'\b'
+        rules += [(functions, 'functions', None)]
 
         # strings
         rules += [(r'"[^"]*"', 'strings', None)]
