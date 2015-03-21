@@ -65,7 +65,7 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
 
         if len(matches_) > 0:
             for match in matches_:
-                format = self.getFormat(match['format'])
+                format = self.formats[match['format']]
                 self.setFormat(match['start'], match['length'], format)
 
     def get_matches(self, text, rules, matches_):
@@ -103,16 +103,6 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
                     matches_.append(m)
 
         return matches_
-
-    def getFormat(self, format):
-        color = QColor()
-        color.setRed(self.formats[format]['color'][0])
-        color.setGreen(self.formats[format]['color'][1])
-        color.setBlue(self.formats[format]['color'][2])
-        format = QTextCharFormat()
-        format.setForeground(color)
-
-        return format
 
     def is_current_block_in_state(self, block_state):
         state = self.currentBlockState()
@@ -218,7 +208,16 @@ class PugdebugSyntaxerRules():
         return self.rules
 
     def get_formats(self):
-        return self.formats
+        formats_ = {}
+        for format in self.formats:
+            color = QColor()
+            color.setRed(self.formats[format]['color'][0])
+            color.setGreen(self.formats[format]['color'][1])
+            color.setBlue(self.formats[format]['color'][2])
+            charFormat = QTextCharFormat()
+            charFormat.setForeground(color)
+            formats_[format] = charFormat
+        return formats_
 
     def get_syntaxer_rules_path(self):
         return "%s/pugdebug/syntaxer/" % os.getcwd()
