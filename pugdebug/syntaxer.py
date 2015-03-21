@@ -186,14 +186,14 @@ class PugdebugSyntaxerRules():
 
         rules += self.get_php_rules()
 
-        # $variables
-        rules += [(r'\$[\w]*', 'variables', None)]
-
         keywords = r'\b' + r'\b|\b'.join(self.keywords) + r'\b'
         rules += [(keywords, 'keywords', None)]
 
         functions = r'\b' + r'\b|\b'.join(self.functions) + r'\b'
         rules += [(functions, 'functions', None)]
+
+        # $variables
+        rules += [(r'\$[\w]*', 'variables', None)]
 
         # strings
         rules += [(r'"[^"]*"', 'strings', None)]
