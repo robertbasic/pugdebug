@@ -13,7 +13,7 @@ $variable = null; // this $variable has a null value
 
 $camel_case = $upperCase = 2;
 
-$an_array = [
+$array = [
     'foo' => 'bar\'s value'
 ];
 
@@ -34,5 +34,7 @@ $foo = new Foo();
 this $var is outside * <?php echo 'inline'; ?>
 
 <a href='#'><?php echo 'inline php'; ?></a>
+
+skip this line $completely
 
 <?php // more than one php block in a file ?>
