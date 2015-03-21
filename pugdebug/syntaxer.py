@@ -67,8 +67,7 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
                 self.setFormat(match['start'], match['length'], format)
 
     def get_matches(self, text, rules, matches_):
-        for pattern, format, options in rules:
-            regex = QRegularExpression(pattern)
+        for regex, format, options in rules:
             if options is not None:
                 regex.setPatternOptions(options)
 
@@ -206,11 +205,11 @@ class PugdebugSyntaxerRules():
         rules += [(r'/\*+', 'comments', None)]
         rules += [(r'\*+/', 'comments', None)]
 
-        self.rules = [(pattern, format, options)
+        self.rules = [(QRegularExpression(pattern), format, options)
                     for(pattern, format, options) in rules]
 
     def get_php_rules(self):
-        return [(r'%s' % p, 'phpBlock', None)
+        return [(QRegularExpression(r'%s' % p), 'phpBlock', None)
                 for p in self.phpBlock]
 
     def get_rules(self):
