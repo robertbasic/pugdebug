@@ -135,8 +135,6 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
 
 class PugdebugSyntaxerRules():
 
-    phpBlock = ['<\?php', '\?>']
-
     keywords = []
 
     functions = []
@@ -176,7 +174,7 @@ class PugdebugSyntaxerRules():
 
         rules = []
 
-        rules += self.get_php_rules()
+        rules += [(r'<\?php', 'phpBlock', None)]
 
         keywords = r'\b' + r'\b|\b'.join(self.keywords) + r'\b'
         rules += [(keywords, 'keywords', None)]
@@ -197,12 +195,10 @@ class PugdebugSyntaxerRules():
         rules += [(r'/\*+', 'comments', None)]
         rules += [(r'\*+/', 'comments', None)]
 
+        rules += [(r'\?>', 'phpBlock', None)]
+
         self.rules = [(QRegularExpression(pattern), format, options)
                     for(pattern, format, options) in rules]
-
-    def get_php_rules(self):
-        return [(QRegularExpression(r'%s' % p), 'phpBlock', None)
-                for p in self.phpBlock]
 
     def get_rules(self):
         return self.rules
