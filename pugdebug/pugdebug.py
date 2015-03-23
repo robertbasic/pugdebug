@@ -12,6 +12,7 @@ __author__="robertbasic"
 import sys
 
 from pugdebug.debugger import PugdebugDebugger
+from pugdebug.syntaxer import PugdebugSyntaxerRules
 from pugdebug.gui.main_window import PugdebugMainWindow
 from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
@@ -29,6 +30,8 @@ class Pugdebug():
         """
 
         self.debugger = PugdebugDebugger()
+
+        self.syntaxer_rules = PugdebugSyntaxerRules()
 
         self.main_window = PugdebugMainWindow()
         self.file_browser = self.main_window.get_file_browser()
@@ -132,7 +135,7 @@ class Pugdebug():
         if not self.documents.is_document_open(path):
             document_model = self.documents.open_document(path)
 
-            document_widget = PugdebugDocument(document_model)
+            document_widget = PugdebugDocument(document_model, self.syntaxer_rules)
 
             self.document_viewer.add_tab(document_widget, document_model.filename, path)
         else:

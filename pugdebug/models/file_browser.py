@@ -20,7 +20,7 @@ class PugdebugFileBrowser(QFileSystemModel):
 
         home_path = os.path.expanduser('~')
 
-        root_path = "%s/www/pugdebug" % home_path
+        root_path = "%s/pugdebug/pugdebug/tests/_files" % home_path
 
         self.setRootPath(home_path)
 
