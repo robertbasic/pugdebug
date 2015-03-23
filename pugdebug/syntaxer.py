@@ -45,13 +45,6 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
         if text == '':
             return
 
-        rules = self.rules.get_rules()
-
-        if not self.is_current_block_in_state(self.in_php_block):
-            if text.find('<?php') < 0:
-                return
-            rules = self.rules.get_php_rules()
-
         if self.is_current_block_in_state(self.in_block_comment):
             m = {
                 'start': 0,
@@ -61,15 +54,40 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
             }
             matches_.append(m)
 
-        matches_ = self.get_matches(text, rules, matches_)
+        """
+        If not in PHP block, see if current line has one-line PHP blocks,
+        get all PHP blocks from the line and get matches for them
+        """
+        skip_matches = False
+        if not self.is_current_block_in_state(self.in_php_block):
+            if text.find('<?php') < 0:
+                return
+            elif text.find('<?php') >= 0 and text.find('?>') >= 0:
+                skip_matches = True
+                matches_ = self.get_one_line_php_matches(text, matches_)
+
+        if not skip_matches:
+            matches_ = self.get_matches(text, matches_)
 
         if len(matches_) > 0:
             for match in matches_:
                 format = self.formats[match['format']]
                 self.setFormat(match['start'], match['length'], format)
 
-    def get_matches(self, text, rules, matches_):
-        for regex, format, options in rules:
+    def get_one_line_php_matches(self, text, matches_):
+        regex = QRegularExpression(r'.*?(<\?php(.*?)\?>)')
+        php_blocks = regex.globalMatch(text)
+
+        while php_blocks.hasNext():
+            match = php_blocks.next()
+            php_block = match.capturedTexts().pop(1)
+            starts_at = text.find(php_block)
+            matches_ = self.get_matches(php_block, matches_, starts_at)
+
+        return matches_
+
+    def get_matches(self, text, matches_, starts_at=0):
+        for regex, format, options in self.rules.get_rules():
             if options is not None:
                 regex.setPatternOptions(options)
 
@@ -95,7 +113,7 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
                         self.unset_current_block(self.in_block_comment)
 
                     m = {
-                        'start': match.capturedStart(),
+                        'start': starts_at + match.capturedStart(),
                         'end': match.capturedEnd(),
                         'length': match.capturedLength(),
                         'format': format
