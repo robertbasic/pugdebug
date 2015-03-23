@@ -208,7 +208,9 @@ class PugdebugSyntaxerRules():
 
         # strings
         rules += [(r'"[^"]*"', 'strings', None)]
+        rules += [(r'"[^"]*(?<!\\)"', 'strings', None)]
         rules += [(r"'[^']*'", 'strings', None)]
+        rules += [(r"'[^']*(?<!\\)'", 'strings', None)]
 
         # comments
         rules += [(r'#[^\n]*', 'comments', None)]

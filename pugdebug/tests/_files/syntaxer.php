@@ -14,7 +14,8 @@ $variable = null; // this $variable has a null value
 $camel_case = $upperCase = 2;
 
 $array = [
-    'foo' => 'bar\'s value'
+    'foo' => 'bar\'s value',
+    'baz' => "bar\"s value"
 ];
 
 class Foo {
