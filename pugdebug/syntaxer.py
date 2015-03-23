@@ -171,7 +171,7 @@ class PugdebugSyntaxerRules():
             'color': (0, 153, 0)
         },
         'dollarSign': {
-            'color': (0, 255, 0)
+            'color': (150, 150, 0)
         },
         'comments': {
             'color': (150, 150, 150)
