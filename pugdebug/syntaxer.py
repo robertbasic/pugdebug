@@ -170,6 +170,9 @@ class PugdebugSyntaxerRules():
         'variables': {
             'color': (0, 153, 0)
         },
+        'dollarSign': {
+            'color': (0, 255, 0)
+        },
         'comments': {
             'color': (150, 150, 150)
         },
@@ -202,6 +205,7 @@ class PugdebugSyntaxerRules():
 
         # $variables
         rules += [(r'\$[\w]*', 'variables', None)]
+        rules += [(r'\$(?=[\w])', 'dollarSign', None)]
 
         # strings
         rules += [(r'"[^"]*"', 'strings', None)]
