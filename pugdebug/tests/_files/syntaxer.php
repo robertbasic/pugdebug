@@ -29,6 +29,10 @@ class Foo {
 }
 
 $foo = new Foo();
+
+$multiline_string = 'on one line
+    on 2nd line
+    on 3rd line';
 ?>
 
 this $var is outside * <?php echo 'inline'; ?>
@@ -38,3 +42,9 @@ this $var is outside * <?php echo 'inline'; ?>
 skip this line $completely
 
 <?php // more than one php block in a file ?>
+
+// what <?php echo 'here'
+
+// ends here ?>
+
+<?php echo 'what about'; ?> //multiple <?php echo 'blocks in line'; ?>
