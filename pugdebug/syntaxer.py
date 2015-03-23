@@ -198,7 +198,7 @@ class PugdebugSyntaxerRules():
         rules += [(r'<\?php', 'phpBlock', None)]
 
         keywords = r'\b' + r'\b|\b'.join(self.keywords) + r'\b'
-        rules += [(keywords, 'keywords', None)]
+        rules += [(keywords, 'keywords', QRegularExpression.CaseInsensitiveOption)]
 
         functions = r'\b' + r'\b|\b'.join(self.functions) + r'\b'
         rules += [(functions, 'functions', None)]
