@@ -25,6 +25,8 @@ class PugdebugServer(QThread):
 
     action = None
 
+    data = None
+
     transaction_id = 0
 
     xdebug_encoding = 'iso-8859-1'
@@ -46,6 +48,8 @@ class PugdebugServer(QThread):
     def run(self):
         self.mutex.lock()
 
+        data = self.data
+
         if self.action == 'connect':
             response = self.__connect_server()
         elif self.action == 'stop':
@@ -60,6 +64,8 @@ class PugdebugServer(QThread):
             response = self.__step_out()
         elif self.action == 'variables':
             response = self.__get_variables()
+        elif self.action == 'breakpoint':
+            response = self.__set_breakpoint(data)
 
         self.thread_finished_signal.emit([response])
 
@@ -114,6 +120,11 @@ class PugdebugServer(QThread):
 
     def get_variables(self):
         self.action = 'variables'
+        self.start()
+
+    def set_breakpoint(self, line_number):
+        self.action = 'breakpoint'
+        self.data = line_number
         self.start()
 
     def __connect_server(self):
@@ -200,6 +211,16 @@ class PugdebugServer(QThread):
             variables[context['name']] = var
 
         return variables
+
+    def __set_breakpoint(self, line_number):
+        command = 'breakpoint_set -i %d -t %s -f %s -n %d' % (
+                self.__get_transaction_id(),
+                'line',
+                'index.php',
+                line_number)
+        response = self.__send_command(command)
+
+        return True
 
     def __send_command(self, command):
         self.sock.send(bytes(command + '\0', 'utf-8'))

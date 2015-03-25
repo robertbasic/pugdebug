@@ -56,6 +56,9 @@ class PugdebugDebugger(QObject):
         self.current_file = ''
         self.current_line = 0
 
+    def is_connected(self):
+        return self.server.is_connected()
+
     def start_debug(self):
         """Start a debugging session
 
@@ -112,6 +115,9 @@ class PugdebugDebugger(QObject):
         Emit a signal with all variables received.
         """
         self.got_all_variables_signal.emit(variables)
+
+    def set_breakpoint(self, line_number):
+        self.server.set_breakpoint(line_number)
 
     def get_current_file(self):
         if 'filename' in self.step_result:
