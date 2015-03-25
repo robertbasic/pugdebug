@@ -142,8 +142,8 @@ class Pugdebug():
         else:
             self.document_viewer.focus_tab(path)
 
-    def handle_document_double_click(self, line_number):
-        self.set_breakpoint(line_number)
+    def handle_document_double_click(self, path, line_number):
+        self.set_breakpoint(path, line_number)
 
     def close_document(self, tab_index):
         """Close a document
@@ -244,11 +244,11 @@ class Pugdebug():
         """
         self.variable_viewer.set_variables(variables)
 
-    def set_breakpoint(self, line_number):
+    def set_breakpoint(self, path, line_number):
         if not self.debugger.is_connected():
             return
 
-        self.debugger.set_breakpoint(line_number)
+        self.debugger.set_breakpoint(path, line_number)
 
     def run(self):
         self.main_window.showMaximized()

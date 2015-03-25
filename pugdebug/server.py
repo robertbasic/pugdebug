@@ -122,9 +122,9 @@ class PugdebugServer(QThread):
         self.action = 'variables'
         self.start()
 
-    def set_breakpoint(self, line_number):
+    def set_breakpoint(self, path, line_number):
         self.action = 'breakpoint'
-        self.data = line_number
+        self.data = (path, line_number)
         self.start()
 
     def __connect_server(self):
@@ -212,11 +212,12 @@ class PugdebugServer(QThread):
 
         return variables
 
-    def __set_breakpoint(self, line_number):
+    def __set_breakpoint(self, data):
+        path, line_number = data
         command = 'breakpoint_set -i %d -t %s -f %s -n %d' % (
                 self.__get_transaction_id(),
                 'line',
-                'index.php',
+                path,
                 line_number)
         response = self.__send_command(command)
 

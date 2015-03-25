@@ -116,8 +116,8 @@ class PugdebugDebugger(QObject):
         """
         self.got_all_variables_signal.emit(variables)
 
-    def set_breakpoint(self, line_number):
-        self.server.set_breakpoint(line_number)
+    def set_breakpoint(self, path, line_number):
+        self.server.set_breakpoint(path, line_number)
 
     def get_current_file(self):
         if 'filename' in self.step_result:

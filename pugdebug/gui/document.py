@@ -21,7 +21,7 @@ class PugdebugDocument(QPlainTextEdit):
 
     syntaxer = None
 
-    document_double_clicked_signal = pyqtSignal(int)
+    document_double_clicked_signal = pyqtSignal(str, int)
 
     def __init__(self, document_model, syntaxer_rules):
         super(PugdebugDocument, self).__init__()
@@ -42,10 +42,13 @@ class PugdebugDocument(QPlainTextEdit):
         pass
 
     def mouseDoubleClickEvent(self, event):
+        path = self.document_model.path
+
         cursor = self.cursorForPosition(event.pos())
         line_number = cursor.blockNumber()
         line_number += 1
-        self.document_double_clicked_signal.emit(line_number)
+
+        self.document_double_clicked_signal.emit(path, line_number)
 
     def contextMenuEvent(self, event):
         pass
