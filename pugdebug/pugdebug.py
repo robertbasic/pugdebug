@@ -136,10 +136,14 @@ class Pugdebug():
             document_model = self.documents.open_document(path)
 
             document_widget = PugdebugDocument(document_model, self.syntaxer_rules)
+            document_widget.document_double_clicked_signal.connect(self.handle_document_double_click)
 
             self.document_viewer.add_tab(document_widget, document_model.filename, path)
         else:
             self.document_viewer.focus_tab(path)
+
+    def handle_document_double_click(self, line_number):
+        print(line_number)
 
     def close_document(self, tab_index):
         """Close a document
