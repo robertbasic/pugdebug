@@ -365,3 +365,26 @@ class PugdebugMessageParserTest(unittest.TestCase):
         result = self.parser.parse_breakpoint_set_message(message)
 
         self.assertFalse(result)
+
+    def test_parse_breakpoint_list_message(self):
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="breakpoint_list" transaction_id="12"><breakpoint type="line" filename="file:///home/robert/www/pugdebug/index.php" lineno="3" state="enabled" hit_count="0" hit_value="0" id="32350002"></breakpoint><breakpoint type="line" filename="file:///home/robert/www/pugdebug/index.php" lineno="10" state="enabled" hit_count="0" hit_value="0" id="32350001"></breakpoint></response>'
+
+        result = self.parser.parse_breakpoint_list_message(message)
+
+        expected = [
+            {
+                'filename': 'file:///home/robert/www/pugdebug/index.php',
+                'lineno': '3',
+                'state': 'enabled',
+                'type': 'line'
+            },
+            {
+                'filename': 'file:///home/robert/www/pugdebug/index.php',
+                'lineno': '10',
+                'state': 'enabled',
+                'type': 'line'
+            }
+        ]
+
+        self.assertEqual(expected, result)

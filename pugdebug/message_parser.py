@@ -95,6 +95,23 @@ class PugdebugMessageParser():
 
         return True
 
+    def parse_breakpoint_list_message(self, message):
+        if not message:
+            return []
+
+        breakpoints = []
+
+        xml = xml_parser.fromstring(message)
+
+        attribs = ['type', 'filename', 'lineno', 'state']
+        for child in xml.getchildren():
+            breakpoint = {}
+            breakpoint = self.get_attribs(child, attribs, breakpoint)
+
+            breakpoints.append(breakpoint)
+
+        return breakpoints
+
     def get_variables(self, parent, result):
         attribs = ['name', 'type', 'encoding']
         for child in parent.getchildren():
