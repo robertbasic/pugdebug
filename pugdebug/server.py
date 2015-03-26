@@ -36,6 +36,8 @@ class PugdebugServer(QThread):
     server_stopped_signal = pyqtSignal()
     server_stepped_signal = pyqtSignal(type({}))
     server_got_variables_signal = pyqtSignal(object)
+    server_set_breakpoint_signal = pyqtSignal(bool)
+    server_listed_breakpoints_signal = pyqtSignal(type([]))
 
     def __init__(self):
         super(PugdebugServer, self).__init__()
@@ -64,8 +66,10 @@ class PugdebugServer(QThread):
             response = self.__step_out()
         elif self.action == 'variables':
             response = self.__get_variables()
-        elif self.action == 'breakpoint':
+        elif self.action == 'breakpoint_set':
             response = self.__set_breakpoint(data)
+        elif self.action == 'breakpoint_list':
+            response = self.__list_breakpoints()
 
         self.thread_finished_signal.emit([response])
 
@@ -86,6 +90,10 @@ class PugdebugServer(QThread):
             self.server_stepped_signal.emit(thread_result.pop())
         elif self.action == 'variables':
             self.server_got_variables_signal.emit(thread_result.pop())
+        elif self.action == 'breakpoint_set':
+            self.server_set_breakpoint_signal.emit(thread_result.pop())
+        elif self.action == 'breakpoint_list':
+            self.server_listed_breakpoints_signal.emit(thread_result.pop())
 
     def connect(self):
         self.action = 'connect'
@@ -123,8 +131,12 @@ class PugdebugServer(QThread):
         self.start()
 
     def set_breakpoint(self, path, line_number):
-        self.action = 'breakpoint'
+        self.action = 'breakpoint_set'
         self.data = (path, line_number)
+        self.start()
+
+    def list_breakpoints(self):
+        self.action = 'breakpoint_list'
         self.start()
 
     def __connect_server(self):
@@ -222,6 +234,14 @@ class PugdebugServer(QThread):
         response = self.__send_command(command)
 
         return self.parser.parse_breakpoint_set_message(response)
+
+    def __list_breakpoints(self):
+        command = 'breakpoint_list -i %d' % self.__get_transaction_id()
+        response = self.__send_command(command)
+
+        breakpoints = self.parser.parse_breakpoint_list_message(response)
+
+        return breakpoints
 
     def __send_command(self, command):
         self.sock.send(bytes(command + '\0', 'utf-8'))

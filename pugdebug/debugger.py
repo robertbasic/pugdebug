@@ -45,6 +45,8 @@ class PugdebugDebugger(QObject):
         self.server.server_stopped_signal.connect(self.handle_server_stopped)
         self.server.server_stepped_signal.connect(self.handle_server_stepped)
         self.server.server_got_variables_signal.connect(self.handle_server_got_variables)
+        self.server.server_set_breakpoint_signal.connect(self.handle_server_set_breakpoint)
+        self.server.server_listed_breakpoints_signal.connect(self.handle_server_listed_breakpoints)
 
     def cleanup(self):
         """Cleanup debugger when it's done
@@ -118,6 +120,16 @@ class PugdebugDebugger(QObject):
 
     def set_breakpoint(self, path, line_number):
         self.server.set_breakpoint(path, line_number)
+
+    def handle_server_set_breakpoint(self, successful):
+        if successful:
+            self.list_breakpoints()
+
+    def list_breakpoints(self):
+        self.server.list_breakpoints()
+
+    def handle_server_listed_breakpoints(self, breakpoints):
+        print(breakpoints)
 
     def get_current_file(self):
         if 'filename' in self.step_result:
