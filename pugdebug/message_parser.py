@@ -84,6 +84,17 @@ class PugdebugMessageParser():
 
         return variables
 
+    def parse_breakpoint_set_message(self, message):
+        if not message:
+            return False
+
+        xml = xml_parser.fromstring(message)
+
+        if len(xml.getchildren()):
+            return False
+
+        return True
+
     def get_variables(self, parent, result):
         attribs = ['name', 'type', 'encoding']
         for child in parent.getchildren():

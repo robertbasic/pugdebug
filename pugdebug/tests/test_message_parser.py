@@ -349,3 +349,19 @@ class PugdebugMessageParserTest(unittest.TestCase):
         self.assertEqual(expected[4], result[4])
         self.assertEqual(expected[5], result[5])
         self.assertEqual(expected[6]['variables'][28], result[6]['variables'][28])
+
+    def test_parse_successful_breakpoint_set_message(self):
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="breakpoint_set" transaction_id="9" id="32310001"></response>'
+
+        result = self.parser.parse_breakpoint_set_message(message)
+
+        self.assertTrue(result)
+
+    def test_parse_unsuccessful_breakpoint_set_message(self):
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="breakpoint_set" transaction_id="9" status="break" reason="ok"><error code="3"><message><![CDATA[invalid or missing options]]></message></error></response>'
+
+        result = self.parser.parse_breakpoint_set_message(message)
+
+        self.assertFalse(result)
