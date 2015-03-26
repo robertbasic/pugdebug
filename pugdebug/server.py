@@ -221,7 +221,7 @@ class PugdebugServer(QThread):
                 line_number)
         response = self.__send_command(command)
 
-        return True
+        return self.parser.parse_breakpoint_set_message(response)
 
     def __send_command(self, command):
         self.sock.send(bytes(command + '\0', 'utf-8'))
