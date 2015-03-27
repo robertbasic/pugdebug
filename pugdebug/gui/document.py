@@ -32,7 +32,7 @@ class PugdebugDocument(QPlainTextEdit):
 
         self.cursorPositionChanged.connect(self.highlight)
 
-        self.appendPlainText(document_model.contents)
+        self.setPlainText(document_model.contents)
 
         self.move_to_line(0)
 
