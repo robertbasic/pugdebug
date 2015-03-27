@@ -255,5 +255,9 @@ class Pugdebug():
     def handle_breakpoints_listed(self, breakpoints):
         self.breakpoint_viewer.set_breakpoints(breakpoints)
 
+        for breakpoint in breakpoints:
+            tab = self.document_viewer.get_tab(breakpoint['filename'])
+            tab.highlight_breakpoint_line(breakpoint['lineno'])
+
     def run(self):
         self.main_window.showMaximized()
