@@ -133,7 +133,7 @@ class PugdebugDebugger(QObject):
 
     def get_current_file(self):
         if 'filename' in self.step_result:
-            self.current_file = self.step_result['filename'].replace('file://', '')
+            self.current_file = self.step_result['filename']
 
         return self.current_file
 

@@ -129,6 +129,9 @@ class PugdebugMessageParser():
 
     def get_attribs(self, xml, attribs, result):
         for attrib in (attrib for attrib in xml.attrib if attrib in attribs):
-            result[attrib] = xml.attrib[attrib]
+            if attrib.startswith('file'):
+                result[attrib] = xml.attrib[attrib].replace('file://', '')
+            else:
+                result[attrib] = xml.attrib[attrib]
 
         return result
