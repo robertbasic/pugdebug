@@ -28,6 +28,7 @@ class PugdebugDebugger(QObject):
     debugging_stopped_signal = pyqtSignal()
     step_command_signal = pyqtSignal()
     got_all_variables_signal = pyqtSignal(object)
+    breakpoints_listed_signal = pyqtSignal(type([]))
 
     def __init__(self):
         """Init the debugger object
@@ -129,7 +130,7 @@ class PugdebugDebugger(QObject):
         self.server.list_breakpoints()
 
     def handle_server_listed_breakpoints(self, breakpoints):
-        print(breakpoints)
+        self.breakpoints_listed_signal.emit(breakpoints)
 
     def get_current_file(self):
         if 'filename' in self.step_result:

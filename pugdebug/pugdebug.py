@@ -37,6 +37,7 @@ class Pugdebug():
         self.file_browser = self.main_window.get_file_browser()
         self.document_viewer = self.main_window.get_document_viewer()
         self.variable_viewer = self.main_window.get_variable_viewer()
+        self.breakpoint_viewer = self.main_window.get_breakpoint_viewer()
 
         self.documents = PugdebugDocuments()
 
@@ -114,6 +115,7 @@ class Pugdebug():
         self.debugger.debugging_stopped_signal.connect(self.handle_debugging_stopped)
         self.debugger.step_command_signal.connect(self.handle_step_command)
         self.debugger.got_all_variables_signal.connect(self.handle_got_all_variables)
+        self.debugger.breakpoints_listed_signal.connect(self.handle_breakpoints_listed)
 
     def file_browser_item_activated(self, index):
         """Handle when file browser item gets activated
@@ -249,6 +251,9 @@ class Pugdebug():
             return
 
         self.debugger.set_breakpoint(path, line_number)
+
+    def handle_breakpoints_listed(self, breakpoints):
+        self.breakpoint_viewer.set_breakpoints(breakpoints)
 
     def run(self):
         self.main_window.showMaximized()

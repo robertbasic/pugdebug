@@ -39,3 +39,6 @@ class PugdebugWorkareaWindow(QWidget):
 
     def get_variable_viewer(self):
         return self.variable_viewer
+
+    def get_breakpoint_viewer(self):
+        return self.breakpoint_viewer
