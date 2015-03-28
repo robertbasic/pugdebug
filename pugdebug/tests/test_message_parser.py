@@ -372,7 +372,9 @@ class PugdebugMessageParserTest(unittest.TestCase):
 
         result = self.parser.parse_breakpoint_remove_message(message)
 
-        self.assertTrue(result)
+        expected = 41240003
+
+        self.assertEqual(expected, result)
 
     def test_parse_unsuccessful_breakpoint_remove_message(self):
         message = '<?xml version="1.0" encoding="iso-8859-1"?>\

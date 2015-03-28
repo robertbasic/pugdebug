@@ -104,7 +104,9 @@ class PugdebugMessageParser():
         children = xml.getchildren()
 
         if len(children) == 1:
-            return children.pop().tag.endswith('breakpoint')
+            child = children.pop()
+            if child.tag.endswith('breakpoint'):
+                return int(child.attrib['id'])
 
         return False
 
