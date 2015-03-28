@@ -37,6 +37,7 @@ class Pugdebug():
 
         self.main_window = PugdebugMainWindow()
         self.file_browser = self.main_window.get_file_browser()
+        self.settings = self.main_window.get_settings()
         self.document_viewer = self.main_window.get_document_viewer()
         self.variable_viewer = self.main_window.get_variable_viewer()
         self.breakpoint_viewer = self.main_window.get_breakpoint_viewer()
@@ -55,6 +56,8 @@ class Pugdebug():
         """
 
         model = PugdebugFileBrowser(self.main_window)
+        model.set_path(self.settings.get_project_root())
+
         self.file_browser.setModel(model)
         self.file_browser.setRootIndex(model.start_index)
         self.file_browser.hide_columns()
@@ -67,6 +70,7 @@ class Pugdebug():
         """
 
         self.connect_file_browser_signals()
+        self.connect_settings_signals()
         self.connect_document_viewer_signals()
 
         self.connect_toolbar_action_signals()
@@ -80,6 +84,9 @@ class Pugdebug():
         slot that gets called when a file browser item is activated.
         """
         self.file_browser.activated.connect(self.file_browser_item_activated)
+
+    def connect_settings_signals(self):
+        self.settings.project_root.returnPressed.connect(self.project_root_changed)
 
     def connect_document_viewer_signals(self):
         self.document_viewer.tabCloseRequested.connect(self.close_document)
@@ -180,6 +187,14 @@ class Pugdebug():
 
         document_widget = self.document_viewer.get_current_document()
         document_widget.move_to_line(current_line)
+
+    def project_root_changed(self):
+        project_root = self.settings.get_project_root()
+
+        model = self.file_browser.model()
+        model.set_path(project_root)
+        self.file_browser.setModel(model)
+        self.file_browser.setRootIndex(model.start_index)
 
     def start_debug(self):
         self.variable_viewer.clear()

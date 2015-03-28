@@ -9,7 +9,9 @@
 
 __author__="robertbasic"
 
-from PyQt5.QtWidgets import QWidget, QSpinBox, QFormLayout
+import os
+
+from PyQt5.QtWidgets import QWidget, QLineEdit, QFormLayout
 
 class PugdebugSettingsWindow(QWidget):
 
@@ -18,11 +20,15 @@ class PugdebugSettingsWindow(QWidget):
     def __init__(self, parent):
         super(PugdebugSettingsWindow, self).__init__(parent)
 
-        port_number = QSpinBox()
-        port_number.setRange(1, 65535)
-        port_number.setValue(9000)
+        home_path = os.path.expanduser('~')
+
+        self.project_root = QLineEdit(home_path)
+        self.project_root.setMaximumWidth(250)
 
         layout = QFormLayout()
         self.setLayout(layout)
 
-        layout.addRow("Port:", port_number)
+        layout.addRow("Root:", self.project_root)
+
+    def get_project_root(self):
+        return self.project_root.text()

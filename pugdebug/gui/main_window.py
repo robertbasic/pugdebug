@@ -59,7 +59,7 @@ class PugdebugMainWindow(QMainWindow):
 
     def setup_settings_window(self):
         self.settings_window = PugdebugSettingsWindow(self)
-        self.central_widget_layout.addWidget(self.settings_window, 1, 0, 1, 1)
+        self.central_widget_layout.addWidget(self.settings_window, 1, 0, 1, 2)
 
     def setup_toolbar(self):
         toolbar = QToolBar()
@@ -85,6 +85,9 @@ class PugdebugMainWindow(QMainWindow):
 
     def get_file_browser(self):
         return self.file_browser
+
+    def get_settings(self):
+        return self.settings_window
 
     def get_document_viewer(self):
         return self.workarea_window.get_document_viewer()
