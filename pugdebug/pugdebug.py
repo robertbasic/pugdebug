@@ -267,7 +267,17 @@ class Pugdebug():
         self.debugger.remove_breakpoint(breakpoint_id)
 
     def handle_breakpoint_removed(self, breakpoint_id):
-        print(breakpoint_id)
+        path = None
+        line_number = None
+
+        for breakpoint in self.breakpoints:
+            if int(breakpoint['id']) == breakpoint_id:
+                path = breakpoint['filename']
+                line_number = breakpoint['lineno']
+
+        if path is not None and line_number is not None:
+            tab = self.document_viewer.get_tab(path)
+            tab.remove_breakpoint_line(line_number)
 
     def get_breakpoint_id(self, path, line_number):
         if len(self.breakpoints) == 0:

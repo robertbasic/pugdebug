@@ -140,3 +140,17 @@ class PugdebugTabContents(QWidget):
 
         ex.append(selection)
         self.numbers_widget.setExtraSelections(ex)
+
+    def remove_breakpoint_line(self, line_number):
+        line_number = int(line_number) - 1
+
+        ex = []
+
+        extraSelections = self.numbers_widget.extraSelections()
+
+        for extraSelection in extraSelections:
+            cursor = extraSelection.cursor
+            if cursor.blockNumber() != line_number:
+                ex.append(extraSelection)
+
+        self.numbers_widget.setExtraSelections(ex)
