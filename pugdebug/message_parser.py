@@ -95,6 +95,19 @@ class PugdebugMessageParser():
 
         return True
 
+    def parse_breakpoint_remove_message(self, message):
+        if not message:
+            return False
+
+        xml = xml_parser.fromstring(message)
+
+        children = xml.getchildren()
+
+        if len(children) == 1:
+            return children.pop().tag.endswith('breakpoint')
+
+        return False
+
     def parse_breakpoint_list_message(self, message):
         if not message:
             return []
