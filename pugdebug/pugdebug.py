@@ -11,6 +11,8 @@ __author__="robertbasic"
 
 import sys
 
+from PyQt5.QtCore import QObject
+
 from pugdebug.debugger import PugdebugDebugger
 from pugdebug.syntaxer import PugdebugSyntaxerRules
 from pugdebug.gui.main_window import PugdebugMainWindow
@@ -18,7 +20,7 @@ from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
 from pugdebug.models.file_browser import PugdebugFileBrowser
 
-class Pugdebug():
+class Pugdebug(QObject):
 
     breakpoints = []
 
@@ -30,6 +32,7 @@ class Pugdebug():
         Creates the PugdebugDebugger object, sets up the application UI,
         connects signals to slots.
         """
+        super(Pugdebug, self).__init__()
 
         self.debugger = PugdebugDebugger()
 
@@ -55,7 +58,7 @@ class Pugdebug():
         not needed columns.
         """
 
-        model = PugdebugFileBrowser(self.main_window)
+        model = PugdebugFileBrowser(self)
         model.set_path(self.settings.get_project_root())
 
         self.file_browser.setModel(model)
@@ -134,9 +137,9 @@ class Pugdebug():
         """
         path = self.file_browser.model().get_file_path(index)
         if path is not None:
-            self.open_document(path)
+            self.open_document(path, False)
 
-    def open_document(self, path):
+    def open_document(self, path, map_paths=True):
         """Open a document
 
         If a document is not already open, open it and add it as a new
@@ -144,6 +147,9 @@ class Pugdebug():
 
         If the document is already open, focus the tab with that document.
         """
+
+        path = self.__get_path_mapped_to_local(path, map_paths)
+
         if not self.documents.is_document_open(path):
             document_model = self.documents.open_document(path)
 
@@ -155,6 +161,8 @@ class Pugdebug():
             self.document_viewer.focus_tab(path)
 
     def handle_document_double_click(self, path, line_number):
+        path = self.__get_path_mapped_to_remote(path)
+
         breakpoint_id = self.get_breakpoint_id(path, line_number)
 
         if breakpoint_id is None:
@@ -293,6 +301,8 @@ class Pugdebug():
                 self.debugger.list_breakpoints()
 
         if path is not None and line_number is not None:
+            path = self.__get_path_mapped_to_local(path)
+
             tab = self.document_viewer.get_tab(path)
             tab.remove_breakpoint_line(line_number)
 
@@ -312,8 +322,27 @@ class Pugdebug():
         self.breakpoint_viewer.set_breakpoints(breakpoints)
 
         for breakpoint in breakpoints:
-            tab = self.document_viewer.get_tab(breakpoint['filename'])
+            path = self.__get_path_mapped_to_local(breakpoint['filename'])
+            tab = self.document_viewer.get_tab(path)
             tab.highlight_breakpoint_line(breakpoint['lineno'])
+
+    def __get_path_mapped_to_local(self, path, map_paths=True):
+        path_map = self.settings.get_path_mapping()
+        if path_map is not False and map_paths is True and path.index(path_map) == 0:
+            path = path[len(path_map):]
+            path = "%s%s" % (self.file_browser.model().rootPath(), path)
+
+        return path
+
+    def __get_path_mapped_to_remote(self, path):
+        path_map = self.settings.get_path_mapping()
+        root_path = self.file_browser.model().rootPath()
+
+        if path_map is not False and path.index(root_path) == 0:
+            path = path[len(root_path):]
+            path = "%s%s" % (path_map, path)
+
+        return path
 
     def run(self):
         self.main_window.showMaximized()
