@@ -37,7 +37,7 @@ class PugdebugServer(QThread):
     server_stepped_signal = pyqtSignal(type({}))
     server_got_variables_signal = pyqtSignal(object)
     server_set_breakpoint_signal = pyqtSignal(bool)
-    server_removed_breakpoint_signal = pyqtSignal(bool)
+    server_removed_breakpoint_signal = pyqtSignal(object)
     server_listed_breakpoints_signal = pyqtSignal(type([]))
 
     def __init__(self):
