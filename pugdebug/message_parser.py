@@ -84,6 +84,49 @@ class PugdebugMessageParser():
 
         return variables
 
+    def parse_breakpoint_set_message(self, message):
+        if not message:
+            return False
+
+        xml = xml_parser.fromstring(message)
+
+        if len(xml.getchildren()):
+            return False
+
+        return True
+
+    def parse_breakpoint_remove_message(self, message):
+        if not message:
+            return False
+
+        xml = xml_parser.fromstring(message)
+
+        children = xml.getchildren()
+
+        if len(children) == 1:
+            child = children.pop()
+            if child.tag.endswith('breakpoint'):
+                return int(child.attrib['id'])
+
+        return False
+
+    def parse_breakpoint_list_message(self, message):
+        if not message:
+            return []
+
+        breakpoints = []
+
+        xml = xml_parser.fromstring(message)
+
+        attribs = ['type', 'filename', 'lineno', 'state', 'id']
+        for child in xml.getchildren():
+            breakpoint = {}
+            breakpoint = self.get_attribs(child, attribs, breakpoint)
+
+            breakpoints.append(breakpoint)
+
+        return breakpoints
+
     def get_variables(self, parent, result):
         attribs = ['name', 'type', 'encoding']
         for child in parent.getchildren():
@@ -101,6 +144,9 @@ class PugdebugMessageParser():
 
     def get_attribs(self, xml, attribs, result):
         for attrib in (attrib for attrib in xml.attrib if attrib in attribs):
-            result[attrib] = xml.attrib[attrib]
+            if attrib.startswith('file'):
+                result[attrib] = xml.attrib[attrib].replace('file://', '')
+            else:
+                result[attrib] = xml.attrib[attrib]
 
         return result

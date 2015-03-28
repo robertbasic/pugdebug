@@ -9,10 +9,23 @@
 
 __author__="robertbasic"
 
-from PyQt5.QtWidgets import QTextEdit
+from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
-class PugdebugBreakpointViewer(QTextEdit):
+class PugdebugBreakpointViewer(QTreeWidget):
 
     def __init__(self):
         super(PugdebugBreakpointViewer, self).__init__()
-        self.setText('bp viewer')
+
+        self.setColumnCount(2)
+        self.setHeaderLabels(['File', 'Line'])
+
+        self.setColumnWidth(0, 350)
+
+    def set_breakpoints(self, breakpoints):
+        self.clear()
+
+        for breakpoint in breakpoints:
+            args = [breakpoint['filename'], breakpoint['lineno']]
+            item = QTreeWidgetItem(args)
+
+            self.addTopLevelItem(item)

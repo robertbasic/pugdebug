@@ -26,7 +26,7 @@ class PugdebugMessageParserTest(unittest.TestCase):
         result = self.parser.parse_init_message(message)
 
         expected = {
-            'fileuri': 'file:///home/robert/www/pxdebug/index.php',
+            'fileuri': '/home/robert/www/pxdebug/index.php',
             'idekey': '1',
             'engine': 'Xdebug 2.2.7',
             'author': 'Derick Rethans',
@@ -47,7 +47,7 @@ class PugdebugMessageParserTest(unittest.TestCase):
             'transaction_id': '1',
             'status': 'break',
             'reason': 'ok',
-            'filename': 'file:///home/robert/www/pxdebug/index.php',
+            'filename': '/home/robert/www/pxdebug/index.php',
             'lineno': '3'
         }
 
@@ -349,3 +349,62 @@ class PugdebugMessageParserTest(unittest.TestCase):
         self.assertEqual(expected[4], result[4])
         self.assertEqual(expected[5], result[5])
         self.assertEqual(expected[6]['variables'][28], result[6]['variables'][28])
+
+    def test_parse_successful_breakpoint_set_message(self):
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="breakpoint_set" transaction_id="9" id="32310001"></response>'
+
+        result = self.parser.parse_breakpoint_set_message(message)
+
+        self.assertTrue(result)
+
+    def test_parse_unsuccessful_breakpoint_set_message(self):
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="breakpoint_set" transaction_id="9" status="break" reason="ok"><error code="3"><message><![CDATA[invalid or missing options]]></message></error></response>'
+
+        result = self.parser.parse_breakpoint_set_message(message)
+
+        self.assertFalse(result)
+
+    def test_parse_successful_breakpoint_remove_message(self):
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="breakpoint_remove" transaction_id="11"><breakpoint type="line" filename="file:///home/robert/www/pugdebug/index.php" lineno="10" state="enabled" hit_count="0" hit_value="0" id="41240003"></breakpoint></response>'
+
+        result = self.parser.parse_breakpoint_remove_message(message)
+
+        expected = 41240003
+
+        self.assertEqual(expected, result)
+
+    def test_parse_unsuccessful_breakpoint_remove_message(self):
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="breakpoint_remove" transaction_id="11" status="break" reason="ok"><error code="205"><message><![CDATA[no such breakpoint]]></message></error></response>'
+
+        result = self.parser.parse_breakpoint_remove_message(message)
+
+        self.assertFalse(result)
+
+    def test_parse_breakpoint_list_message(self):
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="breakpoint_list" transaction_id="12"><breakpoint type="line" filename="file:///home/robert/www/pugdebug/index.php" lineno="3" state="enabled" hit_count="0" hit_value="0" id="32350002"></breakpoint><breakpoint type="line" filename="file:///home/robert/www/pugdebug/index.php" lineno="10" state="enabled" hit_count="0" hit_value="0" id="32350001"></breakpoint></response>'
+
+        result = self.parser.parse_breakpoint_list_message(message)
+
+        expected = [
+            {
+                'filename': '/home/robert/www/pugdebug/index.php',
+                'id': '32350002',
+                'lineno': '3',
+                'state': 'enabled',
+                'type': 'line'
+            },
+            {
+                'filename': '/home/robert/www/pugdebug/index.php',
+                'id': '32350001',
+                'lineno': '10',
+                'state': 'enabled',
+                'type': 'line'
+            }
+        ]
+
+        self.assertEqual(expected, result)

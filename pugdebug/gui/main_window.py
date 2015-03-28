@@ -92,5 +92,8 @@ class PugdebugMainWindow(QMainWindow):
     def get_variable_viewer(self):
         return self.workarea_window.get_variable_viewer()
 
+    def get_breakpoint_viewer(self):
+        return self.workarea_window.get_breakpoint_viewer()
+
     def set_statusbar_text(self, text):
         self.statusBar().showMessage(text)

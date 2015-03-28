@@ -12,8 +12,8 @@ __author__="robertbasic"
 import math
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTabWidget, QPlainTextEdit, QGridLayout, QFrame, QWidget
-from PyQt5.QtGui import QTextCursor, QTextOption
+from PyQt5.QtWidgets import QTabWidget, QPlainTextEdit, QGridLayout, QFrame, QWidget, QTextEdit
+from PyQt5.QtGui import QTextCursor, QTextOption, QTextFormat, QColor
 
 class PugdebugDocumentViewer(QTabWidget):
 
@@ -51,13 +51,16 @@ class PugdebugDocumentViewer(QTabWidget):
         self.tabs = tabs
 
     def focus_tab(self, path):
+        tab_index = self.find_tab_index_by_path(path)
+        if tab_index is not None:
+            self.setCurrentIndex(tab_index)
+
+    def find_tab_index_by_path(self, path):
         tab_index = None
         for i, p in self.tabs.items():
             if p == path:
                 tab_index = i
-
-        if tab_index is not None:
-            self.setCurrentIndex(tab_index)
+        return tab_index
 
     def get_current_document(self):
         index = self.currentIndex()
@@ -65,6 +68,10 @@ class PugdebugDocumentViewer(QTabWidget):
 
     def get_document(self, index):
         return self.widget(index).document_widget
+
+    def get_tab(self, path):
+        index = self.find_tab_index_by_path(path)
+        return self.widget(index)
 
 class PugdebugTabContents(QWidget):
 
@@ -97,7 +104,7 @@ class PugdebugTabContents(QWidget):
 
         self.set_numbers_width(number_of_lines)
 
-        for line in range(1, number_of_lines):
+        for line in range(1, number_of_lines+1):
             self.numbers_widget.appendPlainText("%d" % line)
 
         self.numbers_widget.moveCursor(QTextCursor.Start)
@@ -112,3 +119,38 @@ class PugdebugTabContents(QWidget):
         if (dy != 0):
             m = self.document_widget.verticalScrollBar().value()
             self.numbers_widget.verticalScrollBar().setValue(m)
+
+    def highlight_breakpoint_line(self, line_number):
+        line_number = int(line_number) - 1
+
+        ex = self.numbers_widget.extraSelections()
+
+        selection = QTextEdit.ExtraSelection()
+
+        cursor = self.numbers_widget.textCursor()
+        cursor.movePosition(QTextCursor.Down, QTextCursor.MoveAnchor, line_number)
+
+        color = QColor(220, 236, 209)
+
+        selection.format.setBackground(color)
+        selection.format.setProperty(QTextFormat.FullWidthSelection, True)
+        selection.cursor = cursor
+
+        selection.cursor.clearSelection()
+
+        ex.append(selection)
+        self.numbers_widget.setExtraSelections(ex)
+
+    def remove_breakpoint_line(self, line_number):
+        line_number = int(line_number) - 1
+
+        ex = []
+
+        extraSelections = self.numbers_widget.extraSelections()
+
+        for extraSelection in extraSelections:
+            cursor = extraSelection.cursor
+            if cursor.blockNumber() != line_number:
+                ex.append(extraSelection)
+
+        self.numbers_widget.setExtraSelections(ex)

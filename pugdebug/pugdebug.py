@@ -20,6 +20,8 @@ from pugdebug.models.file_browser import PugdebugFileBrowser
 
 class Pugdebug():
 
+    breakpoints = []
+
     def __init__(self):
         """Initialize the application
 
@@ -37,6 +39,7 @@ class Pugdebug():
         self.file_browser = self.main_window.get_file_browser()
         self.document_viewer = self.main_window.get_document_viewer()
         self.variable_viewer = self.main_window.get_variable_viewer()
+        self.breakpoint_viewer = self.main_window.get_breakpoint_viewer()
 
         self.documents = PugdebugDocuments()
 
@@ -114,6 +117,8 @@ class Pugdebug():
         self.debugger.debugging_stopped_signal.connect(self.handle_debugging_stopped)
         self.debugger.step_command_signal.connect(self.handle_step_command)
         self.debugger.got_all_variables_signal.connect(self.handle_got_all_variables)
+        self.debugger.breakpoint_removed_signal.connect(self.handle_breakpoint_removed)
+        self.debugger.breakpoints_listed_signal.connect(self.handle_breakpoints_listed)
 
     def file_browser_item_activated(self, index):
         """Handle when file browser item gets activated
@@ -136,10 +141,19 @@ class Pugdebug():
             document_model = self.documents.open_document(path)
 
             document_widget = PugdebugDocument(document_model, self.syntaxer_rules)
+            document_widget.document_double_clicked_signal.connect(self.handle_document_double_click)
 
             self.document_viewer.add_tab(document_widget, document_model.filename, path)
         else:
             self.document_viewer.focus_tab(path)
+
+    def handle_document_double_click(self, path, line_number):
+        breakpoint_id = self.get_breakpoint_id(path, line_number)
+
+        if breakpoint_id is None:
+            self.set_breakpoint(path, line_number)
+        else:
+            self.remove_breakpoint(breakpoint_id)
 
     def close_document(self, tab_index):
         """Close a document
@@ -239,6 +253,52 @@ class Pugdebug():
         """Handle when all variables are retrieved from xdebug
         """
         self.variable_viewer.set_variables(variables)
+
+    def set_breakpoint(self, path, line_number):
+        if not self.debugger.is_connected():
+            return
+
+        self.debugger.set_breakpoint(path, line_number)
+
+    def remove_breakpoint(self, breakpoint_id):
+        if not self.debugger.is_connected():
+            return
+
+        self.debugger.remove_breakpoint(breakpoint_id)
+
+    def handle_breakpoint_removed(self, breakpoint_id):
+        path = None
+        line_number = None
+
+        for breakpoint in self.breakpoints:
+            if int(breakpoint['id']) == breakpoint_id:
+                path = breakpoint['filename']
+                line_number = breakpoint['lineno']
+
+                self.debugger.list_breakpoints()
+
+        if path is not None and line_number is not None:
+            tab = self.document_viewer.get_tab(path)
+            tab.remove_breakpoint_line(line_number)
+
+    def get_breakpoint_id(self, path, line_number):
+        if len(self.breakpoints) == 0:
+            return None
+
+        for breakpoint in self.breakpoints:
+            if breakpoint['filename'] == path and int(breakpoint['lineno']) == line_number:
+                return int(breakpoint['id'])
+
+        return None
+
+    def handle_breakpoints_listed(self, breakpoints):
+        self.breakpoints = breakpoints
+
+        self.breakpoint_viewer.set_breakpoints(breakpoints)
+
+        for breakpoint in breakpoints:
+            tab = self.document_viewer.get_tab(breakpoint['filename'])
+            tab.highlight_breakpoint_line(breakpoint['lineno'])
 
     def run(self):
         self.main_window.showMaximized()

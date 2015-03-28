@@ -9,6 +9,7 @@
 
 __author__="robertbasic"
 
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QPlainTextEdit, QTextEdit
 from PyQt5.QtGui import QColor, QTextFormat, QTextCursor
 
@@ -20,6 +21,8 @@ class PugdebugDocument(QPlainTextEdit):
 
     syntaxer = None
 
+    document_double_clicked_signal = pyqtSignal(str, int)
+
     def __init__(self, document_model, syntaxer_rules):
         super(PugdebugDocument, self).__init__()
 
@@ -29,7 +32,7 @@ class PugdebugDocument(QPlainTextEdit):
 
         self.cursorPositionChanged.connect(self.highlight)
 
-        self.appendPlainText(document_model.contents)
+        self.setPlainText(document_model.contents)
 
         self.move_to_line(0)
 
@@ -39,7 +42,13 @@ class PugdebugDocument(QPlainTextEdit):
         pass
 
     def mouseDoubleClickEvent(self, event):
-        pass
+        path = self.document_model.path
+
+        cursor = self.cursorForPosition(event.pos())
+        line_number = cursor.blockNumber()
+        line_number += 1
+
+        self.document_double_clicked_signal.emit(path, line_number)
 
     def contextMenuEvent(self, event):
         pass
