@@ -18,13 +18,9 @@ class PugdebugFileBrowser(QFileSystemModel):
     def __init__(self, parent):
         super(PugdebugFileBrowser, self).__init__(parent)
 
-        home_path = os.path.expanduser('~')
-
-        root_path = "%s/www/pugdebug" % home_path
-
-        self.setRootPath(home_path)
-
-        self.start_index = self.index(root_path)
+    def set_path(self, path):
+        self.setRootPath(path)
+        self.start_index = self.index(path)
 
     def get_file_path(self, model_index):
         if not self.isDir(model_index):
