@@ -103,7 +103,7 @@ class PugdebugMessageParser():
 
         xml = xml_parser.fromstring(message)
 
-        attribs = ['type', 'filename', 'lineno', 'state']
+        attribs = ['type', 'filename', 'lineno', 'state', 'id']
         for child in xml.getchildren():
             breakpoint = {}
             breakpoint = self.get_attribs(child, attribs, breakpoint)

@@ -375,12 +375,14 @@ class PugdebugMessageParserTest(unittest.TestCase):
         expected = [
             {
                 'filename': '/home/robert/www/pugdebug/index.php',
+                'id': '32350002',
                 'lineno': '3',
                 'state': 'enabled',
                 'type': 'line'
             },
             {
                 'filename': '/home/robert/www/pugdebug/index.php',
+                'id': '32350001',
                 'lineno': '10',
                 'state': 'enabled',
                 'type': 'line'
