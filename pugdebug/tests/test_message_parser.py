@@ -26,7 +26,7 @@ class PugdebugMessageParserTest(unittest.TestCase):
         result = self.parser.parse_init_message(message)
 
         expected = {
-            'fileuri': 'file:///home/robert/www/pxdebug/index.php',
+            'fileuri': '/home/robert/www/pxdebug/index.php',
             'idekey': '1',
             'engine': 'Xdebug 2.2.7',
             'author': 'Derick Rethans',
@@ -47,7 +47,7 @@ class PugdebugMessageParserTest(unittest.TestCase):
             'transaction_id': '1',
             'status': 'break',
             'reason': 'ok',
-            'filename': 'file:///home/robert/www/pxdebug/index.php',
+            'filename': '/home/robert/www/pxdebug/index.php',
             'lineno': '3'
         }
 
@@ -374,13 +374,13 @@ class PugdebugMessageParserTest(unittest.TestCase):
 
         expected = [
             {
-                'filename': 'file:///home/robert/www/pugdebug/index.php',
+                'filename': '/home/robert/www/pugdebug/index.php',
                 'lineno': '3',
                 'state': 'enabled',
                 'type': 'line'
             },
             {
-                'filename': 'file:///home/robert/www/pugdebug/index.php',
+                'filename': '/home/robert/www/pugdebug/index.php',
                 'lineno': '10',
                 'state': 'enabled',
                 'type': 'line'
