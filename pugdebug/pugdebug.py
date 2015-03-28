@@ -147,6 +147,12 @@ class Pugdebug(QObject):
 
         If the document is already open, focus the tab with that document.
         """
+
+        path_map = self.settings.get_path_mapping()
+        if path_map is not False:
+            path = path.lstrip(path_map)
+            path = "%s/%s" % (self.file_browser.model().rootPath(), path)
+
         if not self.documents.is_document_open(path):
             document_model = self.documents.open_document(path)
 
