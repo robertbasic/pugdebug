@@ -28,6 +28,7 @@ class PugdebugDebugger(QObject):
     debugging_stopped_signal = pyqtSignal()
     step_command_signal = pyqtSignal()
     got_all_variables_signal = pyqtSignal(object)
+    breakpoint_removed_signal = pyqtSignal(int)
     breakpoints_listed_signal = pyqtSignal(type([]))
 
     def __init__(self):
@@ -47,6 +48,7 @@ class PugdebugDebugger(QObject):
         self.server.server_stepped_signal.connect(self.handle_server_stepped)
         self.server.server_got_variables_signal.connect(self.handle_server_got_variables)
         self.server.server_set_breakpoint_signal.connect(self.handle_server_set_breakpoint)
+        self.server.server_removed_breakpoint_signal.connect(self.handle_server_removed_breakpoint)
         self.server.server_listed_breakpoints_signal.connect(self.handle_server_listed_breakpoints)
 
     def cleanup(self):
@@ -125,6 +127,12 @@ class PugdebugDebugger(QObject):
     def handle_server_set_breakpoint(self, successful):
         if successful:
             self.list_breakpoints()
+
+    def remove_breakpoint(self, breakpoint_id):
+        self.server.remove_breakpoint(breakpoint_id)
+
+    def handle_server_removed_breakpoint(self, breakpoint_id):
+        self.breakpoint_removed_signal.emit(breakpoint_id)
 
     def list_breakpoints(self):
         self.server.list_breakpoints()

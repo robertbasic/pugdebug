@@ -37,6 +37,7 @@ class PugdebugServer(QThread):
     server_stepped_signal = pyqtSignal(type({}))
     server_got_variables_signal = pyqtSignal(object)
     server_set_breakpoint_signal = pyqtSignal(bool)
+    server_removed_breakpoint_signal = pyqtSignal(bool)
     server_listed_breakpoints_signal = pyqtSignal(type([]))
 
     def __init__(self):
@@ -68,6 +69,8 @@ class PugdebugServer(QThread):
             response = self.__get_variables()
         elif self.action == 'breakpoint_set':
             response = self.__set_breakpoint(data)
+        elif self.action == 'breakpoint_remove':
+            response = self.__remove_breakpoint(data)
         elif self.action == 'breakpoint_list':
             response = self.__list_breakpoints()
 
@@ -92,6 +95,8 @@ class PugdebugServer(QThread):
             self.server_got_variables_signal.emit(thread_result.pop())
         elif self.action == 'breakpoint_set':
             self.server_set_breakpoint_signal.emit(thread_result.pop())
+        elif self.action == 'breakpoint_remove':
+            self.server_removed_breakpoint_signal.emit(thread_result.pop())
         elif self.action == 'breakpoint_list':
             self.server_listed_breakpoints_signal.emit(thread_result.pop())
 
@@ -133,6 +138,11 @@ class PugdebugServer(QThread):
     def set_breakpoint(self, path, line_number):
         self.action = 'breakpoint_set'
         self.data = (path, line_number)
+        self.start()
+
+    def remove_breakpoint(self, breakpoint_id):
+        self.action = 'breakpoint_remove'
+        self.data = breakpoint_id
         self.start()
 
     def list_breakpoints(self):
@@ -234,6 +244,12 @@ class PugdebugServer(QThread):
         response = self.__send_command(command)
 
         return self.parser.parse_breakpoint_set_message(response)
+
+    def __remove_breakpoint(self, breakpoint_id):
+        command = 'breakpoint_remove -i %d -d %d' % (self.__get_transaction_id(), breakpoint_id)
+        response = self.__send_command(command)
+
+        return self.parser.parse_breakpoint_remove_message(response)
 
     def __list_breakpoints(self):
         command = 'breakpoint_list -i %d' % self.__get_transaction_id()
