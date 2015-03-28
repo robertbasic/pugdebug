@@ -10,7 +10,6 @@
 __author__="robertbasic"
 
 from PyQt5.QtWidgets import QWidget, QTreeView
-from PyQt5.QtGui import QFont
 
 
 class PugdebugFileBrowser(QTreeView):

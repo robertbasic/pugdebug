@@ -9,7 +9,7 @@
 
 __author__="robertbasic"
 
-from PyQt5.QtWidgets import QMainWindow, QGridLayout, QWidget, QToolBar, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QGridLayout, QWidget, QToolBar
 from PyQt5.QtGui import QFont
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
