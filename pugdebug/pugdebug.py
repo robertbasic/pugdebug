@@ -11,6 +11,8 @@ __author__="robertbasic"
 
 import sys
 
+from PyQt5.QtCore import QObject
+
 from pugdebug.debugger import PugdebugDebugger
 from pugdebug.syntaxer import PugdebugSyntaxerRules
 from pugdebug.gui.main_window import PugdebugMainWindow
@@ -18,7 +20,7 @@ from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
 from pugdebug.models.file_browser import PugdebugFileBrowser
 
-class Pugdebug():
+class Pugdebug(QObject):
 
     breakpoints = []
 
@@ -30,6 +32,7 @@ class Pugdebug():
         Creates the PugdebugDebugger object, sets up the application UI,
         connects signals to slots.
         """
+        super(Pugdebug, self).__init__()
 
         self.debugger = PugdebugDebugger()
 
@@ -55,7 +58,7 @@ class Pugdebug():
         not needed columns.
         """
 
-        model = PugdebugFileBrowser(self.main_window)
+        model = PugdebugFileBrowser(self)
         model.set_path(self.settings.get_project_root())
 
         self.file_browser.setModel(model)
