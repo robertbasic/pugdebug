@@ -275,6 +275,8 @@ class Pugdebug():
                 path = breakpoint['filename']
                 line_number = breakpoint['lineno']
 
+                self.debugger.list_breakpoints()
+
         if path is not None and line_number is not None:
             tab = self.document_viewer.get_tab(path)
             tab.remove_breakpoint_line(line_number)
