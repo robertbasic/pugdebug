@@ -239,4 +239,4 @@ class PugdebugSyntaxerRules():
         return formats_
 
     def get_syntaxer_rules_path(self):
-        return "%s/pugdebug/syntaxer/" % os.getcwd()
+        return "%s/data" % os.getcwd()
