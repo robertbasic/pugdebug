@@ -7,7 +7,7 @@
     license: GNU GPL v3, see LICENSE for more details
 """
 
-__author__="robertbasic"
+__author__ = "robertbasic"
 
 import base64
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
@@ -18,7 +18,7 @@ class PugdebugVariableViewer(QTreeWidget):
         super(PugdebugVariableViewer, self).__init__()
 
         self.setColumnCount(3)
-        self.setHeaderLabels(['Name','Type','Value'])
+        self.setHeaderLabels(['Name', 'Type', 'Value'])
 
         self.setColumnWidth(0, 250)
         self.setColumnWidth(1, 150)

@@ -7,7 +7,7 @@
     license: GNU GPL v3, see LICENSE for more details
 """
 
-__author__="robertbasic"
+__author__ = "robertbasic"
 
 import math
 
@@ -104,7 +104,7 @@ class PugdebugTabContents(QWidget):
 
         self.set_numbers_width(number_of_lines)
 
-        for line in range(1, number_of_lines+1):
+        for line in range(1, number_of_lines + 1):
             self.numbers_widget.appendPlainText("%d" % line)
 
         self.numbers_widget.moveCursor(QTextCursor.Start)

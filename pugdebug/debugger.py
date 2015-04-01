@@ -7,16 +7,13 @@
     license: GNU GPL v3, see LICENSE for more details
 """
 
-__author__="robertbasic"
-
-import socket
+__author__ = "robertbasic"
 
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from pugdebug.server import PugdebugServer
 
 class PugdebugDebugger(QObject):
-
     server = None
 
     step_result = ''

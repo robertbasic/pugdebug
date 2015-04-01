@@ -7,7 +7,7 @@
     license: GNU GPL v3, see LICENSE for more details
 """
 
-__author__="robertbasic"
+__author__ = "robertbasic"
 
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
