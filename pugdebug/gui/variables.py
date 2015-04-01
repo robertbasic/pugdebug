@@ -37,8 +37,14 @@ class PugdebugVariableViewer(QTreeWidget):
                 self.add_variable(variable, item)
 
     def add_variable(self, variable, parent=None):
-        if variable['type'] == 'uninitialized':
+        type = variable['type']
+
+        if type == 'uninitialized':
             return
+
+        # Display the class name instead of type for objects
+        if type == 'object':
+            type = variable['classname']
 
         if 'value' in variable:
             value = variable['value']
@@ -49,9 +55,9 @@ class PugdebugVariableViewer(QTreeWidget):
             if value is None:
                 value = 'NULL'
 
-            args = [variable['name'], variable['type'], value]
+            args = [variable['name'], type, value]
         else:
-            args = [variable['name'], variable['type'], ' ... ']
+            args = [variable['name'], type, ' ... ']
 
         if parent is None:
             item = QTreeWidgetItem(args)

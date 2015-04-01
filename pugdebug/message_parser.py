@@ -128,12 +128,12 @@ class PugdebugMessageParser():
         return breakpoints
 
     def get_variables(self, parent, result):
-        attribs = ['name', 'type', 'encoding']
+        attribs = ['name', 'type', 'encoding', 'classname']
         for child in parent.getchildren():
             var = {}
             var = self.get_attribs(child, attribs, var)
 
-            if var['type'] == 'array':
+            if var['type'] == 'array' or var['type'] == 'object':
                 var['variables'] = self.get_variables(child, [])
             else:
                 var['value'] = child.text
