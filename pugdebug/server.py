@@ -7,7 +7,7 @@
     license: GNU GPL v3, see LICENSE for more details
 """
 
-__author__="robertbasic"
+__author__ = "robertbasic"
 
 import socket
 
@@ -189,7 +189,7 @@ class PugdebugServer(QThread):
 
     def __stop(self):
         command = 'stop -i %d' % self.__get_transaction_id()
-        response = self.__send_command(command)
+        self.__send_command(command)
 
         return True
 
@@ -237,10 +237,10 @@ class PugdebugServer(QThread):
     def __set_breakpoint(self, data):
         path, line_number = data
         command = 'breakpoint_set -i %d -t %s -f %s -n %d' % (
-                self.__get_transaction_id(),
-                'line',
-                path,
-                line_number)
+            self.__get_transaction_id(),
+            'line',
+            path,
+            line_number)
         response = self.__send_command(command)
 
         return self.parser.parse_breakpoint_set_message(response)

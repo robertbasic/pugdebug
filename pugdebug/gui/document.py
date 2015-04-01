@@ -7,7 +7,7 @@
     license: GNU GPL v3, see LICENSE for more details
 """
 
-__author__="robertbasic"
+__author__ = "robertbasic"
 
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QPlainTextEdit, QTextEdit

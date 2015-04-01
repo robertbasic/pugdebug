@@ -7,7 +7,7 @@
     license: GNU GPL v3, see LICENSE for more details
 """
 
-__author__="robertbasic"
+__author__ = "robertbasic"
 
 import os
 import json
@@ -221,7 +221,7 @@ class PugdebugSyntaxerRules():
         rules += [(r'\?>', 'phpBlock', None)]
 
         self.rules = [(QRegularExpression(pattern), format, options)
-                    for(pattern, format, options) in rules]
+                      for(pattern, format, options) in rules]
 
     def get_rules(self):
         return self.rules

@@ -7,9 +7,8 @@
     license: GNU GPL v3, see LICENSE for more details
 """
 
-__author__="robertbasic"
+__author__ = "robertbasic"
 
-import sys
 import unittest
 
 from pugdebug.message_parser import PugdebugMessageParser
@@ -164,7 +163,7 @@ class PugdebugMessageParserTest(unittest.TestCase):
                         'type': 'string',
                         'encoding': 'base64',
                         'value': 'VlBBajZpYWgxVGtGQGlDVzFuNzhCZ0FBQUFB'
-                        },
+                    },
                     {
                         'name': 'HTTP_HOST',
                         'type': 'string',
@@ -176,13 +175,13 @@ class PugdebugMessageParserTest(unittest.TestCase):
                         'type': 'string',
                         'encoding': 'base64',
                         'value': 'TW96aWxsYS81LjAgKFgxMTsgRmVkb3JhOyBMaW51eCB4ODZfNjQ7IHJ2OjM2LjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvMzYuMA=='
-                        },
+                    },
                     {
                         'name': 'HTTP_ACCEPT',
                         'type': 'string',
                         'encoding': 'base64',
                         'value': 'dGV4dC9odG1sLGFwcGxpY2F0aW9uL3hodG1sK3htbCxhcHBsaWNhdGlvbi94bWw7cT0wLjksKi8qO3E9MC44'
-                        },
+                    },
                     {
                         'name': 'HTTP_ACCEPT_LANGUAGE',
                         'type': 'string',
