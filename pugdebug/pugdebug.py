@@ -224,7 +224,8 @@ class Pugdebug(QObject):
         self.step_into()
 
     def stop_debug(self):
-        self.debugger.stop_debug()
+        if self.debugger.is_connected():
+            self.debugger.stop_debug()
 
     def handle_debugging_stopped(self):
         """Handle when debugging stops
