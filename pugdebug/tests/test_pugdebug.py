@@ -7,12 +7,11 @@
     license: GNU GPL v3, see LICENSE for more details
 """
 
-__author__="robertbasic"
+__author__ = "robertbasic"
 
 import sys
 import unittest
 
-from PyQt5.QtTest import QTest
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTreeView
 from pugdebug.pugdebug import Pugdebug
 
