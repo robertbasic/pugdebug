@@ -96,6 +96,26 @@ This whole breakpoint ordeal is a bit clumsy still, but will be improved in the
 near future. It also might have a
 [bug or two](https://github.com/robertbasic/pugdebug/issues/2).
 
+## debugging cli scripts
+
+It is also possible to debug CLI scripts with pugdebug.
+
+Start pugdebug as stated in the previous section, click `Start` to
+start a debugging session and then in a second terminal type:
+
+```
+export XDEBUG_CONFIG="idekey=netbeans-xdebug"
+```
+
+(or whatever you set the `xdebug.idekey` setting to) and then start
+your PHP CLI script normally:
+
+```
+php script.php
+```
+
+pugdebug should pick up the debugging session and let you debug your script.
+
 # executables
 
 I'm trying to make executables with
