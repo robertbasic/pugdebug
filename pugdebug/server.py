@@ -15,6 +15,7 @@ from PyQt5.QtCore import QThread, QMutex, pyqtSignal
 
 from pugdebug.message_parser import PugdebugMessageParser
 
+
 class PugdebugServer(QThread):
 
     mutex = None
@@ -176,13 +177,19 @@ class PugdebugServer(QThread):
 
         init_message = self.parser.parse_init_message(response)
 
-        command = 'feature_set -i %d -n max_depth -v 9' % self.__get_transaction_id()
+        command = 'feature_set -i %d -n max_depth -v 9' % (
+            self.__get_transaction_id()
+        )
         response = self.__send_command(command)
 
-        command = 'feature_set -i %d -n max_children -v 512' % self.__get_transaction_id()
+        command = 'feature_set -i %d -n max_children -v 512' % (
+            self.__get_transaction_id()
+        )
         response = self.__send_command(command)
 
-        command = 'feature_set -i %d -n max_data -v 4096' % self.__get_transaction_id()
+        command = 'feature_set -i %d -n max_data -v 4096' % (
+            self.__get_transaction_id()
+        )
         response = self.__send_command(command)
 
         return init_message
@@ -226,7 +233,10 @@ class PugdebugServer(QThread):
 
         for context in contexts:
             context_id = int(context['id'])
-            command = 'context_get -i %d -c %d' % (self.__get_transaction_id(), context_id)
+            command = 'context_get -i %d -c %d' % (
+                self.__get_transaction_id(),
+                context_id
+            )
             response = self.__send_command(command)
 
             var = self.parser.parse_variables_message(response)
@@ -246,7 +256,10 @@ class PugdebugServer(QThread):
         return self.parser.parse_breakpoint_set_message(response)
 
     def __remove_breakpoint(self, breakpoint_id):
-        command = 'breakpoint_remove -i %d -d %d' % (self.__get_transaction_id(), breakpoint_id)
+        command = 'breakpoint_remove -i %d -d %d' % (
+            self.__get_transaction_id(),
+            breakpoint_id
+        )
         response = self.__send_command(command)
 
         return self.parser.parse_breakpoint_remove_message(response)

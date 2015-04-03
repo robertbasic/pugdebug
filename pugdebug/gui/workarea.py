@@ -16,6 +16,7 @@ from pugdebug.gui.variables import PugdebugVariableViewer
 from pugdebug.gui.stacktraces import PugdebugStacktraceViewer
 from pugdebug.gui.breakpoints import PugdebugBreakpointViewer
 
+
 class PugdebugWorkareaWindow(QWidget):
 
     def __init__(self, parent):

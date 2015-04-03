@@ -13,6 +13,7 @@ import hashlib
 
 from pugdebug.models.document import PugdebugDocument
 
+
 class PugdebugDocuments():
 
     open_documents = {}

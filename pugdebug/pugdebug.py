@@ -18,6 +18,7 @@ from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
 from pugdebug.models.file_browser import PugdebugFileBrowser
 
+
 class Pugdebug(QObject):
 
     breakpoints = []
@@ -87,7 +88,9 @@ class Pugdebug(QObject):
         self.file_browser.activated.connect(self.file_browser_item_activated)
 
     def connect_settings_signals(self):
-        self.settings.project_root.returnPressed.connect(self.project_root_changed)
+        self.settings.project_root.returnPressed.connect(
+            self.project_root_changed
+        )
 
     def connect_document_viewer_signals(self):
         self.document_viewer.tabCloseRequested.connect(self.close_document)
@@ -95,12 +98,14 @@ class Pugdebug(QObject):
     def connect_toolbar_action_signals(self):
         """Connect toolbar action signals
 
-        Connect signals that get emitted when the toolbar actions get triggered.
+        Connect signals that get emitted when the toolbar actions get
+        triggered.
 
-        Connect signals when the start/stop debug actions are triggered are connected.
-
-        Connect signals when the run and step continuation commands are triggered are
+        Connect signals when the start/stop debug actions are triggered are
         connected.
+
+        Connect signals when the run and step continuation commands are
+        triggered are connected.
         """
         self.main_window.start_debug_action.triggered.connect(self.start_debug)
         self.main_window.stop_debug_action.triggered.connect(self.stop_debug)
@@ -118,15 +123,26 @@ class Pugdebug(QObject):
 
         Connect signal that gets emitted when a step command is execute.
 
-        Connect signal that gets emitted when all variables from xdebug are read.
+        Connect signal that gets emitted when all variables from xdebug are
+        read.
         """
 
-        self.debugger.debugging_started_signal.connect(self.handle_debugging_started)
-        self.debugger.debugging_stopped_signal.connect(self.handle_debugging_stopped)
+        self.debugger.debugging_started_signal.connect(
+            self.handle_debugging_started
+        )
+        self.debugger.debugging_stopped_signal.connect(
+            self.handle_debugging_stopped
+        )
         self.debugger.step_command_signal.connect(self.handle_step_command)
-        self.debugger.got_all_variables_signal.connect(self.handle_got_all_variables)
-        self.debugger.breakpoint_removed_signal.connect(self.handle_breakpoint_removed)
-        self.debugger.breakpoints_listed_signal.connect(self.handle_breakpoints_listed)
+        self.debugger.got_all_variables_signal.connect(
+            self.handle_got_all_variables
+        )
+        self.debugger.breakpoint_removed_signal.connect(
+            self.handle_breakpoint_removed
+        )
+        self.debugger.breakpoints_listed_signal.connect(
+            self.handle_breakpoints_listed
+        )
 
     def file_browser_item_activated(self, index):
         """Handle when file browser item gets activated
@@ -151,10 +167,19 @@ class Pugdebug(QObject):
         if not self.documents.is_document_open(path):
             document_model = self.documents.open_document(path)
 
-            document_widget = PugdebugDocument(document_model, self.syntaxer_rules)
-            document_widget.document_double_clicked_signal.connect(self.handle_document_double_click)
+            document_widget = PugdebugDocument(
+                document_model,
+                self.syntaxer_rules
+            )
+            document_widget.document_double_clicked_signal.connect(
+                self.handle_document_double_click
+            )
 
-            self.document_viewer.add_tab(document_widget, document_model.filename, path)
+            self.document_viewer.add_tab(
+                document_widget,
+                document_model.filename,
+                path
+            )
         else:
             self.document_viewer.focus_tab(path)
 
@@ -310,7 +335,8 @@ class Pugdebug(QObject):
             return None
 
         for breakpoint in self.breakpoints:
-            if breakpoint['filename'] == path and int(breakpoint['lineno']) == line_number:
+            if (breakpoint['filename'] == path and
+                    int(breakpoint['lineno']) == line_number):
                 return int(breakpoint['id'])
 
         return None
@@ -327,7 +353,9 @@ class Pugdebug(QObject):
 
     def __get_path_mapped_to_local(self, path, map_paths=True):
         path_map = self.settings.get_path_mapping()
-        if path_map is not False and map_paths is True and path.index(path_map) == 0:
+        if (path_map is not False and
+                map_paths is True and
+                path.index(path_map) == 0):
             path = path[len(path_map):]
             path = "%s%s" % (self.file_browser.model().rootPath(), path)
 

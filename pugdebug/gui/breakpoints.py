@@ -11,6 +11,7 @@ __author__ = "robertbasic"
 
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
+
 class PugdebugBreakpointViewer(QTreeWidget):
 
     def __init__(self):

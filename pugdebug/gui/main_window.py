@@ -16,6 +16,7 @@ from pugdebug.gui.file_browser import PugdebugFileBrowser
 from pugdebug.gui.settings import PugdebugSettingsWindow
 from pugdebug.gui.workarea import PugdebugWorkareaWindow
 
+
 class PugdebugMainWindow(QMainWindow):
 
     def __init__(self):

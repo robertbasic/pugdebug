@@ -11,6 +11,7 @@ __author__ = "robertbasic"
 
 from PyQt5.QtCore import QFile, QFileInfo, QIODevice, QTextCodec
 
+
 class PugdebugDocument():
 
     path = None
