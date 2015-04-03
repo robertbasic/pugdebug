@@ -45,8 +45,8 @@ class PugdebugDocumentViewer(QTabWidget):
         number_of_tabs = len(self.tabs)
         if number_of_tabs > 0:
             for index in range(0, number_of_tabs):
-                document_contents = self.widget(index).document_contents
-                tabs[index] = document_contents.document_model.path
+                document_widget = self.widget(index)
+                tabs[index] = document_widget.get_path()
 
         self.tabs = tabs
 
@@ -64,12 +64,12 @@ class PugdebugDocumentViewer(QTabWidget):
 
     def get_current_document(self):
         index = self.currentIndex()
-        return self.widget(index).document_contents
+        return self.widget(index)
 
     def get_document(self, index):
-        return self.widget(index).document_contents
+        return self.widget(index)
 
-    def get_tab(self, path):
+    def get_document_by_path(self, path):
         index = self.find_tab_index_by_path(path)
         return self.widget(index)
 

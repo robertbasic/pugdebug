@@ -104,6 +104,11 @@ class PugdebugDocument(QWidget):
 
         painter.end()
 
+    def get_path(self):
+        return self.document_contents.document_model.path
+
+    def move_to_line(self, line):
+        self.document_contents.move_to_line(line)
 
 class PugdebugDocumentContents(QPlainTextEdit):
 
