@@ -176,7 +176,7 @@ class Pugdebug(QObject):
         Remove the tab.
         """
         document_widget = self.document_viewer.get_document(tab_index)
-        self.documents.close_document(document_widget.document_model.path)
+        self.documents.close_document(document_widget.get_path())
         document_widget.deleteLater()
         self.document_viewer.close_tab(tab_index)
 
@@ -302,8 +302,8 @@ class Pugdebug(QObject):
         if path is not None and line_number is not None:
             path = self.__get_path_mapped_to_local(path)
 
-            tab = self.document_viewer.get_tab(path)
-            tab.remove_breakpoint_line(line_number)
+            document_widget = self.document_viewer.get_document_by_path(path)
+            document_widget.rehighlight_breakpoint_lines()
 
     def get_breakpoint_id(self, path, line_number):
         if len(self.breakpoints) == 0:
@@ -322,8 +322,8 @@ class Pugdebug(QObject):
 
         for breakpoint in breakpoints:
             path = self.__get_path_mapped_to_local(breakpoint['filename'])
-            tab = self.document_viewer.get_tab(path)
-            tab.highlight_breakpoint_line(breakpoint['lineno'])
+            document_widget = self.document_viewer.get_document_by_path(path)
+            document_widget.rehighlight_breakpoint_lines()
 
     def __get_path_mapped_to_local(self, path, map_paths=True):
         path_map = self.settings.get_path_mapping()
