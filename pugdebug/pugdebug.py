@@ -152,7 +152,7 @@ class Pugdebug(QObject):
             document_model = self.documents.open_document(path)
 
             document_widget = PugdebugDocument(document_model, self.syntaxer_rules)
-            #document_widget.document_double_clicked_signal.connect(self.handle_document_double_click)
+            document_widget.document_double_clicked_signal.connect(self.handle_document_double_click)
 
             self.document_viewer.add_tab(document_widget, document_model.filename, path)
         else:
@@ -303,7 +303,7 @@ class Pugdebug(QObject):
             path = self.__get_path_mapped_to_local(path)
 
             document_widget = self.document_viewer.get_document_by_path(path)
-            document_widget.remove_breakpoint_line(line_number)
+            document_widget.rehighlight_breakpoint_lines()
 
     def get_breakpoint_id(self, path, line_number):
         if len(self.breakpoints) == 0:
@@ -323,7 +323,7 @@ class Pugdebug(QObject):
         for breakpoint in breakpoints:
             path = self.__get_path_mapped_to_local(breakpoint['filename'])
             document_widget = self.document_viewer.get_document_by_path(path)
-            document_widget.highlight_breakpoint_line(breakpoint['lineno'])
+            document_widget.rehighlight_breakpoint_lines()
 
     def __get_path_mapped_to_local(self, path, map_paths=True):
         path_map = self.settings.get_path_mapping()

@@ -11,7 +11,7 @@ __author__ = "robertbasic"
 
 import math
 
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal, Qt, QRect
 from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QTextEdit, QGridLayout
 from PyQt5.QtGui import QColor, QTextFormat, QTextCursor, QPainter
 
@@ -30,11 +30,14 @@ class PugdebugDocument(QWidget):
 
     line_numbers = None
 
+    document_double_clicked_signal = pyqtSignal(str, int)
+
     def __init__(self, document_model, syntaxer_rules):
         super(PugdebugDocument, self).__init__()
 
         # The QPlainTextEdit widget that holds the contents of the document
         self.document_contents = PugdebugDocumentContents(
+            self,
             document_model,
             syntaxer_rules
         )
@@ -95,6 +98,16 @@ class PugdebugDocument(QWidget):
             if not block.isVisible() or block_top >= event.rect().bottom():
                 break
 
+            # If block has a breakpoint,
+            # draw a green rectangle by the line number
+            if block.userState() == 1:
+                brush = painter.brush()
+                brush.setStyle(Qt.SolidPattern)
+                brush.setColor(Qt.darkGreen)
+                painter.setBrush(brush)
+                rect = QRect(0, block_top+2, 7, 7)
+                painter.drawRect(rect)
+
             # Convert the line number to string so we can paint it
             text = str(line_number)
 
@@ -110,52 +123,27 @@ class PugdebugDocument(QWidget):
     def move_to_line(self, line):
         self.document_contents.move_to_line(line)
 
-    def highlight_breakpoint_line(self, line_number):
-        line_number = int(line_number) - 1
+    def rehighlight_breakpoint_lines(self):
+        """Rehighlight breakpoint lines
 
-        ex = self.line_numbers.extraSelections()
-
-        selection = QTextEdit.ExtraSelection()
-
-        cursor = self.line_numbers.textCursor()
-        cursor.movePosition(QTextCursor.Down, QTextCursor.MoveAnchor, line_number)
-
-        color = QColor(220, 236, 209)
-
-        selection.format.setBackground(color)
-        selection.format.setProperty(QTextFormat.FullWidthSelection, True)
-        selection.cursor = cursor
-
-        selection.cursor.clearSelection()
-
-        ex.append(selection)
-        self.line_numbers.setExtraSelections(ex)
-
-    def remove_breakpoint_line(self, line_number):
-        line_number = int(line_number) - 1
-
-        ex = []
-
-        extraSelections = self.line_numbers.extraSelections()
-
-        for extraSelection in extraSelections:
-            cursor = extraSelection.cursor
-            if cursor.blockNumber() != line_number:
-                ex.append(extraSelection)
-
-        self.line_numbers.setExtraSelections(ex)
+        Update the line numbers so the paint event gets fired
+        and so the breakpoints get repainted as well.
+        """
+        self.line_numbers.update()
 
 
 class PugdebugDocumentContents(QPlainTextEdit):
+
+    document_widget = None
 
     document_model = None
 
     syntaxer = None
 
-    document_double_clicked_signal = pyqtSignal(str, int)
-
-    def __init__(self, document_model, syntaxer_rules):
+    def __init__(self, document_widget, document_model, syntaxer_rules):
         super(PugdebugDocumentContents, self).__init__()
+
+        self.document_widget = document_widget
 
         self.document_model = document_model
 
@@ -176,10 +164,20 @@ class PugdebugDocumentContents(QPlainTextEdit):
         path = self.document_model.path
 
         cursor = self.cursorForPosition(event.pos())
-        line_number = cursor.blockNumber()
-        line_number += 1
 
-        self.document_double_clicked_signal.emit(path, line_number)
+        block = cursor.block()
+        # Set/unset breakpoint flag on the double clicked line
+        if block.userState() == 1:
+            block.setUserState(-1)
+        else:
+            block.setUserState(1)
+
+        line_number = block.blockNumber() + 1
+
+        self.document_widget.document_double_clicked_signal.emit(
+            path,
+            line_number
+        )
 
     def contextMenuEvent(self, event):
         pass
@@ -224,7 +222,8 @@ class PugdebugLineNumbers(QWidget):
 
     def set_numbers_width(self, number_of_lines):
         digits = int(math.log10(number_of_lines) + 1)
-        width = digits * 10
+        # add 7 to have space to paint the breakpoint markers
+        width = digits * 10 + 7
         self.setFixedWidth(width)
 
     def paintEvent(self, event):
