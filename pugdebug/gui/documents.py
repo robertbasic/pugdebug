@@ -9,11 +9,9 @@
 
 __author__ = "robertbasic"
 
-import math
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTabWidget, QPlainTextEdit, QGridLayout, QFrame, QWidget, QTextEdit
-from PyQt5.QtGui import QTextCursor, QTextOption, QTextFormat, QColor
+from PyQt5.QtWidgets import QTabWidget
+
 
 class PugdebugDocumentViewer(QTabWidget):
 
