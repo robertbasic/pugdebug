@@ -11,6 +11,7 @@ __author__ = "robertbasic"
 
 import xml.etree.ElementTree as xml_parser
 
+
 class PugdebugMessageParser():
 
     namespace = '{urn:debugger_protocol_v1}'
@@ -50,11 +51,19 @@ class PugdebugMessageParser():
         xml = xml_parser.fromstring(message)
 
         attribs = ['command', 'transaction_id', 'status', 'reason']
-        continuation_message = self.get_attribs(xml, attribs, continuation_message)
+        continuation_message = self.get_attribs(
+            xml,
+            attribs,
+            continuation_message
+        )
 
         if len(xml.getchildren()) == 1:
             attribs = ['filename', 'lineno']
-            continuation_message = self.get_attribs(xml[0], attribs, continuation_message)
+            continuation_message = self.get_attribs(
+                xml[0],
+                attribs,
+                continuation_message
+            )
 
         return continuation_message
 

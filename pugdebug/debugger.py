@@ -13,6 +13,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from pugdebug.server import PugdebugServer
 
+
 class PugdebugDebugger(QObject):
     server = None
 
@@ -40,13 +41,23 @@ class PugdebugDebugger(QObject):
 
         self.server = PugdebugServer()
 
-        self.server.server_connected_signal.connect(self.handle_server_connected)
+        self.server.server_connected_signal.connect(
+            self.handle_server_connected
+        )
         self.server.server_stopped_signal.connect(self.handle_server_stopped)
         self.server.server_stepped_signal.connect(self.handle_server_stepped)
-        self.server.server_got_variables_signal.connect(self.handle_server_got_variables)
-        self.server.server_set_breakpoint_signal.connect(self.handle_server_set_breakpoint)
-        self.server.server_removed_breakpoint_signal.connect(self.handle_server_removed_breakpoint)
-        self.server.server_listed_breakpoints_signal.connect(self.handle_server_listed_breakpoints)
+        self.server.server_got_variables_signal.connect(
+            self.handle_server_got_variables
+        )
+        self.server.server_set_breakpoint_signal.connect(
+            self.handle_server_set_breakpoint
+        )
+        self.server.server_removed_breakpoint_signal.connect(
+            self.handle_server_removed_breakpoint
+        )
+        self.server.server_listed_breakpoints_signal.connect(
+            self.handle_server_listed_breakpoints
+        )
 
     def cleanup(self):
         """Cleanup debugger when it's done
@@ -159,6 +170,7 @@ class PugdebugDebugger(QObject):
         return self.is_status('stopped')
 
     def is_status(self, status):
-        if 'status' in self.step_result and self.step_result['status'] == status:
+        if ('status' in self.step_result and
+                self.step_result['status'] == status):
             return True
         return False

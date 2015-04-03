@@ -12,6 +12,7 @@ __author__ = "robertbasic"
 import base64
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
+
 class PugdebugVariableViewer(QTreeWidget):
 
     def __init__(self):

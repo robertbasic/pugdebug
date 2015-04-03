@@ -11,6 +11,7 @@ __author__ = "robertbasic"
 
 from PyQt5.QtWidgets import QFileSystemModel
 
+
 class PugdebugFileBrowser(QFileSystemModel):
 
     def __init__(self, parent):

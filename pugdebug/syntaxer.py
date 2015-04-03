@@ -15,6 +15,7 @@ import json
 from PyQt5.QtCore import QRegularExpression
 from PyQt5.QtGui import QSyntaxHighlighter, QColor, QTextCharFormat
 
+
 class PugdebugSyntaxer(QSyntaxHighlighter):
 
     rules = None
@@ -90,7 +91,8 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
             if options is not None:
                 regex.setPatternOptions(options)
 
-            if self.is_current_block_in_state(self.in_block_comment) and format != 'comments':
+            if (self.is_current_block_in_state(self.in_block_comment) and
+                    format != 'comments'):
                 continue
 
             matches = regex.globalMatch(text)
@@ -150,6 +152,7 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
 
         self.setCurrentBlockState(state)
 
+
 class PugdebugSyntaxerRules():
 
     keywords = []
@@ -197,7 +200,11 @@ class PugdebugSyntaxerRules():
         rules += [(r'<\?php', 'phpBlock', None)]
 
         keywords = r'\b' + r'\b|\b'.join(self.keywords) + r'\b'
-        rules += [(keywords, 'keywords', QRegularExpression.CaseInsensitiveOption)]
+        rules += [(
+            keywords,
+            'keywords',
+            QRegularExpression.CaseInsensitiveOption
+        )]
 
         functions = r'\b' + r'\b|\b'.join(self.functions) + r'\b'
         rules += [(functions, 'functions', None)]

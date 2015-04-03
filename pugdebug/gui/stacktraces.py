@@ -11,6 +11,7 @@ __author__ = "robertbasic"
 
 from PyQt5.QtWidgets import QTextEdit
 
+
 class PugdebugStacktraceViewer(QTextEdit):
 
     def __init__(self):

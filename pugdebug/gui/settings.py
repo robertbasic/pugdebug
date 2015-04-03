@@ -13,6 +13,7 @@ import os
 
 from PyQt5.QtWidgets import QWidget, QLineEdit, QFormLayout
 
+
 class PugdebugSettingsWindow(QWidget):
 
     layout = QFormLayout()
