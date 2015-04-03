@@ -93,8 +93,7 @@ be listed in the breakpoint viewer (bottom right corner).
 Double clicking the line with a breakpoint should remove that breakpoint.
 
 This whole breakpoint ordeal is a bit clumsy still, but will be improved in the
-near future. It also might have a
-[bug or two](https://github.com/robertbasic/pugdebug/issues/2).
+near future.
 
 ## debugging cli scripts
 
