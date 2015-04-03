@@ -28,8 +28,8 @@ class PugdebugDocumentViewer(QTabWidget):
         # PugdebugTabContents is a temporary (?!) widget
         # so we can show line numbers by the contents
         # ugly hack, will rewrite post-launch
-        tab_widget = PugdebugTabContents(document_widget)
-        tab_index = self.addTab(tab_widget, filename)
+        #tab_widget = PugdebugTabContents(document_widget)
+        tab_index = self.addTab(document_widget, filename)
         self.setCurrentIndex(tab_index)
 
         self.tabs[tab_index] = path
@@ -45,8 +45,8 @@ class PugdebugDocumentViewer(QTabWidget):
         number_of_tabs = len(self.tabs)
         if number_of_tabs > 0:
             for index in range(0, number_of_tabs):
-                document_widget = self.widget(index).document_widget
-                tabs[index] = document_widget.document_model.path
+                document_contents = self.widget(index).document_contents
+                tabs[index] = document_contents.document_model.path
 
         self.tabs = tabs
 
@@ -64,10 +64,10 @@ class PugdebugDocumentViewer(QTabWidget):
 
     def get_current_document(self):
         index = self.currentIndex()
-        return self.widget(index).document_widget
+        return self.widget(index).document_contents
 
     def get_document(self, index):
-        return self.widget(index).document_widget
+        return self.widget(index).document_contents
 
     def get_tab(self, path):
         index = self.find_tab_index_by_path(path)
