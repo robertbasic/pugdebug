@@ -110,6 +110,42 @@ class PugdebugDocument(QWidget):
     def move_to_line(self, line):
         self.document_contents.move_to_line(line)
 
+    def highlight_breakpoint_line(self, line_number):
+        line_number = int(line_number) - 1
+
+        ex = self.line_numbers.extraSelections()
+
+        selection = QTextEdit.ExtraSelection()
+
+        cursor = self.line_numbers.textCursor()
+        cursor.movePosition(QTextCursor.Down, QTextCursor.MoveAnchor, line_number)
+
+        color = QColor(220, 236, 209)
+
+        selection.format.setBackground(color)
+        selection.format.setProperty(QTextFormat.FullWidthSelection, True)
+        selection.cursor = cursor
+
+        selection.cursor.clearSelection()
+
+        ex.append(selection)
+        self.line_numbers.setExtraSelections(ex)
+
+    def remove_breakpoint_line(self, line_number):
+        line_number = int(line_number) - 1
+
+        ex = []
+
+        extraSelections = self.line_numbers.extraSelections()
+
+        for extraSelection in extraSelections:
+            cursor = extraSelection.cursor
+            if cursor.blockNumber() != line_number:
+                ex.append(extraSelection)
+
+        self.line_numbers.setExtraSelections(ex)
+
+
 class PugdebugDocumentContents(QPlainTextEdit):
 
     document_model = None
