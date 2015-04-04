@@ -9,6 +9,7 @@
 
 __author__ = "robertbasic"
 
+import os
 import xml.etree.ElementTree as xml_parser
 
 
@@ -154,8 +155,22 @@ class PugdebugMessageParser():
     def get_attribs(self, xml, attribs, result):
         for attrib in (attrib for attrib in xml.attrib if attrib in attribs):
             if attrib.startswith('file'):
-                result[attrib] = xml.attrib[attrib].replace('file://', '')
+                result[attrib] = self._parse_file_url(xml.attrib[attrib])
             else:
                 result[attrib] = xml.attrib[attrib]
 
         return result
+
+    def _parse_file_url(self, url):
+        """Takes a file:// url and returns the file path.
+
+            On windows, needs to strip 3 slashes, e.g.:
+            file:///C:/Users/username/file.php
+
+            On linux needs to strip only 2 slashes, e.g.:
+            file:///home/user/file.php
+        """
+        if os.name == 'nt':
+            return url.replace('file:///', '')
+        else:
+            return url.replace('file://', '')
