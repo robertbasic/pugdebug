@@ -10,7 +10,7 @@
 __author__ = "robertbasic"
 
 from PyQt5.QtWidgets import QMainWindow, QGridLayout, QWidget, QToolBar
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QKeySequence
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
 from pugdebug.gui.settings import PugdebugSettingsWindow
@@ -66,11 +66,44 @@ class PugdebugMainWindow(QMainWindow):
         toolbar = QToolBar()
 
         self.start_debug_action = toolbar.addAction("Start")
+        self.start_debug_action.setToolTip("Start server (F1)")
+        self.start_debug_action.setStatusTip("Start listening to for "
+            "connections. Shortcut: F1")
+        self.start_debug_action.setShortcut(QKeySequence("F1"))
+
         self.stop_debug_action = toolbar.addAction("Stop")
+        self.stop_debug_action.setToolTip("Stop server (F2)")
+        self.stop_debug_action.setStatusTip("Stop listening to for "
+            "connections. Shortcut: F2")
+        self.stop_debug_action.setShortcut(QKeySequence("F2"))
+
         self.run_debug_action = toolbar.addAction("Run")
+        self.run_debug_action.setToolTip("Start/resume the script (F5)")
+        self.run_debug_action.setStatusTip("Start or resume the script "
+            "until a new breakpoint is reached, or the end of the script is "
+            "reached. Shortcut: F5")
+        self.run_debug_action.setShortcut(QKeySequence("F5"))
+
         self.step_over_action = toolbar.addAction("Over")
+        self.step_over_action.setToolTip("Step over the next statement (F6)")
+        self.step_over_action.setStatusTip("Step to the next statement, if "
+            "there is a function call involved it will break on the statement "
+            "after the function call in the same scope as from where the "
+            "command was issued. Shortcut: F6")
+        self.step_over_action.setShortcut(QKeySequence("F6"))
+
         self.step_into_action = toolbar.addAction("In")
+        self.step_into_action.setToolTip("Step into the next statement (F7)")
+        self.step_into_action.setStatusTip("Step to the next statement, if "
+            "there is a function call involved it will break on the first "
+            "statement in that function. Shortcut: F7")
+        self.step_into_action.setShortcut(QKeySequence("F7"))
+
         self.step_out_action = toolbar.addAction("Out")
+        self.step_out_action.setToolTip("Step out of the current scope (F8)")
+        self.step_out_action.setStatusTip("Step out of the current scope "
+            "and breaks on the next statement. Shortcut: F8")
+        self.step_out_action.setShortcut(QKeySequence("F8"))
 
         self.toggle_actions(False)
 
