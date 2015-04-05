@@ -14,6 +14,7 @@ import socket
 from PyQt5.QtCore import QThread, QMutex, pyqtSignal
 
 from pugdebug.message_parser import PugdebugMessageParser
+from pugdebug.models.settings import get_setting
 
 
 class PugdebugServer(QThread):
@@ -168,7 +169,9 @@ class PugdebugServer(QThread):
         response = None
 
         try:
-            socket_server.bind(('', 9000))
+            # Read the port number from settings
+            port_number = int(get_setting('debugger/port_number'))
+            socket_server.bind(('', port_number))
             response = self.__init_connection(socket_server)
         except OSError:
             print(OSError.strerror())
