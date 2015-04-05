@@ -38,6 +38,7 @@ class Pugdebug(QObject):
 
         self.syntaxer_rules = PugdebugSyntaxerRules()
 
+        # UI elements
         self.main_window = PugdebugMainWindow()
         self.file_browser = self.main_window.get_file_browser()
         self.settings = self.main_window.get_settings()
@@ -68,8 +69,8 @@ class Pugdebug(QObject):
     def connect_signals(self):
         """Connect all signals to their slots
 
-        Connect file browser signals, toolbar action signals,
-        debugger signals.
+        Connect file browser signals, settings signals, document viewer signals
+        toolbar action signals, debugger signals.
         """
 
         self.connect_file_browser_signals()
@@ -89,11 +90,22 @@ class Pugdebug(QObject):
         self.file_browser.activated.connect(self.file_browser_item_activated)
 
     def connect_settings_signals(self):
+        """Connect settings signals
+
+        Connects the signal that gets fired when the return key is pressed
+        in the project_root line edit to the slot that will handle the changing
+        of the project root.
+        """
         self.settings.project_root.returnPressed.connect(
-            self.project_root_changed
+            self.handle_project_root_changed
         )
 
     def connect_document_viewer_signals(self):
+        """Connect document viewer signals
+
+        Connects the signal that gets fired when a tab widget is being closed.
+        It will call the method that will close the document.
+        """
         self.document_viewer.tabCloseRequested.connect(self.close_document)
 
     def connect_toolbar_action_signals(self):
@@ -172,19 +184,31 @@ class Pugdebug(QObject):
                 document_model,
                 self.syntaxer_rules
             )
+            # For every new document that gets opened, connect to the double
+            # clicked signal of that document
             document_widget.document_double_clicked_signal.connect(
                 self.handle_document_double_click
             )
 
+            # Add the newly opened document to the document viewer's tab stack
             self.document_viewer.add_tab(
                 document_widget,
                 document_model.filename,
                 path
             )
         else:
+            # Just focus the tab that has the opened document
             self.document_viewer.focus_tab(path)
 
     def handle_document_double_click(self, path, line_number):
+        """Handle when a document gets double clicked
+
+        We get the path of the document that was double clicked and the line
+        number of the line that was double clicked inside that document.
+
+        If there is no breakpoint set on that line, we set it.
+        If there is a breakpoint set on that line, we remove it.
+        """
         path = self.__get_path_mapped_to_remote(path)
 
         breakpoint = self.get_breakpoint(path, line_number)
@@ -221,7 +245,11 @@ class Pugdebug(QObject):
         document_widget = self.document_viewer.get_current_document()
         document_widget.move_to_line(current_line)
 
-    def project_root_changed(self):
+    def handle_project_root_changed(self):
+        """Handle when the project root is changed
+
+        Update the file browser's model to the new root.
+        """
         project_root = self.settings.get_project_root()
 
         model = self.file_browser.model()
@@ -230,6 +258,12 @@ class Pugdebug(QObject):
         self.file_browser.setRootIndex(model.start_index)
 
     def start_debug(self):
+        """Start a new debugging session
+
+        Clear the variable viewer.
+
+        Start a debugging session.
+        """
         self.variable_viewer.clear()
 
         self.debugger.start_debug()
@@ -252,6 +286,10 @@ class Pugdebug(QObject):
         self.set_init_breakpoints(self.init_breakpoints)
 
     def stop_debug(self):
+        """Stop a debugging session
+
+        Stop the currently active debugging session (if any).
+        """
         if self.debugger.is_connected():
             self.debugger.stop_debug()
 
@@ -288,26 +326,61 @@ class Pugdebug(QObject):
             self.stop_debug()
 
     def run_debug(self):
+        """Issue a run continuation command on the debugger
+
+        This gets called when the "Run" action button is pressed.
+        """
         self.debugger.run_debug()
 
     def step_over(self):
+        """Issue a step over continuation command on the debugger
+
+        This gets called when the "Step over" action button is pressed.
+        """
         self.debugger.step_over()
 
     def step_into(self):
+        """Issue a step into continuation command on the debugger
+
+        This gets called when the "Step into" action button is pressed.
+        """
         self.debugger.step_into()
 
     def step_out(self):
+        """Issue a step out continuation command on the debugger
+
+        This gets called when the "Step out" action button is pressed.
+        """
         self.debugger.step_out()
 
     def handle_got_all_variables(self, variables):
         """Handle when all variables are retrieved from xdebug
+
+        Set the variables on the variable viewer.
         """
         self.variable_viewer.set_variables(variables)
 
     def set_init_breakpoints(self, breakpoints):
+        """Set initial breakpoints
+
+        Initial breakpoints are the breakpoints that are set before a debugging
+        session has been started.
+
+        Set initial breakpoints on the debugger. This should be called only
+        right after a new debugging session has been started.
+        """
         self.debugger.set_init_breakpoints(breakpoints)
 
     def set_breakpoint(self, breakpoint):
+        """Set a breakpoint
+
+        If there is no active debugging session, add the breakpoint data to
+        the initial breakpoints, highlight the init breakpoints on the line
+        numbers of the documents, and show them in the breakpoint viewer.
+
+        If there is an active debugging session, tell the debugger to set the
+        breakpoint.
+        """
         if not self.debugger.is_connected():
             self.init_breakpoints.append(breakpoint)
 
@@ -322,6 +395,15 @@ class Pugdebug(QObject):
         self.debugger.set_breakpoint(breakpoint)
 
     def remove_breakpoint(self, breakpoint):
+        """Remove a breakpoint
+
+        If there is no active debugging session, just remove the breakpoint
+        from the initial breakpoints, rehighlight the line numbers for
+        breakpoint markers and update the breakpoint viewer.
+
+        If there is an active debugging session, tell the debugger to remove
+        the breakpoint.
+        """
         if not self.debugger.is_connected():
             path = breakpoint['path']
             line_number = breakpoint['line_number']
@@ -342,6 +424,13 @@ class Pugdebug(QObject):
         self.debugger.remove_breakpoint(breakpoint_id)
 
     def handle_breakpoint_removed(self, breakpoint_id):
+        """Handle when a breakpoint gets removed
+
+        This slot is called when a breakpoint is removed through the debugger.
+
+        It relists the breakpoints and rehighlights the breakpoint markers
+        on the line numbers.
+        """
         path = None
         line_number = None
 
@@ -359,6 +448,15 @@ class Pugdebug(QObject):
             document_widget.rehighlight_breakpoint_lines()
 
     def get_breakpoint(self, path, line_number):
+        """Get a breakpoint by it's path and line number
+
+        If the breakpoint can be found in the breakpoints from a debugging
+        session, return that breakpoint.
+
+        If the breakpoint can be found in the init breakpoints, return that.
+
+        Finally return None.
+        """
         for breakpoint in self.breakpoints:
             if (breakpoint['filename'] == path and
                     int(breakpoint['lineno']) == line_number):
@@ -372,6 +470,11 @@ class Pugdebug(QObject):
         return None
 
     def handle_breakpoints_listed(self, breakpoints):
+        """Handle when debugger lists breakpoints
+
+        Show the breakpoints in the breakpoint viewer and rehighlight the
+        breakpoint markers.
+        """
         self.breakpoints = breakpoints
 
         self.breakpoint_viewer.set_breakpoints(breakpoints)
@@ -382,6 +485,10 @@ class Pugdebug(QObject):
             document_widget.rehighlight_breakpoint_lines()
 
     def __get_path_mapped_to_local(self, path, map_paths=True):
+        """Get a path mapped to local
+
+        Turns a path like /var/www into /home/user/local/path
+        """
         path_map = self.settings.get_path_mapping()
         if (path_map is not False and
                 map_paths is True and
@@ -392,6 +499,10 @@ class Pugdebug(QObject):
         return path
 
     def __get_path_mapped_to_remote(self, path):
+        """Get a path mapped to remote
+
+        Turns a path liek /home/usre/local/path to /var/www
+        """
         path_map = self.settings.get_path_mapping()
         root_path = self.file_browser.model().rootPath()
 
@@ -402,4 +513,6 @@ class Pugdebug(QObject):
         return path
 
     def run(self):
+        """Run the application!
+        """
         self.main_window.showMaximized()
