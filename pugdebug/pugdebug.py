@@ -189,7 +189,8 @@ class Pugdebug(QObject):
         breakpoint_id = self.get_breakpoint_id(path, line_number)
 
         if breakpoint_id is None:
-            self.set_breakpoint(path, line_number)
+            breakpoint = {'path': path, 'line_number': line_number}
+            self.set_breakpoint(breakpoint)
         else:
             self.remove_breakpoint(breakpoint_id)
 
@@ -301,11 +302,11 @@ class Pugdebug(QObject):
         """
         self.variable_viewer.set_variables(variables)
 
-    def set_breakpoint(self, path, line_number):
+    def set_breakpoint(self, breakpoint):
         if not self.debugger.is_connected():
             return
 
-        self.debugger.set_breakpoint(path, line_number)
+        self.debugger.set_breakpoint(breakpoint)
 
     def remove_breakpoint(self, breakpoint_id):
         if not self.debugger.is_connected():
