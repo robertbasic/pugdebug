@@ -84,16 +84,13 @@ project, while stopping the execution on the first line.
 Using the `Run`, `Over`, `In`, `Out` continuation commands you can step through
 your PHP code.
 
-Setting breakpoints is possible once a debugging session is active, by double
-clicking the line where a breakpoint should be placed.
+Setting breakpoints is possible by double clicking the line where a breakpoint
+should be placed.
 
 The correspoding line number should be highlighted and a new breakpoint should
 be listed in the breakpoint viewer (bottom right corner).
 
 Double clicking the line with a breakpoint should remove that breakpoint.
-
-This whole breakpoint ordeal is a bit clumsy still, but will be improved in the
-near future.
 
 ## debugging cli scripts
 

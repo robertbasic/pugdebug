@@ -49,6 +49,9 @@ class PugdebugDebugger(QObject):
         self.server.server_got_variables_signal.connect(
             self.handle_server_got_variables
         )
+        self.server.server_set_init_breakpoints_signal.connect(
+            self.handle_server_set_breakpoint
+        )
         self.server.server_set_breakpoint_signal.connect(
             self.handle_server_set_breakpoint
         )
@@ -129,8 +132,11 @@ class PugdebugDebugger(QObject):
         """
         self.got_all_variables_signal.emit(variables)
 
-    def set_breakpoint(self, path, line_number):
-        self.server.set_breakpoint(path, line_number)
+    def set_init_breakpoints(self, breakpoints):
+        self.server.set_init_breakpoints(breakpoints)
+
+    def set_breakpoint(self, breakpoint):
+        self.server.set_breakpoint(breakpoint)
 
     def handle_server_set_breakpoint(self, successful):
         if successful:

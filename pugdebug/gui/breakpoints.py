@@ -26,7 +26,10 @@ class PugdebugBreakpointViewer(QTreeWidget):
         self.clear()
 
         for breakpoint in breakpoints:
-            args = [breakpoint['filename'], breakpoint['lineno']]
+            if 'filename' in breakpoint:
+                args = [breakpoint['filename'], breakpoint['lineno']]
+            else:
+                args = [breakpoint['path'], str(breakpoint['line_number'])]
             item = QTreeWidgetItem(args)
 
             self.addTopLevelItem(item)

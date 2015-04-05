@@ -37,6 +37,7 @@ class PugdebugServer(QThread):
     server_stopped_signal = pyqtSignal()
     server_stepped_signal = pyqtSignal(type({}))
     server_got_variables_signal = pyqtSignal(object)
+    server_set_init_breakpoints_signal = pyqtSignal(bool)
     server_set_breakpoint_signal = pyqtSignal(bool)
     server_removed_breakpoint_signal = pyqtSignal(object)
     server_listed_breakpoints_signal = pyqtSignal(type([]))
@@ -68,6 +69,8 @@ class PugdebugServer(QThread):
             response = self.__step_out()
         elif self.action == 'variables':
             response = self.__get_variables()
+        elif self.action == 'init_breakpoint_set':
+            response = self.__set_init_breakpoints(data)
         elif self.action == 'breakpoint_set':
             response = self.__set_breakpoint(data)
         elif self.action == 'breakpoint_remove':
@@ -94,6 +97,8 @@ class PugdebugServer(QThread):
             self.server_stepped_signal.emit(thread_result.pop())
         elif self.action == 'variables':
             self.server_got_variables_signal.emit(thread_result.pop())
+        elif self.action == 'init_breakpoint_set':
+            self.server_set_init_breakpoints_signal.emit(thread_result.pop())
         elif self.action == 'breakpoint_set':
             self.server_set_breakpoint_signal.emit(thread_result.pop())
         elif self.action == 'breakpoint_remove':
@@ -136,9 +141,14 @@ class PugdebugServer(QThread):
         self.action = 'variables'
         self.start()
 
-    def set_breakpoint(self, path, line_number):
+    def set_init_breakpoints(self, breakpoints):
+        self.action = 'init_breakpoint_set'
+        self.data = breakpoints
+        self.start()
+
+    def set_breakpoint(self, breakpoint):
         self.action = 'breakpoint_set'
-        self.data = (path, line_number)
+        self.data = breakpoint
         self.start()
 
     def remove_breakpoint(self, breakpoint_id):
@@ -244,13 +254,23 @@ class PugdebugServer(QThread):
 
         return variables
 
-    def __set_breakpoint(self, data):
-        path, line_number = data
+    def __set_init_breakpoints(self, breakpoints):
+        all_successful = True
+
+        for breakpoint in breakpoints:
+            response = self.__set_breakpoint(breakpoint)
+            if response is False:
+                all_successful = False
+
+        return all_successful
+
+    def __set_breakpoint(self, breakpoint):
         command = 'breakpoint_set -i %d -t %s -f %s -n %d' % (
             self.__get_transaction_id(),
             'line',
-            path,
-            line_number)
+            breakpoint['path'],
+            breakpoint['line_number']
+        )
         response = self.__send_command(command)
 
         return self.parser.parse_breakpoint_set_message(response)

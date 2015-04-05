@@ -21,6 +21,7 @@ from pugdebug.models.file_browser import PugdebugFileBrowser
 
 class Pugdebug(QObject):
 
+    init_breakpoints = []
     breakpoints = []
 
     def __init__(self):
@@ -189,7 +190,8 @@ class Pugdebug(QObject):
         breakpoint_id = self.get_breakpoint_id(path, line_number)
 
         if breakpoint_id is None:
-            self.set_breakpoint(path, line_number)
+            breakpoint = {'path': path, 'line_number': line_number}
+            self.set_breakpoint(breakpoint)
         else:
             self.remove_breakpoint(breakpoint_id)
 
@@ -240,13 +242,14 @@ class Pugdebug(QObject):
         xdebug is established and the initial message from xdebug
         is read.
 
-        Issue a step_into command to break at the first line.
+        Sets initial breakpoints, breakpoints that were set before the
+        debugging session started.
         """
         self.main_window.set_statusbar_text("Debugging in progress...")
 
         self.main_window.toggle_actions(True)
 
-        self.step_into()
+        self.set_init_breakpoints(self.init_breakpoints)
 
     def stop_debug(self):
         if self.debugger.is_connected():
@@ -301,11 +304,22 @@ class Pugdebug(QObject):
         """
         self.variable_viewer.set_variables(variables)
 
-    def set_breakpoint(self, path, line_number):
+    def set_init_breakpoints(self, breakpoints):
+        self.debugger.set_init_breakpoints(breakpoints)
+
+    def set_breakpoint(self, breakpoint):
         if not self.debugger.is_connected():
+            self.init_breakpoints.append(breakpoint)
+
+            path = breakpoint['path']
+            document_widget = self.document_viewer.get_document_by_path(path)
+            document_widget.rehighlight_breakpoint_lines()
+
+            self.breakpoint_viewer.set_breakpoints(self.init_breakpoints)
+
             return
 
-        self.debugger.set_breakpoint(path, line_number)
+        self.debugger.set_breakpoint(breakpoint)
 
     def remove_breakpoint(self, breakpoint_id):
         if not self.debugger.is_connected():
