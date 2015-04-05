@@ -315,6 +315,8 @@ class Pugdebug(QObject):
             document_widget = self.document_viewer.get_document_by_path(path)
             document_widget.rehighlight_breakpoint_lines()
 
+            self.breakpoint_viewer.set_breakpoints(self.init_breakpoints)
+
             return
 
         self.debugger.set_breakpoint(breakpoint)
