@@ -310,6 +310,11 @@ class Pugdebug(QObject):
     def set_breakpoint(self, breakpoint):
         if not self.debugger.is_connected():
             self.init_breakpoints.append(breakpoint)
+
+            path = breakpoint['path']
+            document_widget = self.document_viewer.get_document_by_path(path)
+            document_widget.rehighlight_breakpoint_lines()
+
             return
 
         self.debugger.set_breakpoint(breakpoint)
