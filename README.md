@@ -48,9 +48,6 @@ xdebug.remote_port=9000
 xdebug.remote_connect_back=1
 ```
 
-Do note that pugdebug's settings are hardcoded at the moment so it's always
-port 9000. This will change in the future.
-
 # using pugdebug
 
 In a terminal go to the directory where you have pugdebug cloned and start it by

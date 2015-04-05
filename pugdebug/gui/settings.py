@@ -11,7 +11,9 @@ __author__ = "robertbasic"
 
 import os
 
-from PyQt5.QtWidgets import QWidget, QLineEdit, QFormLayout
+from PyQt5.QtWidgets import QWidget, QLineEdit, QFormLayout, QSpinBox
+
+from pugdebug.models.settings import get_setting, set_setting
 
 
 class PugdebugSettingsWindow(QWidget):
@@ -29,11 +31,20 @@ class PugdebugSettingsWindow(QWidget):
         self.path_mapping = QLineEdit()
         self.path_mapping.setMaximumWidth(250)
 
+        self.port_number = QSpinBox()
+        self.port_number.setRange(1, 65535)
+
+        self.port_number.valueChanged.connect(self.handle_port_number_changed)
+
+        port_number = int(get_setting('debugger/port_number'))
+        self.port_number.setValue(port_number)
+
         layout = QFormLayout()
         self.setLayout(layout)
 
         layout.addRow("Root:", self.project_root)
         layout.addRow("Maps from:", self.path_mapping)
+        layout.addRow("Port", self.port_number)
 
     def get_project_root(self):
         return self.project_root.text()
@@ -45,3 +56,10 @@ class PugdebugSettingsWindow(QWidget):
             return path_map
 
         return False
+
+    def handle_port_number_changed(self, value):
+        """Handle when port number gets changed
+
+        Set the new value in the application's setting.
+        """
+        set_setting('debugger/port_number', value)
