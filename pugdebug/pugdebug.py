@@ -187,13 +187,13 @@ class Pugdebug(QObject):
     def handle_document_double_click(self, path, line_number):
         path = self.__get_path_mapped_to_remote(path)
 
-        breakpoint_id = self.get_breakpoint_id(path, line_number)
+        breakpoint = self.get_breakpoint(path, line_number)
 
-        if breakpoint_id is None:
+        if breakpoint is None:
             breakpoint = {'path': path, 'line_number': line_number}
             self.set_breakpoint(breakpoint)
         else:
-            self.remove_breakpoint(breakpoint_id)
+            self.remove_breakpoint(breakpoint)
 
     def close_document(self, tab_index):
         """Close a document
@@ -321,10 +321,24 @@ class Pugdebug(QObject):
 
         self.debugger.set_breakpoint(breakpoint)
 
-    def remove_breakpoint(self, breakpoint_id):
+    def remove_breakpoint(self, breakpoint):
         if not self.debugger.is_connected():
+            path = breakpoint['path']
+            line_number = breakpoint['line_number']
+
+            for init_breakpoint in self.init_breakpoints:
+                if (init_breakpoint['path'] == path and
+                        init_breakpoint['line_number'] == line_number):
+                    self.init_breakpoints.remove(init_breakpoint)
+
+            document_widget = self.document_viewer.get_document_by_path(path)
+            document_widget.rehighlight_breakpoint_lines()
+
+            self.breakpoint_viewer.set_breakpoints(self.init_breakpoints)
+
             return
 
+        breakpoint_id = int(breakpoint['id'])
         self.debugger.remove_breakpoint(breakpoint_id)
 
     def handle_breakpoint_removed(self, breakpoint_id):
@@ -344,14 +358,16 @@ class Pugdebug(QObject):
             document_widget = self.document_viewer.get_document_by_path(path)
             document_widget.rehighlight_breakpoint_lines()
 
-    def get_breakpoint_id(self, path, line_number):
-        if len(self.breakpoints) == 0:
-            return None
-
+    def get_breakpoint(self, path, line_number):
         for breakpoint in self.breakpoints:
             if (breakpoint['filename'] == path and
                     int(breakpoint['lineno']) == line_number):
-                return int(breakpoint['id'])
+                return breakpoint
+
+        for breakpoint in self.init_breakpoints:
+            if (breakpoint['path'] == path and
+                    int(breakpoint['line_number']) == line_number):
+                return breakpoint
 
         return None
 
