@@ -9,8 +9,6 @@
 
 __author__ = "robertbasic"
 
-import os
-
 from PyQt5.QtWidgets import QWidget, QLineEdit, QFormLayout, QSpinBox
 
 from pugdebug.models.settings import get_setting, set_setting
@@ -23,13 +21,24 @@ class PugdebugSettingsWindow(QWidget):
     def __init__(self, parent):
         super(PugdebugSettingsWindow, self).__init__(parent)
 
-        home_path = os.path.expanduser('~')
-
-        self.project_root = QLineEdit(home_path)
+        self.project_root = QLineEdit()
         self.project_root.setMaximumWidth(250)
+
+        self.project_root.editingFinished.connect(
+            self.handle_project_root_changed
+        )
+
+        project_root = get_setting('path/project_root')
+        self.project_root.setText(project_root)
 
         self.path_mapping = QLineEdit()
         self.path_mapping.setMaximumWidth(250)
+
+        self.path_mapping.editingFinished.connect(
+            self.handle_path_mapping_changed
+        )
+        path_mapping = get_setting('path/path_mapping')
+        self.path_mapping.setText(path_mapping)
 
         self.host = QLineEdit()
         self.host.setMaximumWidth(250)
@@ -65,6 +74,14 @@ class PugdebugSettingsWindow(QWidget):
             return path_map
 
         return False
+
+    def handle_project_root_changed(self):
+        value = self.project_root.text()
+        set_setting('path/project_root', value)
+
+    def handle_path_mapping_changed(self):
+        value = self.path_mapping.text()
+        set_setting('path/path_mapping', value)
 
     def handle_host_changed(self):
         value = self.host.text()

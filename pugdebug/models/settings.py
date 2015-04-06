@@ -9,6 +9,8 @@
 
 __author__ = "robertbasic"
 
+import os
+
 from PyQt5.QtCore import QCoreApplication, QSettings
 
 
@@ -29,6 +31,7 @@ class PugdebugSettings():
         self.application_settings = QSettings()
 
         self.setup_debugger_settings()
+        self.setup_path_settings()
 
     def setup_debugger_settings(self):
         """Set up initial debugger settings
@@ -43,6 +46,24 @@ class PugdebugSettings():
 
         if not self.application_settings.contains('port_number'):
             self.application_settings.setValue('port_number', 9000)
+
+        self.application_settings.endGroup()
+
+    def setup_path_settings(self):
+        """Set up initial path settings
+
+        Sets up the initial project root to the user's home directory.
+        Sets up the initial path mapping to an empty string.
+        """
+
+        self.application_settings.beginGroup("path")
+
+        if not self.application_settings.contains('project_root'):
+            home_path = os.path.expanduser('~')
+            self.application_settings.setValue('project_root', home_path)
+
+        if not self.application_settings.contains('path_mapping'):
+            self.application_settings.setValue('path_mapping', '')
 
         self.application_settings.endGroup()
 
