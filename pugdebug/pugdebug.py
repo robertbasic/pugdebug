@@ -515,4 +515,4 @@ class Pugdebug(QObject):
     def run(self):
         """Run the application!
         """
-        self.main_window.showMaximized()
+        self.main_window.show()
