@@ -33,9 +33,13 @@ class PugdebugSettings():
     def setup_debugger_settings(self):
         """Set up initial debugger settings
 
+        Sets up the initial host to 127.0.0.1.
         Sets up the initial port number to 9000.
         """
         self.application_settings.beginGroup("debugger")
+
+        if not self.application_settings.contains('host'):
+            self.application_settings.setValue('host', '127.0.0.1')
 
         if not self.application_settings.contains('port_number'):
             self.application_settings.setValue('port_number', 9000)
