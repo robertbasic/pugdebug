@@ -51,6 +51,9 @@ class PugdebugSettings():
 
     def setup_path_settings(self):
         """Set up initial path settings
+
+        Sets up the initial project root to the user's home directory.
+        Sets up the initial path mapping to an empty string.
         """
 
         self.application_settings.beginGroup("path")
@@ -58,6 +61,9 @@ class PugdebugSettings():
         if not self.application_settings.contains('project_root'):
             home_path = os.path.expanduser('~')
             self.application_settings.setValue('project_root', home_path)
+
+        if not self.application_settings.contains('path_mapping'):
+            self.application_settings.setValue('path_mapping', '')
 
         self.application_settings.endGroup()
 
