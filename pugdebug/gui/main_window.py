@@ -15,6 +15,7 @@ from PyQt5.QtGui import QFont, QKeySequence
 from pugdebug.gui.file_browser import PugdebugFileBrowser
 from pugdebug.gui.settings import PugdebugSettingsWindow
 from pugdebug.gui.workarea import PugdebugWorkareaWindow
+from pugdebug.models.settings import get_setting, set_setting, has_setting
 
 
 class PugdebugMainWindow(QMainWindow):
@@ -24,6 +25,12 @@ class PugdebugMainWindow(QMainWindow):
         self.setObjectName("pugdebug")
         self.setWindowTitle("pugdebug")
 
+        if has_setting("window/geometry"):
+            self.restoreGeometry(get_setting("window/geometry"))
+
+        if has_setting("window/state"):
+            self.restoreState(get_setting("window/state"))
+
         self.central_widget_layout = QGridLayout()
 
         self.central_widget = QWidget(self)
@@ -32,6 +39,12 @@ class PugdebugMainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.setup_gui_elements()
+
+    def closeEvent(self, event):
+        set_setting("window/geometry", self.saveGeometry())
+        set_setting("window/state", self.saveState())
+
+        super(PugdebugMainWindow, self).closeEvent(event)
 
     def setup_gui_elements(self):
         self.setup_fonts()
@@ -63,7 +76,8 @@ class PugdebugMainWindow(QMainWindow):
         self.central_widget_layout.addWidget(self.settings_window, 1, 0, 1, 2)
 
     def setup_toolbar(self):
-        toolbar = QToolBar()
+        toolbar = QToolBar("Main Toolbar")
+        toolbar.setObjectName("main-toolbar")
 
         self.start_debug_action = toolbar.addAction("Start")
         self.start_debug_action.setToolTip("Start server (F1)")

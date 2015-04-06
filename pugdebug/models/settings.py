@@ -70,6 +70,9 @@ class PugdebugSettings():
     def get(self, key):
         return self.application_settings.value(key)
 
+    def has(self, key):
+        return self.application_settings.contains(key)
+
     def set(self, key, value):
         return self.application_settings.setValue(key, value)
 
@@ -79,6 +82,10 @@ settings = PugdebugSettings()
 
 def get_setting(key):
     return settings.get(key)
+
+
+def has_setting(key):
+    return settings.has(key)
 
 
 def set_setting(key, value):
