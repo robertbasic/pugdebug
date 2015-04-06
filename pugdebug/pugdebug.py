@@ -489,8 +489,8 @@ class Pugdebug(QObject):
 
         Turns a path like /var/www into /home/user/local/path
         """
-        path_map = self.settings.get_path_mapping()
-        if (path_map is not False and
+        path_map = get_setting('path/path_mapping')
+        if (len(path_map) > 0 and
                 map_paths is True and
                 path.index(path_map) == 0):
             path = path[len(path_map):]
@@ -501,12 +501,12 @@ class Pugdebug(QObject):
     def __get_path_mapped_to_remote(self, path):
         """Get a path mapped to remote
 
-        Turns a path liek /home/usre/local/path to /var/www
+        Turns a path like /home/user/local/path to /var/www
         """
-        path_map = self.settings.get_path_mapping()
+        path_map = get_setting('path/path_mapping')
         root_path = self.file_browser.model().rootPath()
 
-        if path_map is not False and path.index(root_path) == 0:
+        if len(path_map) > 0 and path.index(root_path) == 0:
             path = path[len(root_path):]
             path = "%s%s" % (path_map, path)
 
