@@ -9,6 +9,7 @@
 
 __author__ = "robertbasic"
 
+from base64 import b64encode
 import socket
 
 from PyQt5.QtCore import QThread, QMutex, pyqtSignal
@@ -47,6 +48,7 @@ class PugdebugServer(QThread):
     server_set_breakpoint_signal = pyqtSignal(bool)
     server_removed_breakpoint_signal = pyqtSignal(object)
     server_listed_breakpoints_signal = pyqtSignal(type([]))
+    server_evaluated_signal = pyqtSignal(type([]))
 
     def __init__(self):
         super(PugdebugServer, self).__init__()
@@ -98,6 +100,9 @@ class PugdebugServer(QThread):
         elif action == 'breakpoint_list':
             response = self.__list_breakpoints()
             self.server_listed_breakpoints_signal.emit(response)
+        elif action == 'eval':
+            response = self.__eval(data)
+            self.server_evaluated_signal.emit(response)
 
         self.mutex.unlock()
 
@@ -161,6 +166,11 @@ class PugdebugServer(QThread):
 
     def list_breakpoints(self):
         self.action = 'breakpoint_list'
+        self.start()
+
+    def eval(self, expressions):
+        self.action = 'eval'
+        self.data = expressions
         self.start()
 
     def __connect_server(self):
@@ -329,6 +339,18 @@ class PugdebugServer(QThread):
         breakpoints = self.parser.parse_breakpoint_list_message(response)
 
         return breakpoints
+
+    def __eval(self, expressions):
+        tid = self.__get_transaction_id()
+        results = []
+        for expression in expressions:
+            b64 = b64encode(bytes(expression, 'UTF-8')).decode()
+            command = 'eval -i %d -- %s' % (tid, b64)
+            response = self.__send_command(command)
+
+            results.append(self.parser.parse_eval_message(response))
+
+        return results
 
     def __send_command(self, command):
         self.sock.send(bytes(command + '\0', 'utf-8'))

@@ -180,6 +180,9 @@ class PugdebugMainWindow(QMainWindow):
     def get_breakpoint_viewer(self):
         return self.breakpoint_viewer
 
+    def get_expression_viewer(self):
+        return self.workarea_window.get_expression_viewer()
+
     def set_statusbar_text(self, text):
         self.permanent_statusbar.setText(text)
 
