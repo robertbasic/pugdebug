@@ -31,6 +31,14 @@ class PugdebugSettingsWindow(QWidget):
         self.path_mapping = QLineEdit()
         self.path_mapping.setMaximumWidth(250)
 
+        self.host = QLineEdit()
+        self.host.setMaximumWidth(250)
+
+        self.host.editingFinished.connect(self.handle_host_changed)
+
+        host = get_setting('debugger/host')
+        self.host.setText(host)
+
         self.port_number = QSpinBox()
         self.port_number.setRange(1, 65535)
 
@@ -44,6 +52,7 @@ class PugdebugSettingsWindow(QWidget):
 
         layout.addRow("Root:", self.project_root)
         layout.addRow("Maps from:", self.path_mapping)
+        layout.addRow("Host", self.host)
         layout.addRow("Port", self.port_number)
 
     def get_project_root(self):
@@ -56,6 +65,10 @@ class PugdebugSettingsWindow(QWidget):
             return path_map
 
         return False
+
+    def handle_host_changed(self):
+        value = self.host.text()
+        set_setting('debugger/host', value)
 
     def handle_port_number_changed(self, value):
         """Handle when port number gets changed
