@@ -17,6 +17,7 @@ from pugdebug.gui.main_window import PugdebugMainWindow
 from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
 from pugdebug.models.file_browser import PugdebugFileBrowser
+from pugdebug.models.settings import get_setting
 
 
 class Pugdebug(QObject):
@@ -59,8 +60,9 @@ class Pugdebug(QObject):
         not needed columns.
         """
 
+        project_root = get_setting('path/project_root')
         model = PugdebugFileBrowser(self)
-        model.set_path(self.settings.get_project_root())
+        model.set_path(project_root)
 
         self.file_browser.setModel(model)
         self.file_browser.setRootIndex(model.start_index)
@@ -92,11 +94,9 @@ class Pugdebug(QObject):
     def connect_settings_signals(self):
         """Connect settings signals
 
-        Connects the signal that gets fired when the return key is pressed
-        in the project_root line edit to the slot that will handle the changing
-        of the project root.
+        Connects the signal that gets fired when project root gets changed.
         """
-        self.settings.project_root.returnPressed.connect(
+        self.settings.project_root.editingFinished.connect(
             self.handle_project_root_changed
         )
 
@@ -250,7 +250,7 @@ class Pugdebug(QObject):
 
         Update the file browser's model to the new root.
         """
-        project_root = self.settings.get_project_root()
+        project_root = get_setting('path/project_root')
 
         model = self.file_browser.model()
         model.set_path(project_root)
