@@ -169,9 +169,11 @@ class PugdebugServer(QThread):
         response = None
 
         try:
+            # Read the host from settings
+            host = get_setting('debugger/host')
             # Read the port number from settings
             port_number = int(get_setting('debugger/port_number'))
-            socket_server.bind(('', port_number))
+            socket_server.bind((host, port_number))
             response = self.__init_connection(socket_server)
         except OSError:
             print(OSError.strerror())
