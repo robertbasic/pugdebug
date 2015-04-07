@@ -9,7 +9,7 @@
 
 __author__ = "robertbasic"
 
-from PyQt5.QtWidgets import QMainWindow, QGridLayout, QWidget, QToolBar
+from PyQt5.QtWidgets import QMainWindow, QGridLayout, QWidget, QToolBar, QLabel
 from PyQt5.QtGui import QFont, QKeySequence
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
@@ -55,7 +55,11 @@ class PugdebugMainWindow(QMainWindow):
 
         self.setup_toolbar()
 
-        self.set_statusbar_text("Idle...")
+        self.setup_statusbar()
+
+    def setup_statusbar(self):
+        self.permanent_statusbar = QLabel("Idle...")
+        self.statusBar().addPermanentWidget(self.permanent_statusbar)
 
     def setup_fonts(self):
         font = QFont('mono')
@@ -147,4 +151,4 @@ class PugdebugMainWindow(QMainWindow):
         return self.workarea_window.get_breakpoint_viewer()
 
     def set_statusbar_text(self, text):
-        self.statusBar().showMessage(text)
+        self.permanent_statusbar.setText(text)
