@@ -278,12 +278,16 @@ class Pugdebug(QObject):
 
         Sets initial breakpoints, breakpoints that were set before the
         debugging session started.
+
+        Open the index file in the document viewer.
         """
         self.main_window.set_statusbar_text("Debugging in progress...")
 
         self.main_window.toggle_actions(True)
 
         self.set_init_breakpoints(self.init_breakpoints)
+
+        self.open_document(self.debugger.get_index_file())
 
     def stop_debug(self):
         """Stop a debugging session
