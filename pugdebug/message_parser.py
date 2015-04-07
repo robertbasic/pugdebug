@@ -160,7 +160,7 @@ class PugdebugMessageParser():
         child = xml[0]
 
         # Detect errors as having an <error> child
-        if child.tag == '{urn:debugger_protocol_v1}error':
+        if child.tag.endswith('error'):
             return {
                 'type': 'error',
                 'value': child[0].text
