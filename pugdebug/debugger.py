@@ -31,7 +31,7 @@ class PugdebugDebugger(QObject):
     got_stacktraces_signal = pyqtSignal(object)
     breakpoint_removed_signal = pyqtSignal(int)
     breakpoints_listed_signal = pyqtSignal(type([]))
-    evaluated_signal = pyqtSignal(type([]))
+    expressions_evaluated_signal = pyqtSignal(type([]))
 
     def __init__(self):
         """Init the debugger object
@@ -71,7 +71,7 @@ class PugdebugDebugger(QObject):
         self.server.server_listed_breakpoints_signal.connect(
             self.handle_server_listed_breakpoints
         )
-        self.server.server_evaluated_signal.connect(
+        self.server.server_expressions_evaluated_signal.connect(
             self.handle_server_evaluated
         )
 
@@ -194,7 +194,7 @@ class PugdebugDebugger(QObject):
         self.server.eval(expressions)
 
     def handle_server_evaluated(self, result):
-        self.evaluated_signal.emit(result)
+        self.expressions_evaluated_signal.emit(result)
 
     def get_current_file(self):
         if 'filename' in self.step_result:

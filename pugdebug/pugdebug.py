@@ -162,7 +162,7 @@ class Pugdebug(QObject):
         self.debugger.breakpoints_listed_signal.connect(
             self.handle_breakpoints_listed
         )
-        self.debugger.evaluated_signal.connect(
+        self.debugger.expressions_evaluated_signal.connect(
             self.handle_evaluated
         )
 

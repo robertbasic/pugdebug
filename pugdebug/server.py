@@ -48,7 +48,7 @@ class PugdebugServer(QThread):
     server_set_breakpoint_signal = pyqtSignal(bool)
     server_removed_breakpoint_signal = pyqtSignal(object)
     server_listed_breakpoints_signal = pyqtSignal(type([]))
-    server_evaluated_signal = pyqtSignal(type([]))
+    server_expressions_evaluated_signal = pyqtSignal(type([]))
 
     def __init__(self):
         super(PugdebugServer, self).__init__()
@@ -102,7 +102,7 @@ class PugdebugServer(QThread):
             self.server_listed_breakpoints_signal.emit(response)
         elif action == 'eval':
             response = self.__eval(data)
-            self.server_evaluated_signal.emit(response)
+            self.server_expressions_evaluated_signal.emit(response)
 
         self.mutex.unlock()
 
