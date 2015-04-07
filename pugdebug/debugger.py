@@ -17,6 +17,7 @@ from pugdebug.server import PugdebugServer
 class PugdebugDebugger(QObject):
     server = None
 
+    init_message = None
     step_result = ''
 
     current_file = ''
@@ -82,11 +83,13 @@ class PugdebugDebugger(QObject):
         """
         self.server.connect()
 
-    def handle_server_connected(self):
+    def handle_server_connected(self, init_message):
         """Handle when server gets connected
 
         Emit a debugging started signal.
         """
+        self.init_message = init_message
+
         self.debugging_started_signal.emit()
 
     def stop_debug(self):
@@ -153,6 +156,12 @@ class PugdebugDebugger(QObject):
 
     def handle_server_listed_breakpoints(self, breakpoints):
         self.breakpoints_listed_signal.emit(breakpoints)
+
+    def get_index_file(self):
+        if 'fileuri' in self.init_message:
+            return self.init_message['fileuri']
+        else:
+            return None
 
     def get_current_file(self):
         if 'filename' in self.step_result:
