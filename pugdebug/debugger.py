@@ -50,6 +50,9 @@ class PugdebugDebugger(QObject):
         self.server.server_got_variables_signal.connect(
             self.handle_server_got_variables
         )
+        self.server.server_got_stacktraces_signal.connect(
+            self.handle_server_got_stacktraces
+        )
         self.server.server_set_init_breakpoints_signal.connect(
             self.handle_server_set_breakpoint
         )
@@ -125,8 +128,7 @@ class PugdebugDebugger(QObject):
         self.step_result = step_result
         self.step_command_signal.emit()
 
-    def get_variables(self):
-        self.server.get_variables()
+        self.server.post_step_command()
 
     def handle_server_got_variables(self, variables):
         """Handle when server recieves all variables
@@ -134,6 +136,9 @@ class PugdebugDebugger(QObject):
         Emit a signal with all variables received.
         """
         self.got_all_variables_signal.emit(variables)
+
+    def handle_server_got_stacktraces(self, stacktraces):
+        print(stacktraces)
 
     def set_init_breakpoints(self, breakpoints):
         self.server.set_init_breakpoints(breakpoints)

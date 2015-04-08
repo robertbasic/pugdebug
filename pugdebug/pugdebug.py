@@ -323,7 +323,6 @@ class Pugdebug(QObject):
 
         if self.debugger.is_breaking():
             self.focus_current_line()
-            self.debugger.get_variables()
         elif self.debugger.is_stopped():
             self.stop_debug()
         elif self.debugger.is_stopping():
