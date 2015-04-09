@@ -78,12 +78,6 @@ class PugdebugServer(QThread):
 
             self.server_got_variables_signal.emit(response['variables'])
             self.server_got_stacktraces_signal.emit(response['stacktraces'])
-        elif action == 'variables':
-            response = self.__get_variables()
-            self.server_got_variables_signal.emit(response)
-        elif action == 'stacktraces':
-            response = self.__get_stacktraces()
-            self.server_got_stacktraces_signal.emit(response)
         elif action == 'init_breakpoint_set':
             response = self.__set_init_breakpoints(data)
             self.server_set_init_breakpoints_signal.emit(response)
@@ -132,14 +126,6 @@ class PugdebugServer(QThread):
 
     def post_step_command(self):
         self.action = 'post_step'
-        self.start()
-
-    def get_variables(self):
-        self.action = 'variables'
-        self.start()
-
-    def get_stacktraces(self):
-        self.action = 'stacktraces'
         self.start()
 
     def set_init_breakpoints(self, breakpoints):
