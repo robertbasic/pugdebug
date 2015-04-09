@@ -27,6 +27,7 @@ class PugdebugDebugger(QObject):
     debugging_stopped_signal = pyqtSignal()
     step_command_signal = pyqtSignal()
     got_all_variables_signal = pyqtSignal(object)
+    got_stacktraces_signal = pyqtSignal(object)
     breakpoint_removed_signal = pyqtSignal(int)
     breakpoints_listed_signal = pyqtSignal(type([]))
 
@@ -139,7 +140,11 @@ class PugdebugDebugger(QObject):
         self.got_all_variables_signal.emit(variables)
 
     def handle_server_got_stacktraces(self, stacktraces):
-        print(stacktraces)
+        """Handle when server receives stacktraces
+
+        Emit a signal with the stacktraces.
+        """
+        self.got_stacktraces_signal.emit(stacktraces)
 
     def set_init_breakpoints(self, breakpoints):
         self.server.set_init_breakpoints(breakpoints)
