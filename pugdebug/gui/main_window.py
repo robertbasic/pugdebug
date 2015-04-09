@@ -85,12 +85,14 @@ class PugdebugMainWindow(QMainWindow):
 
     def setup_file_browser_window(self):
         dw = QDockWidget("File Browser", self)
+        dw.setObjectName("dock-widget-file-browser")
         self.file_browser = PugdebugFileBrowser()
         dw.setWidget(self.file_browser)
         self.addDockWidget(Qt.LeftDockWidgetArea, dw)
 
     def setup_settings_window(self):
         dw = QDockWidget("Settings", self)
+        dw.setObjectName("dock-widget-settings")
         self.settings_window = PugdebugSettingsWindow(self)
         dw.setWidget(self.settings_window)
         self.addDockWidget(Qt.LeftDockWidgetArea, dw)
