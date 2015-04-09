@@ -36,9 +36,14 @@ class PugdebugExpressionViewer(QTreeWidget):
     def show_context_menu(self, point):
         # Create the context menu
         self.context_menu = QMenu(self)
-        self.context_menu.addAction("Add expression", self.add_expression_action)
+        self.context_menu.addAction("&Add expression", self.add_expression_action)
 
-        # Todo: if clicked on item, offer to delete item
+        # If clicked on an row, offer to delete it
+        item = self.itemAt(point)
+        if item:
+            deleteAction = QAction("&Delete expression", self.context_menu)
+            deleteAction.triggered.connect(lambda: self.delete_expression(item))
+            self.context_menu.addAction(deleteAction)
 
         point = self.mapToGlobal(point)
         self.context_menu.popup(point)
@@ -51,6 +56,11 @@ class PugdebugExpressionViewer(QTreeWidget):
         item = QTreeWidgetItem([expression, '', ''])
         item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsEditable)
         self.addTopLevelItem(item)
+
+    def delete_expression(self, item):
+        index = self.indexOfTopLevelItem(item)
+        self.takeTopLevelItem(index)
+        self.save_state()
 
     def get_expressions(self):
         """Returns a list of expressions which are to be evaluated"""
