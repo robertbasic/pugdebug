@@ -268,7 +268,7 @@ class PugdebugServer(QThread):
         return variables
 
     def __get_stacktraces(self):
-        command = 'context_names -i %d' % self.__get_transaction_id()
+        command = 'stack_get -i %d' % self.__get_transaction_id()
         response = self.__send_command(command)
 
         return response
