@@ -94,6 +94,23 @@ class PugdebugMessageParser():
 
         return variables
 
+    def parse_stacktraces_message(self, message):
+        if not message:
+            return []
+
+        stacktraces = []
+
+        xml = xml_parser.fromstring(message)
+
+        attribs = ['filename', 'lineno', 'where', 'level']
+        for child in xml.getchildren():
+            stacktrace = {}
+            stacktrace = self.get_attribs(child, attribs, stacktrace)
+
+            stacktraces.append(stacktrace)
+
+        return stacktraces
+
     def parse_breakpoint_set_message(self, message):
         if not message:
             return False
