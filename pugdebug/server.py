@@ -257,7 +257,9 @@ class PugdebugServer(QThread):
         command = 'stack_get -i %d' % self.__get_transaction_id()
         response = self.__send_command(command)
 
-        return response
+        stacktraces = self.parser.parse_stacktraces_message(response)
+
+        return stacktraces
 
     def __set_init_breakpoints(self, breakpoints):
         all_successful = True
