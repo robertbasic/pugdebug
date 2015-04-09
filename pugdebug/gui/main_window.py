@@ -147,6 +147,9 @@ class PugdebugMainWindow(QMainWindow):
     def get_variable_viewer(self):
         return self.workarea_window.get_variable_viewer()
 
+    def get_stacktrace_viewer(self):
+        return self.workarea_window.get_stacktrace_viewer()
+
     def get_breakpoint_viewer(self):
         return self.workarea_window.get_breakpoint_viewer()
 

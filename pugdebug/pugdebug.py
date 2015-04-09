@@ -45,6 +45,7 @@ class Pugdebug(QObject):
         self.settings = self.main_window.get_settings()
         self.document_viewer = self.main_window.get_document_viewer()
         self.variable_viewer = self.main_window.get_variable_viewer()
+        self.stacktrace_viewer = self.main_window.get_stacktrace_viewer()
         self.breakpoint_viewer = self.main_window.get_breakpoint_viewer()
 
         self.documents = PugdebugDocuments()
@@ -149,6 +150,9 @@ class Pugdebug(QObject):
         self.debugger.step_command_signal.connect(self.handle_step_command)
         self.debugger.got_all_variables_signal.connect(
             self.handle_got_all_variables
+        )
+        self.debugger.got_stacktraces_signal.connect(
+            self.handle_got_stacktraces
         )
         self.debugger.breakpoint_removed_signal.connect(
             self.handle_breakpoint_removed
@@ -323,7 +327,7 @@ class Pugdebug(QObject):
 
         if self.debugger.is_breaking():
             self.focus_current_line()
-            self.debugger.get_variables()
+            self.debugger.post_step_command()
         elif self.debugger.is_stopped():
             self.stop_debug()
         elif self.debugger.is_stopping():
@@ -363,6 +367,13 @@ class Pugdebug(QObject):
         Set the variables on the variable viewer.
         """
         self.variable_viewer.set_variables(variables)
+
+    def handle_got_stacktraces(self, stacktraces):
+        """Handle when stacktraces are retrieved from xdebug
+
+        Set the stacktraces on the stacktrace viewer.
+        """
+        self.stacktrace_viewer.set_stacktraces(stacktraces)
 
     def set_init_breakpoints(self, breakpoints):
         """Set initial breakpoints

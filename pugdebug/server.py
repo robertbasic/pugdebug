@@ -33,11 +33,11 @@ class PugdebugServer(QThread):
 
     xdebug_encoding = 'iso-8859-1'
 
-    thread_finished_signal = pyqtSignal(type([]))
     server_connected_signal = pyqtSignal(type({}))
     server_stopped_signal = pyqtSignal()
     server_stepped_signal = pyqtSignal(type({}))
     server_got_variables_signal = pyqtSignal(object)
+    server_got_stacktraces_signal = pyqtSignal(object)
     server_set_init_breakpoints_signal = pyqtSignal(bool)
     server_set_breakpoint_signal = pyqtSignal(bool)
     server_removed_breakpoint_signal = pyqtSignal(object)
@@ -49,63 +49,49 @@ class PugdebugServer(QThread):
         self.mutex = QMutex()
         self.parser = PugdebugMessageParser()
 
-        self.thread_finished_signal.connect(self.handle_thread_finished)
-
     def run(self):
         self.mutex.lock()
 
         data = self.data
+        action = self.action
 
-        if self.action == 'connect':
+        if action == 'connect':
             response = self.__connect_server()
-        elif self.action == 'stop':
+            self.server_connected_signal.emit(response)
+        elif action == 'stop':
             response = self.__stop()
-        elif self.action == 'step_run':
+            self.server_stopped_signal.emit()
+        elif action == 'step_run':
             response = self.__step_run()
-        elif self.action == 'step_into':
+            self.server_stepped_signal.emit(response)
+        elif action == 'step_into':
             response = self.__step_into()
-        elif self.action == 'step_over':
+            self.server_stepped_signal.emit(response)
+        elif action == 'step_over':
             response = self.__step_over()
-        elif self.action == 'step_out':
+            self.server_stepped_signal.emit(response)
+        elif action == 'step_out':
             response = self.__step_out()
-        elif self.action == 'variables':
-            response = self.__get_variables()
-        elif self.action == 'init_breakpoint_set':
-            response = self.__set_init_breakpoints(data)
-        elif self.action == 'breakpoint_set':
-            response = self.__set_breakpoint(data)
-        elif self.action == 'breakpoint_remove':
-            response = self.__remove_breakpoint(data)
-        elif self.action == 'breakpoint_list':
-            response = self.__list_breakpoints()
+            self.server_stepped_signal.emit(response)
+        elif action == 'post_step':
+            response = self.__post_step()
 
-        self.thread_finished_signal.emit([response])
+            self.server_got_variables_signal.emit(response['variables'])
+            self.server_got_stacktraces_signal.emit(response['stacktraces'])
+        elif action == 'init_breakpoint_set':
+            response = self.__set_init_breakpoints(data)
+            self.server_set_init_breakpoints_signal.emit(response)
+        elif action == 'breakpoint_set':
+            response = self.__set_breakpoint(data)
+            self.server_set_breakpoint_signal.emit(response)
+        elif action == 'breakpoint_remove':
+            response = self.__remove_breakpoint(data)
+            self.server.server_removed_breakpoint_signal.emit(response)
+        elif action == 'breakpoint_list':
+            response = self.__list_breakpoints()
+            self.server_listed_breakpoints_signal.emit(response)
 
         self.mutex.unlock()
-
-    def handle_thread_finished(self, thread_result):
-        if self.action == 'connect':
-            self.server_connected_signal.emit(thread_result.pop())
-        elif self.action == 'stop':
-            self.server_stopped_signal.emit()
-        elif self.action == 'step_run':
-            self.server_stepped_signal.emit(thread_result.pop())
-        elif self.action == 'step_into':
-            self.server_stepped_signal.emit(thread_result.pop())
-        elif self.action == 'step_over':
-            self.server_stepped_signal.emit(thread_result.pop())
-        elif self.action == 'step_out':
-            self.server_stepped_signal.emit(thread_result.pop())
-        elif self.action == 'variables':
-            self.server_got_variables_signal.emit(thread_result.pop())
-        elif self.action == 'init_breakpoint_set':
-            self.server_set_init_breakpoints_signal.emit(thread_result.pop())
-        elif self.action == 'breakpoint_set':
-            self.server_set_breakpoint_signal.emit(thread_result.pop())
-        elif self.action == 'breakpoint_remove':
-            self.server_removed_breakpoint_signal.emit(thread_result.pop())
-        elif self.action == 'breakpoint_list':
-            self.server_listed_breakpoints_signal.emit(thread_result.pop())
 
     def connect(self):
         self.action = 'connect'
@@ -138,8 +124,8 @@ class PugdebugServer(QThread):
         self.action = 'step_out'
         self.start()
 
-    def get_variables(self):
-        self.action = 'variables'
+    def post_step_command(self):
+        self.action = 'post_step'
         self.start()
 
     def set_init_breakpoints(self, breakpoints):
@@ -238,6 +224,14 @@ class PugdebugServer(QThread):
 
         return response
 
+    def __post_step(self):
+        post_step_response = {
+            'variables': self.__get_variables(),
+            'stacktraces': self.__get_stacktraces()
+        }
+
+        return post_step_response
+
     def __get_variables(self):
         command = 'context_names -i %d' % self.__get_transaction_id()
         response = self.__send_command(command)
@@ -258,6 +252,14 @@ class PugdebugServer(QThread):
             variables[context['name']] = var
 
         return variables
+
+    def __get_stacktraces(self):
+        command = 'stack_get -i %d' % self.__get_transaction_id()
+        response = self.__send_command(command)
+
+        stacktraces = self.parser.parse_stacktraces_message(response)
+
+        return stacktraces
 
     def __set_init_breakpoints(self, breakpoints):
         all_successful = True
@@ -314,7 +316,7 @@ class PugdebugServer(QThread):
             character = self.sock.recv(1)
 
             if self.__is_eof(character):
-                self.close()
+                self.disconnect()
 
             if character.isdigit():
                 length = length + character.decode(self.xdebug_encoding)
@@ -331,7 +333,7 @@ class PugdebugServer(QThread):
             data = self.sock.recv(length)
 
             if self.__is_eof(data):
-                self.close()
+                self.disconnect()
 
             body = body + data.decode(self.xdebug_encoding)
 
@@ -346,7 +348,7 @@ class PugdebugServer(QThread):
             character = self.sock.recv(1)
 
             if self.__is_eof(character):
-                self.close()
+                self.disconnect()
 
             if character.decode(self.xdebug_encoding) == '\0':
                 return

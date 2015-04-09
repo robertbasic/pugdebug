@@ -407,3 +407,76 @@ class PugdebugMessageParserTest(unittest.TestCase):
         ]
 
         self.assertEqual(expected, result)
+
+    def test_parse_stacktraces_message(self):
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="stack_get" transaction_id="118"><stack where="{main}" level="0" type="file" filename="file:///home/robert/www/pugdebug/index.php" lineno="30"></stack></response>'
+
+        result = self.parser.parse_stacktraces_message(message)
+
+        expected = [
+            {
+                'filename': '/home/robert/www/pugdebug/index.php',
+                'lineno': '30',
+                'where': '{main}',
+                'level': '0'
+            }
+        ]
+
+        self.assertEqual(expected, result)
+
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="stack_get" transaction_id="22"><stack where="include_once" level="0" type="file" filename="file:///home/robert/www/pugdebug/dir/foo.php" lineno="3"></stack><stack where="include_once" level="1" type="file" filename="file:///home/robert/www/pugdebug/file.php" lineno="3"></stack><stack where="{main}" level="2" type="file" filename="file:///home/robert/www/pugdebug/index.php" lineno="3"></stack></response>'
+
+        result = self.parser.parse_stacktraces_message(message)
+
+        expected = [
+            {
+                'filename': '/home/robert/www/pugdebug/dir/foo.php',
+                'lineno': '3',
+                'where': 'include_once',
+                'level': '0'
+            },
+            {
+                'filename': '/home/robert/www/pugdebug/file.php',
+                'lineno': '3',
+                'where': 'include_once',
+                'level': '1'
+            },
+            {
+                'filename': '/home/robert/www/pugdebug/index.php',
+                'lineno': '3',
+                'where': '{main}',
+                'level': '2'
+            }
+        ]
+
+        self.assertEqual(expected, result)
+
+        message = '<?xml version="1.0" encoding="iso-8859-1"?>\
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="stack_get" transaction_id="54"><stack where="foo" level="0" type="file" filename="file:///home/robert/www/pugdebug/dir/foo.php" lineno="4"></stack><stack where="call_foo" level="1" type="file" filename="file:///home/robert/www/pugdebug/file.php" lineno="6"></stack><stack where="{main}" level="2" type="file" filename="file:///home/robert/www/pugdebug/index.php" lineno="34"></stack></response>'
+
+        result = self.parser.parse_stacktraces_message(message)
+
+        expected = [
+            {
+                'filename': '/home/robert/www/pugdebug/dir/foo.php',
+                'lineno': '4',
+                'where': 'foo',
+                'level': '0'
+            },
+            {
+                'filename': '/home/robert/www/pugdebug/file.php',
+                'lineno': '6',
+                'where': 'call_foo',
+                'level': '1'
+            },
+            {
+                'filename': '/home/robert/www/pugdebug/index.php',
+                'lineno': '34',
+                'where': '{main}',
+                'level': '2'
+            }
+        ]
+
+        self.assertEqual(expected, result)
