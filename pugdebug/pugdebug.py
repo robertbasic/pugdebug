@@ -269,11 +269,14 @@ class Pugdebug(QObject):
 
         Clear the variable viewer.
 
+        Clear the stacktrace viewer.
+
         Remove all line highlights.
 
         Start a debugging session.
         """
         self.variable_viewer.clear()
+        self.stacktrace_viewer.clear()
 
         self.document_viewer.remove_line_highlights()
 
