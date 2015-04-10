@@ -147,6 +147,9 @@ class Pugdebug(QObject):
         self.debugger.debugging_stopped_signal.connect(
             self.handle_debugging_stopped
         )
+        self.debugger.debugging_cancelled_signal.connect(
+            self.handle_debugging_stopped
+        )
         self.debugger.step_command_signal.connect(self.handle_step_command)
         self.debugger.got_all_variables_signal.connect(
             self.handle_got_all_variables
@@ -300,6 +303,8 @@ class Pugdebug(QObject):
         """
         if self.debugger.is_connected():
             self.debugger.stop_debug()
+        elif self.debugger.is_waiting_for_connection():
+            self.debugger.cancel_debug()
 
     def handle_debugging_stopped(self):
         """Handle when debugging stops
