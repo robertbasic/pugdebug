@@ -221,7 +221,7 @@ class Pugdebug(QObject):
         breakpoint = self.get_breakpoint(path, line_number)
 
         if breakpoint is None:
-            breakpoint = {'path': path, 'line_number': line_number}
+            breakpoint = {'filename': path, 'lineno': line_number}
             self.set_breakpoint(breakpoint)
         else:
             self.remove_breakpoint(breakpoint)
@@ -404,7 +404,8 @@ class Pugdebug(QObject):
         if not self.debugger.is_connected():
             self.init_breakpoints.append(breakpoint)
 
-            path = breakpoint['path']
+            path = breakpoint['filename']
+
             document_widget = self.document_viewer.get_document_by_path(path)
             document_widget.rehighlight_breakpoint_lines()
 
@@ -425,12 +426,12 @@ class Pugdebug(QObject):
         the breakpoint.
         """
         if not self.debugger.is_connected():
-            path = breakpoint['path']
-            line_number = breakpoint['line_number']
+            path = breakpoint['filename']
+            line_number = breakpoint['lineno']
 
             for init_breakpoint in self.init_breakpoints:
-                if (init_breakpoint['path'] == path and
-                        init_breakpoint['line_number'] == line_number):
+                if (init_breakpoint['filename'] == path and
+                        init_breakpoint['lineno'] == line_number):
                     self.init_breakpoints.remove(init_breakpoint)
 
             document_widget = self.document_viewer.get_document_by_path(path)
@@ -483,8 +484,8 @@ class Pugdebug(QObject):
                 return breakpoint
 
         for breakpoint in self.init_breakpoints:
-            if (breakpoint['path'] == path and
-                    int(breakpoint['line_number']) == line_number):
+            if (breakpoint['filename'] == path and
+                    int(breakpoint['lineno']) == line_number):
                 return breakpoint
 
         return None
