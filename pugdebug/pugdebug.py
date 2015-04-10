@@ -269,9 +269,13 @@ class Pugdebug(QObject):
 
         Clear the variable viewer.
 
+        Remove all line highlights.
+
         Start a debugging session.
         """
         self.variable_viewer.clear()
+
+        self.document_viewer.remove_line_highlights()
 
         self.debugger.start_debug()
         self.main_window.set_statusbar_text("Waiting for connection...")

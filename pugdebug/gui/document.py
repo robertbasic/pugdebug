@@ -153,7 +153,7 @@ class PugdebugDocumentContents(QPlainTextEdit):
 
         self.setPlainText(document_model.contents)
 
-        self.move_to_line(0)
+        self.remove_line_highlights()
 
         self.syntaxer = PugdebugSyntaxer(self.document(), syntaxer_rules)
 
@@ -205,13 +205,16 @@ class PugdebugDocumentContents(QPlainTextEdit):
 
         block_number = cursor.blockNumber()
         while block_number < line:
-            cursor.movePosition(QTextCursor.NextBlock, QTextCursor.MoveAnchor, 1)
+            cursor.movePosition(
+                QTextCursor.NextBlock,
+                QTextCursor.MoveAnchor,
+                1
+            )
             block_number = cursor.blockNumber()
 
         self.setTextCursor(cursor)
 
     def highlight(self):
-        ex = [QTextEdit.ExtraSelection()]
         selection = QTextEdit.ExtraSelection()
 
         color = QColor(209, 220, 236)
@@ -222,8 +225,17 @@ class PugdebugDocumentContents(QPlainTextEdit):
 
         selection.cursor.clearSelection()
 
-        ex.append(selection)
-        self.setExtraSelections(ex)
+        self.setExtraSelections([selection])
+
+    def remove_line_highlights(self):
+        """Remove line highlights
+
+        Move the cursor to first (zero) line.
+
+        Clear the extra selections in the file.
+        """
+        self.move_to_line(0)
+        self.setExtraSelections([])
 
 
 class PugdebugLineNumbers(QWidget):
