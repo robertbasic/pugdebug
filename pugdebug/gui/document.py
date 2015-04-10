@@ -183,6 +183,14 @@ class PugdebugDocumentContents(QPlainTextEdit):
         pass
 
     def move_to_line(self, line):
+        """Move cursor to line
+
+        Move the cursor of the QPlainTextEdit that holds the document
+        contents to the line.
+
+        Move the cursor block by block until the block number matches
+        the line number.
+        """
         line = line - 1
         if line < 0:
             line = 0
@@ -190,8 +198,10 @@ class PugdebugDocumentContents(QPlainTextEdit):
         cursor = self.textCursor()
         cursor.movePosition(QTextCursor.Start, QTextCursor.MoveAnchor, 0)
 
-        if line > 0:
-            cursor.movePosition(QTextCursor.Down, QTextCursor.MoveAnchor, line)
+        block_number = cursor.blockNumber()
+        while block_number < line:
+            cursor.movePosition(QTextCursor.NextBlock, QTextCursor.MoveAnchor, 1)
+            block_number = cursor.blockNumber()
 
         self.setTextCursor(cursor)
 
