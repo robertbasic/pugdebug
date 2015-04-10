@@ -313,6 +313,10 @@ class Pugdebug(QObject):
         xdebug is terminated.
         """
         self.debugger.cleanup()
+
+        self.init_breakpoints = self.breakpoints
+        self.breakpoints = []
+
         self.main_window.toggle_actions(False)
 
         self.main_window.set_statusbar_text("Debugging stopped...")
