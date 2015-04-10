@@ -306,8 +306,8 @@ class PugdebugServer(QThread):
         command = 'breakpoint_set -i %d -t %s -f %s -n %d' % (
             self.__get_transaction_id(),
             'line',
-            breakpoint['path'],
-            breakpoint['line_number']
+            breakpoint['filename'],
+            breakpoint['lineno']
         )
         response = self.__send_command(command)
 

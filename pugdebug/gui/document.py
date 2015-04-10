@@ -166,6 +166,11 @@ class PugdebugDocumentContents(QPlainTextEdit):
         cursor = self.cursorForPosition(event.pos())
 
         block = cursor.block()
+
+        # Do not try to set breakpoints on empty lines
+        if len(block.text()) == 0:
+            return
+
         # Set/unset breakpoint flag on the double clicked line
         if block.userState() == 1:
             block.setUserState(-1)
