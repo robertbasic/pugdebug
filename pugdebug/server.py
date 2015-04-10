@@ -21,7 +21,11 @@ class PugdebugServer(QThread):
 
     mutex = None
 
+    socket_server = None
     sock = None
+
+    wait_for_accept = False
+    is_waiting = False
 
     parser = None
 
@@ -34,6 +38,7 @@ class PugdebugServer(QThread):
     xdebug_encoding = 'iso-8859-1'
 
     server_connected_signal = pyqtSignal(type({}))
+    server_cancelled_signal = pyqtSignal()
     server_stopped_signal = pyqtSignal()
     server_stepped_signal = pyqtSignal(type({}))
     server_got_variables_signal = pyqtSignal(object)
@@ -57,7 +62,10 @@ class PugdebugServer(QThread):
 
         if action == 'connect':
             response = self.__connect_server()
-            self.server_connected_signal.emit(response)
+            if response is not None:
+                self.server_connected_signal.emit(response)
+            else:
+                self.server_cancelled_signal.emit()
         elif action == 'stop':
             response = self.__stop()
             self.server_stopped_signal.emit()
@@ -94,11 +102,19 @@ class PugdebugServer(QThread):
         self.mutex.unlock()
 
     def connect(self):
+        self.is_waiting = True
+        self.wait_for_accept = True
         self.action = 'connect'
         self.start()
 
+    def cancel(self):
+        self.wait_for_accept = False
+
     def is_connected(self):
         return self.sock is not None
+
+    def is_waiting_for_connection(self):
+        return self.is_waiting
 
     def disconnect(self):
         self.sock.close()
@@ -150,17 +166,33 @@ class PugdebugServer(QThread):
     def __connect_server(self):
         socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        socket_server.settimeout(None)
+        socket_server.settimeout(1)
 
         response = None
 
+        # Read the host from settings
+        host = get_setting('debugger/host')
+        # Read the port number from settings
+        port_number = int(get_setting('debugger/port_number'))
+
         try:
-            # Read the host from settings
-            host = get_setting('debugger/host')
-            # Read the port number from settings
-            port_number = int(get_setting('debugger/port_number'))
+            # As long as the wait_for_accept flag is set
+            # try accepting the socket
+            # if the wait_for_accept flag is unset
+            # it means a cancel connection was requested
             socket_server.bind((host, port_number))
-            response = self.__init_connection(socket_server)
+            socket_server.listen(5)
+
+            while self.wait_for_accept:
+                try:
+                    self.sock, address = socket_server.accept()
+                    self.sock.settimeout(None)
+                    self.wait_for_accept = False
+                except socket.timeout:
+                    pass
+
+            self.is_waiting = False
+            response = self.__init_connection()
         except OSError:
             print(OSError.strerror())
             print("Socket bind failed")
@@ -169,11 +201,10 @@ class PugdebugServer(QThread):
 
         return response
 
-    def __init_connection(self, socket_server):
-        socket_server.listen(5)
+    def __init_connection(self):
+        if self.sock is None:
+            return
 
-        self.sock, address = socket_server.accept()
-        self.sock.settimeout(None)
         response = self.__receive_message()
 
         init_message = self.parser.parse_init_message(response)
