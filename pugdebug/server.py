@@ -86,7 +86,7 @@ class PugdebugServer(QThread):
             self.server_set_breakpoint_signal.emit(response)
         elif action == 'breakpoint_remove':
             response = self.__remove_breakpoint(data)
-            self.server.server_removed_breakpoint_signal.emit(response)
+            self.server_removed_breakpoint_signal.emit(response)
         elif action == 'breakpoint_list':
             response = self.__list_breakpoints()
             self.server_listed_breakpoints_signal.emit(response)
