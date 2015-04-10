@@ -405,6 +405,7 @@ class Pugdebug(QObject):
             self.init_breakpoints.append(breakpoint)
 
             path = breakpoint['filename']
+            path = self.__get_path_mapped_to_local(path)
 
             document_widget = self.document_viewer.get_document_by_path(path)
             document_widget.rehighlight_breakpoint_lines()
@@ -433,6 +434,8 @@ class Pugdebug(QObject):
                 if (init_breakpoint['filename'] == path and
                         init_breakpoint['lineno'] == line_number):
                     self.init_breakpoints.remove(init_breakpoint)
+
+            path = self.__get_path_mapped_to_local(path)
 
             document_widget = self.document_viewer.get_document_by_path(path)
             document_widget.rehighlight_breakpoint_lines()
