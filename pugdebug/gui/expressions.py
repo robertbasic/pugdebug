@@ -103,8 +103,9 @@ class PugdebugExpressionViewer(QTreeWidget):
         if has_setting('expressions_viewer/expressions'):
             expressions = get_setting('expressions_viewer/expressions')
 
-        for expression in expressions:
-            self.add_expression(expression)
+        if expressions is not None:
+            for expression in expressions:
+                self.add_expression(expression)
 
     def handle_item_changed(self, item, column):
         """If user changed the expression, save the state to settings"""

@@ -84,10 +84,11 @@ class PugdebugServer(QThread):
             response = self.__step_out()
             self.server_stepped_signal.emit(response)
         elif action == 'post_step':
-            response = self.__post_step()
+            response = self.__post_step(data)
 
             self.server_got_variables_signal.emit(response['variables'])
             self.server_got_stacktraces_signal.emit(response['stacktraces'])
+            self.server_expressions_evaluated_signal.emit(response['expressions'])
         elif action == 'init_breakpoint_set':
             response = self.__set_init_breakpoints(data)
             self.server_set_init_breakpoints_signal.emit(response)
@@ -100,9 +101,6 @@ class PugdebugServer(QThread):
         elif action == 'breakpoint_list':
             response = self.__list_breakpoints()
             self.server_listed_breakpoints_signal.emit(response)
-        elif action == 'eval':
-            response = self.__eval(data)
-            self.server_expressions_evaluated_signal.emit(response)
 
         self.mutex.unlock()
 
@@ -145,7 +143,8 @@ class PugdebugServer(QThread):
         self.action = 'step_out'
         self.start()
 
-    def post_step_command(self):
+    def post_step_command(self, post_step_data):
+        self.data = post_step_data
         self.action = 'post_step'
         self.start()
 
@@ -265,10 +264,11 @@ class PugdebugServer(QThread):
 
         return response
 
-    def __post_step(self):
+    def __post_step(self, data):
         post_step_response = {
             'variables': self.__get_variables(),
-            'stacktraces': self.__get_stacktraces()
+            'stacktraces': self.__get_stacktraces(),
+            'expressions': self.__eval(data['expressions'])
         }
 
         return post_step_response

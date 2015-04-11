@@ -146,8 +146,8 @@ class PugdebugDebugger(QObject):
         self.step_result = step_result
         self.step_command_signal.emit()
 
-    def post_step_command(self):
-        self.server.post_step_command()
+    def post_step_command(self, post_step_data):
+        self.server.post_step_command(post_step_data)
 
     def handle_server_got_variables(self, variables):
         """Handle when server recieves all variables

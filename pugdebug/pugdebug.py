@@ -345,7 +345,11 @@ class Pugdebug(QObject):
 
         if self.debugger.is_breaking():
             self.focus_current_line()
-            self.debugger.post_step_command()
+
+            post_step_data = {
+                'expressions': self.expression_viewer.get_expressions()
+            }
+            self.debugger.post_step_command(post_step_data)
         elif self.debugger.is_stopped():
             self.stop_debug()
         elif self.debugger.is_stopping():
