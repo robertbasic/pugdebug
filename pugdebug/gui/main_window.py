@@ -10,8 +10,7 @@
 __author__ = "robertbasic"
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QMainWindow, QMdiArea, QMdiSubWindow,
-                             QToolBar, QDockWidget, QLabel)
+from PyQt5.QtWidgets import QMainWindow, QToolBar, QDockWidget, QLabel
 from PyQt5.QtGui import QFont, QKeySequence
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
