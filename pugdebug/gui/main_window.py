@@ -20,6 +20,7 @@ from pugdebug.gui.documents import PugdebugDocumentViewer
 from pugdebug.gui.variables import PugdebugVariableViewer
 from pugdebug.gui.stacktraces import PugdebugStacktraceViewer
 from pugdebug.gui.breakpoints import PugdebugBreakpointViewer
+from pugdebug.gui.expressions import PugdebugExpressionViewer
 from pugdebug.models.settings import get_setting, set_setting, has_setting
 
 
@@ -71,6 +72,9 @@ class PugdebugMainWindow(QMainWindow):
         self.setFont(font)
 
     def setup_mdi_sub_windows(self):
+        self.expression_viewer = PugdebugExpressionViewer()
+        self.__add_sub_window(self.expression_viewer, "Expressions")
+
         self.stacktrace_viewer = PugdebugStacktraceViewer()
         self.__add_sub_window(self.stacktrace_viewer, "Stacktraces")
 
@@ -181,7 +185,7 @@ class PugdebugMainWindow(QMainWindow):
         return self.breakpoint_viewer
 
     def get_expression_viewer(self):
-        return self.workarea_window.get_expression_viewer()
+        return self.expression_viewer
 
     def set_statusbar_text(self, text):
         self.permanent_statusbar.setText(text)
