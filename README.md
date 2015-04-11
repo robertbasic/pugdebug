@@ -4,7 +4,7 @@ pugdebug is (well, should be) a PHP standalone debugger.
 
 A python 3.4.x, pyqt5 project.
 
-# setting up the environment
+## setting up the environment
 
 The main dependencies are Python 3.4,
 [QT5.4](http://doc.qt.io/qt-5/gettingstarted.html),
@@ -24,7 +24,23 @@ setup process on different systems should be available soon.
 
 Do note that I'm trying to figure out how to build executables for this beast.
 
-# setting up xdebug
+### OS X setup with Homebrew
+
+Easiest way to install dependencies on OS X is to use [Homebrew].
+To install the dependencies, execute the following commands from your terminal:
+```
+brew install python3
+brew install qt5 pyqt5 sip
+```
+
+Go to directory where you checked out the pugdebug, and execute
+```
+python3 app.py
+```
+
+At the moment, there seems to be an issue with using virtualenv, python3 and pyqt5 on OS X Yosemite.
+
+## setting up xdebug
 
 To be able to debug PHP with pugdebug, you need to have [xdebug](http://xdebug.org/docs/remote)
 propely set up for remote debugging.
@@ -48,7 +64,7 @@ xdebug.remote_port=9000
 xdebug.remote_connect_back=1
 ```
 
-# using pugdebug
+## using pugdebug
 
 In a terminal go to the directory where you have pugdebug cloned and start it by
 issuing a `python app.py` command.
@@ -68,7 +84,7 @@ input field, the file browser will change to the pugdebug web project.
 
 But this is just temporary, it will be nicer in the future.
 
-# debugging sessions
+## debugging sessions
 
 To start a debugging session, click the "Start" button in the top left corner.
 
@@ -109,17 +125,19 @@ php script.php
 
 pugdebug should pick up the debugging session and let you debug your script.
 
-# executables
+## executables
 
 I'm trying to make executables with
 [pyqtdeploy](http://www.riverbankcomputing.com/software/pyqtdeploy/download).
 So far I managed to create one for Fedora 21.
 
-# todo
+## todo
 
 Take a look at the [issue tracker](https://github.com/robertbasic/pugdebug/issues).
 
-# contributions
+## contributions
 
 Contributions are more than welcome! Report bugs, tell me your ideas and needs,
 write code, test it on different platforms ...
+
+[Homebrew]: http://brew.sh/
