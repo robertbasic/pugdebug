@@ -12,7 +12,7 @@ __author__ = "robertbasic"
 import base64
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QMenu, QWidget, QTreeWidget, QTreeWidgetItem, \
                             QAction, QToolBar, QVBoxLayout, QAbstractItemView
 
@@ -34,6 +34,7 @@ class PugdebugExpressionViewer(QWidget):
         # Action for deleting selected expressions
         self.delete_action = QAction(QIcon.fromTheme('list-remove'),
             "&Delete", self)
+        self.delete_action.setShortcut(QKeySequence("Del"))
         self.delete_action.triggered.connect(self.handle_delete_action)
 
         self.toolbar = QToolBar()
@@ -83,7 +84,19 @@ class PugdebugExpressionViewer(QWidget):
     def delete_selected(self):
         """Deletes currently selected items from the tree"""
         for item in self.tree.selectedItems():
+            index = self.tree.indexOfTopLevelItem(item)
             self.delete_expression(item)
+            self.select_next(index)
+
+    def select_next(self, index):
+        """Selects the next item after an item has been deleted"""
+        prev_item = self.tree.topLevelItem(index - 1)
+        next_item = self.tree.topLevelItem(index)
+
+        if prev_item:
+            prev_item.setSelected(True)
+        elif next_item:
+            next_item.setSelected(True)
 
     def delete_expression(self, item):
         """Deletes the given item from the tree"""
