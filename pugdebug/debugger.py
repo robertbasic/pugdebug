@@ -31,6 +31,7 @@ class PugdebugDebugger(QObject):
     got_stacktraces_signal = pyqtSignal(object)
     breakpoint_removed_signal = pyqtSignal(int)
     breakpoints_listed_signal = pyqtSignal(type([]))
+    expression_evaluated_signal = pyqtSignal(int, type({}))
     expressions_evaluated_signal = pyqtSignal(type([]))
 
     def __init__(self):
@@ -71,8 +72,12 @@ class PugdebugDebugger(QObject):
         self.server.server_listed_breakpoints_signal.connect(
             self.handle_server_listed_breakpoints
         )
+
+        self.server.server_expression_evaluated_signal.connect(
+            self.handle_server_expression_evaluated
+        )
         self.server.server_expressions_evaluated_signal.connect(
-            self.handle_server_evaluated
+            self.handle_server_expressions_evaluated
         )
 
     def cleanup(self):
@@ -191,11 +196,21 @@ class PugdebugDebugger(QObject):
         else:
             return None
 
-    def eval(self, expressions):
-        self.server.eval(expressions)
+    def evaluate_expression(self, index, expression):
+        """Evaluates a single expression"""
+        self.server.evaluate_expression(index, expression)
 
-    def handle_server_evaluated(self, result):
-        self.expressions_evaluated_signal.emit(result)
+    def evaluate_expressions(self, expressions):
+        """Evaluates a list of expressions"""
+        self.server.evaluate_expressions(expressions)
+
+    def handle_server_expression_evaluated(self, index, result):
+        """Handle when server evaluates an expression"""
+        self.expression_evaluated_signal.emit(index, result)
+
+    def handle_server_expressions_evaluated(self, results):
+        """Handle when server evaluates a list of expressions"""
+        self.expressions_evaluated_signal.emit(results)
 
     def get_current_file(self):
         if 'filename' in self.step_result:

@@ -82,6 +82,7 @@ class Pugdebug(QObject):
         self.connect_document_viewer_signals()
         self.connect_toolbar_action_signals()
         self.connect_debugger_signals()
+        self.connect_expression_viewer_signals()
 
     def connect_file_browser_signals(self):
         """Connect file browser signals
@@ -162,8 +163,19 @@ class Pugdebug(QObject):
         self.debugger.breakpoints_listed_signal.connect(
             self.handle_breakpoints_listed
         )
+        self.debugger.expression_evaluated_signal.connect(
+            self.handle_expression_evaluated
+        )
         self.debugger.expressions_evaluated_signal.connect(
-            self.handle_evaluated
+            self.handle_expressions_evaluated
+        )
+
+    def connect_expression_viewer_signals(self):
+        self.expression_viewer.expression_added_signal.connect(
+            self.handle_expression_added_or_changed
+        )
+        self.expression_viewer.expression_changed_signal.connect(
+            self.handle_expression_added_or_changed
         )
 
     def file_browser_item_activated(self, index):
@@ -525,8 +537,20 @@ class Pugdebug(QObject):
             document_widget = self.document_viewer.get_document_by_path(path)
             document_widget.rehighlight_breakpoint_lines()
 
-    def handle_evaluated(self, results):
-        self.expression_viewer.set_evaluated(results)
+    def handle_expression_evaluated(self, index, result):
+        """Handle when an expression is evaluated"""
+        self.expression_viewer.set_evaluated(index, result)
+
+    def handle_expressions_evaluated(self, results):
+        """Handle when a list of expressions is evaluated"""
+        for index, result in enumerate(results):
+            self.expression_viewer.set_evaluated(index, result)
+
+    def handle_expression_added_or_changed(self, index, expression):
+        """Handle when an expression is added, or an existing one is changed.
+        """
+        if self.debugger.is_connected():
+            self.debugger.evaluate_expression(index, expression)
 
     def __get_path_mapped_to_local(self, path, map_paths=True):
         """Get a path mapped to local
