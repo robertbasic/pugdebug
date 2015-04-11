@@ -117,6 +117,9 @@ class PugdebugExpressionViewer(QWidget):
         if 'encoding' in result and value is not None:
             value = base64.b64decode(value).decode()
 
+        if result['type'] == 'bool':
+            value = 'false' if value == '0' else 'true'
+
         return value
 
     def save_state(self):
