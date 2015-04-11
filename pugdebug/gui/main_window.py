@@ -37,10 +37,15 @@ class PugdebugMainWindow(QMainWindow):
         if has_setting("window/state"):
             self.restoreState(get_setting("window/state"))
 
-        self.central_widget = QMdiArea(self)
-        self.central_widget.tileSubWindows()
+        self.file_browser = PugdebugFileBrowser()
+        self.settings_window = PugdebugSettingsWindow(self)
+        self.document_viewer = PugdebugDocumentViewer()
+        self.variable_viewer = PugdebugVariableViewer()
+        self.breakpoint_viewer = PugdebugBreakpointViewer()
+        self.stacktrace_viewer = PugdebugStacktraceViewer()
+        self.expression_viewer = PugdebugExpressionViewer()
 
-        self.setCentralWidget(self.central_widget)
+        self.setCentralWidget(self.document_viewer)
 
         self.setup_gui_elements()
 
@@ -52,10 +57,8 @@ class PugdebugMainWindow(QMainWindow):
 
     def setup_gui_elements(self):
         self.setup_fonts()
-        self.setup_file_browser_window()
-        self.setup_settings_window()
 
-        self.setup_mdi_sub_windows()
+        self.setup_docks()
 
         self.setup_toolbar()
 
@@ -71,35 +74,36 @@ class PugdebugMainWindow(QMainWindow):
         font.setPixelSize(12)
         self.setFont(font)
 
-    def setup_mdi_sub_windows(self):
-        self.expression_viewer = PugdebugExpressionViewer()
-        self.__add_sub_window(self.expression_viewer, "Expressions")
-
-        self.stacktrace_viewer = PugdebugStacktraceViewer()
-        self.__add_sub_window(self.stacktrace_viewer, "Stacktraces")
-
-        self.breakpoint_viewer = PugdebugBreakpointViewer()
-        self.__add_sub_window(self.breakpoint_viewer, "Breakpoints")
-
-        self.variable_viewer = PugdebugVariableViewer()
-        self.__add_sub_window(self.variable_viewer, "Variables")
-
-        self.document_viewer = PugdebugDocumentViewer()
-        self.__add_sub_window(self.document_viewer, "Documents")
-
-    def setup_file_browser_window(self):
+    def setup_docks(self):
         dw = QDockWidget("File Browser", self)
         dw.setObjectName("dock-widget-file-browser")
-        self.file_browser = PugdebugFileBrowser()
         dw.setWidget(self.file_browser)
         self.addDockWidget(Qt.LeftDockWidgetArea, dw)
 
-    def setup_settings_window(self):
         dw = QDockWidget("Settings", self)
         dw.setObjectName("dock-widget-settings")
-        self.settings_window = PugdebugSettingsWindow(self)
         dw.setWidget(self.settings_window)
         self.addDockWidget(Qt.LeftDockWidgetArea, dw)
+
+        dw = QDockWidget("Variables", self)
+        dw.setObjectName("dock-widget-variables")
+        dw.setWidget(self.variable_viewer)
+        self.addDockWidget(Qt.RightDockWidgetArea, dw)
+
+        dw = QDockWidget("Expressions", self)
+        dw.setObjectName("dock-widget-expressions")
+        dw.setWidget(self.expression_viewer)
+        self.addDockWidget(Qt.RightDockWidgetArea, dw)
+
+        dw = QDockWidget("Breakpoints", self)
+        dw.setObjectName("dock-widget-breakpoints")
+        dw.setWidget(self.breakpoint_viewer)
+        self.addDockWidget(Qt.BottomDockWidgetArea, dw)
+
+        dw = QDockWidget("Stacktraces", self)
+        dw.setObjectName("dock-widget-stacktraces")
+        dw.setWidget(self.stacktrace_viewer)
+        self.addDockWidget(Qt.BottomDockWidgetArea, dw)
 
     def setup_toolbar(self):
         toolbar = QToolBar("Main Toolbar")
