@@ -47,6 +47,7 @@ class Pugdebug(QObject):
         self.variable_viewer = self.main_window.get_variable_viewer()
         self.stacktrace_viewer = self.main_window.get_stacktrace_viewer()
         self.breakpoint_viewer = self.main_window.get_breakpoint_viewer()
+        self.expression_viewer = self.main_window.get_expression_viewer()
 
         self.documents = PugdebugDocuments()
 
@@ -79,9 +80,7 @@ class Pugdebug(QObject):
         self.connect_file_browser_signals()
         self.connect_settings_signals()
         self.connect_document_viewer_signals()
-
         self.connect_toolbar_action_signals()
-
         self.connect_debugger_signals()
 
     def connect_file_browser_signals(self):
@@ -162,6 +161,9 @@ class Pugdebug(QObject):
         )
         self.debugger.breakpoints_listed_signal.connect(
             self.handle_breakpoints_listed
+        )
+        self.debugger.expressions_evaluated_signal.connect(
+            self.handle_evaluated
         )
 
     def file_browser_item_activated(self, index):
@@ -518,6 +520,9 @@ class Pugdebug(QObject):
             path = self.__get_path_mapped_to_local(breakpoint['filename'])
             document_widget = self.document_viewer.get_document_by_path(path)
             document_widget.rehighlight_breakpoint_lines()
+
+    def handle_evaluated(self, results):
+        self.expression_viewer.set_evaluated(results)
 
     def __get_path_mapped_to_local(self, path, map_paths=True):
         """Get a path mapped to local

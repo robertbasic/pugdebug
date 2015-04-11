@@ -9,6 +9,7 @@
 
 __author__ = "robertbasic"
 
+import base64
 import os
 import xml.etree.ElementTree as xml_parser
 
@@ -154,20 +155,36 @@ class PugdebugMessageParser():
 
         return breakpoints
 
+    def parse_eval_message(self, message):
+        xml = xml_parser.fromstring(message)
+        child = xml[0]
+
+        # Detect errors as having an <error> child
+        if child.tag.endswith('error'):
+            return {
+                'type': 'error',
+                'value': child[0].text
+            }
+
+        return self.get_variable(child)
+
     def get_variables(self, parent, result):
-        attribs = ['name', 'type', 'encoding', 'classname']
         for child in parent.getchildren():
-            var = {}
-            var = self.get_attribs(child, attribs, var)
-
-            if var['type'] == 'array' or var['type'] == 'object':
-                var['variables'] = self.get_variables(child, [])
-            else:
-                var['value'] = child.text
-
-            result.append(var)
+            result.append(self.get_variable(child))
 
         return result
+
+    def get_variable(self, xml):
+        attribs = ['name', 'type', 'encoding', 'classname']
+        var = {}
+        var = self.get_attribs(xml, attribs, var)
+
+        if var['type'] == 'array' or var['type'] == 'object':
+            var['variables'] = self.get_variables(xml, [])
+        else:
+            var['value'] = xml.text
+
+        return var
 
     def get_attribs(self, xml, attribs, result):
         for attrib in (attrib for attrib in xml.attrib if attrib in attribs):
