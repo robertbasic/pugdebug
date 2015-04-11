@@ -11,13 +11,16 @@ __author__ = "robertbasic"
 
 import base64
 
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QMenu, QTreeWidget, QTreeWidgetItem, QAction
-from PyQt5.QtCore import Qt
 
 from pugdebug.models.settings import get_setting, set_setting, has_setting
 
 
 class PugdebugExpressionViewer(QTreeWidget):
+
+    expression_added_signal = pyqtSignal(int, str)
+    expression_changed_signal = pyqtSignal(int, str)
 
     def __init__(self):
         super(PugdebugExpressionViewer, self).__init__()
@@ -26,6 +29,7 @@ class PugdebugExpressionViewer(QTreeWidget):
 
         self.setup_context_menu()
         self.restore_state()
+
         self.itemChanged.connect(self.handle_item_changed)
 
     def setup_context_menu(self):
@@ -62,6 +66,10 @@ class PugdebugExpressionViewer(QTreeWidget):
         item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsEditable)
         self.addTopLevelItem(item)
 
+        #  Emit the signal to evaluate the expression
+        index = self.indexOfTopLevelItem(item)
+        self.expression_added_signal.emit(index, expression)
+
     def delete_expression(self, item):
         index = self.indexOfTopLevelItem(item)
         self.takeTopLevelItem(index)
@@ -76,15 +84,14 @@ class PugdebugExpressionViewer(QTreeWidget):
 
         return expressions
 
-    def set_evaluated(self, results):
-        """Displays evaluation results"""
-        for key, result in enumerate(results):
-            type = result['type'] if 'type' in result else None
-            value = self.decode_value(result)
+    def set_evaluated(self, index, result):
+        """Displays an evaluated expression result"""
+        type = result['type'] if 'type' in result else None
+        value = self.decode_value(result)
 
-            item = self.topLevelItem(key)
-            item.setText(1, type)
-            item.setText(2, value)
+        item = self.topLevelItem(index)
+        item.setText(1, type)
+        item.setText(2, value)
 
     def decode_value(self, result):
         value = None
@@ -113,6 +120,10 @@ class PugdebugExpressionViewer(QTreeWidget):
                 self.add_expression(expression)
 
     def handle_item_changed(self, item, column):
-        """If user changed the expression, save the state to settings"""
+        """Called when the user changes an item"""
         if column == 0:
+            index = self.indexOfTopLevelItem(item)
+            expression = item.text(0)
+
+            self.expression_changed_signal.emit(index, expression)
             self.save_state()

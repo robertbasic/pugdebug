@@ -48,6 +48,7 @@ class PugdebugServer(QThread):
     server_set_breakpoint_signal = pyqtSignal(bool)
     server_removed_breakpoint_signal = pyqtSignal(object)
     server_listed_breakpoints_signal = pyqtSignal(type([]))
+    server_expression_evaluated_signal = pyqtSignal(int, type({}))
     server_expressions_evaluated_signal = pyqtSignal(type([]))
 
     def __init__(self):
@@ -103,6 +104,10 @@ class PugdebugServer(QThread):
         elif action == 'breakpoint_list':
             response = self.__list_breakpoints()
             self.server_listed_breakpoints_signal.emit(response)
+        elif action == 'evaluate_expression':
+            (index, expression) = data
+            response = self.__evaluate_expression(expression)
+            self.server_expression_evaluated_signal.emit(index, response)
 
         self.mutex.unlock()
 
@@ -169,9 +174,9 @@ class PugdebugServer(QThread):
         self.action = 'breakpoint_list'
         self.start()
 
-    def eval(self, expressions):
-        self.action = 'eval'
-        self.data = expressions
+    def evaluate_expression(self, index, expression):
+        self.action = 'evaluate_expression'
+        self.data = (index, expression)
         self.start()
 
     def __connect_server(self):
@@ -270,7 +275,7 @@ class PugdebugServer(QThread):
         post_step_response = {
             'variables': self.__get_variables(),
             'stacktraces': self.__get_stacktraces(),
-            'expressions': self.__eval(data['expressions'])
+            'expressions': self.__evaluate_expressions(data['expressions'])
         }
 
         return post_step_response
@@ -342,17 +347,22 @@ class PugdebugServer(QThread):
 
         return breakpoints
 
-    def __eval(self, expressions):
-        tid = self.__get_transaction_id()
+    def __evaluate_expressions(self, expressions):
         results = []
-        for expression in expressions:
-            b64 = b64encode(bytes(expression, 'UTF-8')).decode()
-            command = 'eval -i %d -- %s' % (tid, b64)
-            response = self.__send_command(command)
-
-            results.append(self.parser.parse_eval_message(response))
+        for index, expression in enumerate(expressions):
+            results.append(
+                self.__evaluate_expression(expression)
+            )
 
         return results
+
+    def __evaluate_expression(self, expression):
+        tid = self.__get_transaction_id()
+        b64 = b64encode(bytes(expression, 'UTF-8')).decode()
+        command = 'eval -i %d -- %s' % (tid, b64)
+        response = self.__send_command(command)
+
+        return self.parser.parse_eval_message(response)
 
     def __send_command(self, command):
         self.sock.send(bytes(command + '\0', 'utf-8'))
