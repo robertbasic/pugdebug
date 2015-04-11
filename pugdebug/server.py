@@ -38,18 +38,18 @@ class PugdebugServer(QThread):
 
     xdebug_encoding = 'iso-8859-1'
 
-    server_connected_signal = pyqtSignal(type({}))
+    server_connected_signal = pyqtSignal(dict)
     server_cancelled_signal = pyqtSignal()
     server_stopped_signal = pyqtSignal()
-    server_stepped_signal = pyqtSignal(type({}))
+    server_stepped_signal = pyqtSignal(dict)
     server_got_variables_signal = pyqtSignal(object)
     server_got_stacktraces_signal = pyqtSignal(object)
     server_set_init_breakpoints_signal = pyqtSignal(bool)
     server_set_breakpoint_signal = pyqtSignal(bool)
     server_removed_breakpoint_signal = pyqtSignal(object)
-    server_listed_breakpoints_signal = pyqtSignal(type([]))
-    server_expression_evaluated_signal = pyqtSignal(int, type({}))
-    server_expressions_evaluated_signal = pyqtSignal(type([]))
+    server_listed_breakpoints_signal = pyqtSignal(list)
+    server_expression_evaluated_signal = pyqtSignal(int, dict)
+    server_expressions_evaluated_signal = pyqtSignal(list)
 
     def __init__(self):
         super(PugdebugServer, self).__init__()

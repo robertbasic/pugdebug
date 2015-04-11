@@ -30,9 +30,9 @@ class PugdebugDebugger(QObject):
     got_all_variables_signal = pyqtSignal(object)
     got_stacktraces_signal = pyqtSignal(object)
     breakpoint_removed_signal = pyqtSignal(int)
-    breakpoints_listed_signal = pyqtSignal(type([]))
-    expression_evaluated_signal = pyqtSignal(int, type({}))
-    expressions_evaluated_signal = pyqtSignal(type([]))
+    breakpoints_listed_signal = pyqtSignal(list)
+    expression_evaluated_signal = pyqtSignal(int, dict)
+    expressions_evaluated_signal = pyqtSignal(list)
 
     def __init__(self):
         """Init the debugger object
