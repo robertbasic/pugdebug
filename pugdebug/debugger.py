@@ -190,6 +190,7 @@ class PugdebugDebugger(QObject):
             return self.init_message['fileuri']
         else:
             return None
+
     def eval(self, expressions):
         self.server.eval(expressions)
 

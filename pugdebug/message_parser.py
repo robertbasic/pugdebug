@@ -9,7 +9,6 @@
 
 __author__ = "robertbasic"
 
-import base64
 import os
 import xml.etree.ElementTree as xml_parser
 

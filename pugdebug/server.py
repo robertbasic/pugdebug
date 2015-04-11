@@ -88,7 +88,9 @@ class PugdebugServer(QThread):
 
             self.server_got_variables_signal.emit(response['variables'])
             self.server_got_stacktraces_signal.emit(response['stacktraces'])
-            self.server_expressions_evaluated_signal.emit(response['expressions'])
+            self.server_expressions_evaluated_signal.emit(
+                response['expressions']
+            )
         elif action == 'init_breakpoint_set':
             response = self.__set_init_breakpoints(data)
             self.server_set_init_breakpoints_signal.emit(response)
