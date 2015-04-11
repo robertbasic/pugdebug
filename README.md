@@ -24,7 +24,23 @@ setup process on different systems should be available soon.
 
 Do note that I'm trying to figure out how to build executables for this beast.
 
-# setting up xdebug
+### OS X setup with Homebrew
+
+Easiest way to install dependencies on OS X is to use [Homebrew].
+To install the dependencies, execute the following commands from your terminal:
+```
+brew install python3
+brew install qt5 pyqt5 sip
+```
+
+Go to directory where you checked out the pugdebug, and execute
+```
+python3 app.py
+```
+
+At the moment, there seems to be an issue with using virtualenv, python3 and pyqt5 on OS X Yosemite.
+
+## setting up xdebug
 
 To be able to debug PHP with pugdebug, you need to have [xdebug](http://xdebug.org/docs/remote)
 propely set up for remote debugging.
