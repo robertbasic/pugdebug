@@ -22,7 +22,6 @@ class PugdebugSettingsWindow(QWidget):
         super(PugdebugSettingsWindow, self).__init__(parent)
 
         self.project_root = QLineEdit()
-        self.project_root.setMaximumWidth(250)
 
         self.project_root.editingFinished.connect(
             self.handle_project_root_changed
@@ -32,7 +31,6 @@ class PugdebugSettingsWindow(QWidget):
         self.project_root.setText(project_root)
 
         self.path_mapping = QLineEdit()
-        self.path_mapping.setMaximumWidth(250)
 
         self.path_mapping.editingFinished.connect(
             self.handle_path_mapping_changed
@@ -41,7 +39,6 @@ class PugdebugSettingsWindow(QWidget):
         self.path_mapping.setText(path_mapping)
 
         self.host = QLineEdit()
-        self.host.setMaximumWidth(250)
 
         self.host.editingFinished.connect(self.handle_host_changed)
 

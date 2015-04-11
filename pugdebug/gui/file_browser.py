@@ -17,8 +17,6 @@ class PugdebugFileBrowser(QTreeView):
     def __init__(self):
         super(PugdebugFileBrowser, self).__init__()
 
-        self.setMaximumWidth(300)
-
     def hide_columns(self):
         self.setColumnHidden(1, True)
         self.setColumnHidden(2, True)

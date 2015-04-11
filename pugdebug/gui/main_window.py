@@ -10,8 +10,7 @@
 __author__ = "robertbasic"
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QMainWindow, QMdiArea, QMdiSubWindow,
-                             QToolBar, QDockWidget, QLabel)
+from PyQt5.QtWidgets import QMainWindow, QToolBar, QDockWidget, QLabel
 from PyQt5.QtGui import QFont, QKeySequence
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
@@ -37,10 +36,15 @@ class PugdebugMainWindow(QMainWindow):
         if has_setting("window/state"):
             self.restoreState(get_setting("window/state"))
 
-        self.central_widget = QMdiArea(self)
-        self.central_widget.tileSubWindows()
+        self.file_browser = PugdebugFileBrowser()
+        self.settings_window = PugdebugSettingsWindow(self)
+        self.document_viewer = PugdebugDocumentViewer()
+        self.variable_viewer = PugdebugVariableViewer()
+        self.breakpoint_viewer = PugdebugBreakpointViewer()
+        self.stacktrace_viewer = PugdebugStacktraceViewer()
+        self.expression_viewer = PugdebugExpressionViewer()
 
-        self.setCentralWidget(self.central_widget)
+        self.setCentralWidget(self.document_viewer)
 
         self.setup_gui_elements()
 
@@ -52,10 +56,8 @@ class PugdebugMainWindow(QMainWindow):
 
     def setup_gui_elements(self):
         self.setup_fonts()
-        self.setup_file_browser_window()
-        self.setup_settings_window()
 
-        self.setup_mdi_sub_windows()
+        self.setup_docks()
 
         self.setup_toolbar()
 
@@ -71,35 +73,42 @@ class PugdebugMainWindow(QMainWindow):
         font.setPixelSize(12)
         self.setFont(font)
 
-    def setup_mdi_sub_windows(self):
-        self.expression_viewer = PugdebugExpressionViewer()
-        self.__add_sub_window(self.expression_viewer, "Expressions")
+    def setup_docks(self):
+        self.__add_dock_widget(
+            self.file_browser,
+            "File Browser",
+            Qt.LeftDockWidgetArea
+        )
 
-        self.stacktrace_viewer = PugdebugStacktraceViewer()
-        self.__add_sub_window(self.stacktrace_viewer, "Stacktraces")
+        self.__add_dock_widget(
+            self.settings_window,
+            "Settings",
+            Qt.LeftDockWidgetArea
+        )
 
-        self.breakpoint_viewer = PugdebugBreakpointViewer()
-        self.__add_sub_window(self.breakpoint_viewer, "Breakpoints")
+        self.__add_dock_widget(
+            self.variable_viewer,
+            "Variables",
+            Qt.RightDockWidgetArea
+        )
 
-        self.variable_viewer = PugdebugVariableViewer()
-        self.__add_sub_window(self.variable_viewer, "Variables")
+        self.__add_dock_widget(
+            self.expression_viewer,
+            "Expressions",
+            Qt.RightDockWidgetArea
+        )
 
-        self.document_viewer = PugdebugDocumentViewer()
-        self.__add_sub_window(self.document_viewer, "Documents")
+        self.__add_dock_widget(
+            self.breakpoint_viewer,
+            "Breakpoints",
+            Qt.BottomDockWidgetArea
+        )
 
-    def setup_file_browser_window(self):
-        dw = QDockWidget("File Browser", self)
-        dw.setObjectName("dock-widget-file-browser")
-        self.file_browser = PugdebugFileBrowser()
-        dw.setWidget(self.file_browser)
-        self.addDockWidget(Qt.LeftDockWidgetArea, dw)
-
-    def setup_settings_window(self):
-        dw = QDockWidget("Settings", self)
-        dw.setObjectName("dock-widget-settings")
-        self.settings_window = PugdebugSettingsWindow(self)
-        dw.setWidget(self.settings_window)
-        self.addDockWidget(Qt.LeftDockWidgetArea, dw)
+        self.__add_dock_widget(
+            self.stacktrace_viewer,
+            "Stacktraces",
+            Qt.BottomDockWidgetArea
+        )
 
     def setup_toolbar(self):
         toolbar = QToolBar("Main Toolbar")
@@ -190,23 +199,9 @@ class PugdebugMainWindow(QMainWindow):
     def set_statusbar_text(self, text):
         self.permanent_statusbar.setText(text)
 
-    def __add_sub_window(self, widget, title):
-        """Add a MDI sub window
-
-        Qt.WA_DeleteOnClose make sure to delete the MDI widget when the
-        MDI window is closed.
-
-        Set MDI sub window flags - has a title and min max buttons.
-
-        Set the title of the MDI sub window.
-        """
-        ms = QMdiSubWindow()
-        ms.setWidget(widget)
-        ms.setAttribute(Qt.WA_DeleteOnClose)
-        self.central_widget.addSubWindow(ms)
-        ms.setWindowFlags((
-            Qt.CustomizeWindowHint |
-            Qt.WindowTitleHint |
-            Qt.WindowMinMaxButtonsHint
-        ))
-        ms.setWindowTitle(title)
+    def __add_dock_widget(self, widget, title, area):
+        dw = QDockWidget(title, self)
+        object_name = "dock-widget-%s" % title.lower().replace(" ", "-")
+        dw.setObjectName(object_name)
+        dw.setWidget(widget)
+        self.addDockWidget(area, dw)
