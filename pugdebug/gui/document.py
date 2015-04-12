@@ -13,7 +13,8 @@ import math
 
 from PyQt5.QtCore import pyqtSignal, Qt, QRect
 from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QTextEdit, QGridLayout
-from PyQt5.QtGui import QColor, QTextFormat, QTextCursor, QPainter
+from PyQt5.QtGui import (QColor, QTextFormat, QTextCursor, QPainter,
+                         QTextBlockUserData)
 
 from pugdebug.syntaxer import PugdebugSyntaxer
 
@@ -83,6 +84,9 @@ class PugdebugDocument(QWidget):
         height = font_metrics.height()
         width = line_numbers.width()
 
+        cursor = self.document_contents.textCursor()
+        current_line_number = cursor.blockNumber() + 1
+
         while block.isValid():
             # blocks are numbered from zero
             line_number += 1
@@ -100,10 +104,15 @@ class PugdebugDocument(QWidget):
 
             # If block has a breakpoint,
             # draw a green rectangle by the line number
-            if block.userState() == 1:
+            # if the block number matches the current line number
+            # make it red, as it is then a breakpoint hit
+            if self.document_contents.block_has_breakpoint(block):
                 brush = painter.brush()
                 brush.setStyle(Qt.SolidPattern)
-                brush.setColor(Qt.darkGreen)
+                if line_number == current_line_number:
+                    brush.setColor(Qt.red)
+                else:
+                    brush.setColor(Qt.darkGreen)
                 painter.setBrush(brush)
                 rect = QRect(0, block_top+2, 7, 7)
                 painter.drawRect(rect)
@@ -122,6 +131,11 @@ class PugdebugDocument(QWidget):
 
     def move_to_line(self, line):
         self.document_contents.move_to_line(line)
+        self.rehighlight_breakpoint_lines()
+
+    def remove_line_highlights(self):
+        self.document_contents.remove_line_highlights()
+        self.rehighlight_breakpoint_lines()
 
     def rehighlight_breakpoint_lines(self):
         """Rehighlight breakpoint lines
@@ -172,10 +186,10 @@ class PugdebugDocumentContents(QPlainTextEdit):
             return
 
         # Set/unset breakpoint flag on the double clicked line
-        if block.userState() == 1:
-            block.setUserState(-1)
+        if self.block_has_breakpoint(block):
+            self.block_remove_breakpoint(block)
         else:
-            block.setUserState(1)
+            self.block_set_breakpoint(block)
 
         line_number = block.blockNumber() + 1
 
@@ -237,6 +251,26 @@ class PugdebugDocumentContents(QPlainTextEdit):
         self.move_to_line(0)
         self.setExtraSelections([])
 
+    def block_has_breakpoint(self, block):
+        user_data = self.__get_block_user_data(block)
+        return user_data.breakpoint
+
+    def block_set_breakpoint(self, block):
+        user_data = self.__get_block_user_data(block)
+        user_data.breakpoint = True
+        block.setUserData(user_data)
+
+    def block_remove_breakpoint(self, block):
+        user_data = self.__get_block_user_data(block)
+        user_data.breakpoint = False
+        block.setUserData(user_data)
+
+    def __get_block_user_data(self, block):
+        user_data = block.userData()
+        if user_data is None:
+            user_data = PugdebugBlockData()
+        return user_data
+
 
 class PugdebugLineNumbers(QWidget):
 
@@ -255,3 +289,11 @@ class PugdebugLineNumbers(QWidget):
 
     def paintEvent(self, event):
         self.document_widget.paint_line_numbers(self, event)
+
+
+class PugdebugBlockData(QTextBlockUserData):
+
+    breakpoint = False
+
+    def __init__(self):
+        super(PugdebugBlockData, self).__init__()
