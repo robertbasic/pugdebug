@@ -41,6 +41,7 @@ class PugdebugServer(QThread):
     server_connected_signal = pyqtSignal(dict)
     server_cancelled_signal = pyqtSignal()
     server_stopped_signal = pyqtSignal()
+    server_detached_signal = pyqtSignal()
     server_stepped_signal = pyqtSignal(dict)
     server_got_variables_signal = pyqtSignal(object)
     server_got_stacktraces_signal = pyqtSignal(object)
@@ -72,6 +73,9 @@ class PugdebugServer(QThread):
         elif action == 'stop':
             response = self.__stop()
             self.server_stopped_signal.emit()
+        elif action == 'detach':
+            response = self.__detach()
+            self.server_detached_signal.emit()
         elif action == 'step_run':
             response = self.__step_run()
             self.server_stepped_signal.emit(response)
@@ -132,6 +136,10 @@ class PugdebugServer(QThread):
 
     def stop(self):
         self.action = 'stop'
+        self.start()
+
+    def detach(self):
+        self.action = 'detach'
         self.start()
 
     def step_run(self):
@@ -244,6 +252,12 @@ class PugdebugServer(QThread):
 
     def __stop(self):
         command = 'stop -i %d' % self.__get_transaction_id()
+        self.__send_command(command)
+
+        return True
+
+    def __detach(self):
+        command = 'detach -i %d' % self.__get_transaction_id()
         self.__send_command(command)
 
         return True
