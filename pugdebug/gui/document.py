@@ -107,6 +107,14 @@ class PugdebugDocument(QWidget):
                 painter.setBrush(brush)
                 rect = QRect(0, block_top+2, 7, 7)
                 painter.drawRect(rect)
+            elif block.userState() == 3:
+                brush = painter.brush()
+                brush.setStyle(Qt.SolidPattern)
+                brush.setColor(Qt.red)
+                painter.setBrush(brush)
+                rect = QRect(0, block_top+2, 7, 7)
+                painter.drawRect(rect)
+                block.setUserState(1)
 
             # Convert the line number to string so we can paint it
             text = str(line_number)
@@ -123,6 +131,17 @@ class PugdebugDocument(QWidget):
     def move_to_line(self, line):
         self.document_contents.move_to_line(line)
 
+    def breakpoint_hit(self, line):
+        """Mark line number as breakpoint hit
+
+        If the line has a breakpoint, mark it as
+        the breakpoint is hit.
+
+        Repaint the line numbers.
+        """
+        self.document_contents.breakpoint_hit(line)
+        self.rehighlight_breakpoint_lines()
+
     def rehighlight_breakpoint_lines(self):
         """Rehighlight breakpoint lines
 
@@ -130,7 +149,6 @@ class PugdebugDocument(QWidget):
         and so the breakpoints get repainted as well.
         """
         self.line_numbers.update()
-
 
 class PugdebugDocumentContents(QPlainTextEdit):
 
@@ -213,6 +231,22 @@ class PugdebugDocumentContents(QPlainTextEdit):
             block_number = cursor.blockNumber()
 
         self.setTextCursor(cursor)
+
+    def breakpoint_hit(self, line):
+        """Mark line number as breakpoint hit
+
+        If the line has a breakpoint, mark it as
+        a breakpoint hit.
+        """
+        line = line - 1
+        if line < 0:
+            line = 0
+
+        cursor = self.textCursor()
+        block = cursor.block()
+
+        if block.userState() == 1:
+            block.setUserState(3)
 
     def highlight(self):
         selection = QTextEdit.ExtraSelection()

@@ -268,6 +268,7 @@ class Pugdebug(QObject):
 
         document_widget = self.document_viewer.get_current_document()
         document_widget.move_to_line(current_line)
+        document_widget.breakpoint_hit(current_line)
 
     def handle_project_root_changed(self):
         """Handle when the project root is changed
