@@ -69,4 +69,4 @@ class PugdebugDocumentViewer(QTabWidget):
 
     def remove_line_highlights(self):
         for index, path in self.tabs.items():
-            self.widget(index).document_contents.remove_line_highlights()
+            self.widget(index).remove_line_highlights()

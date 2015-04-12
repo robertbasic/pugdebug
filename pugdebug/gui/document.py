@@ -84,6 +84,9 @@ class PugdebugDocument(QWidget):
         height = font_metrics.height()
         width = line_numbers.width()
 
+        cursor = self.document_contents.textCursor()
+        current_line_number = cursor.blockNumber() + 1
+
         while block.isValid():
             # blocks are numbered from zero
             line_number += 1
@@ -99,22 +102,17 @@ class PugdebugDocument(QWidget):
             if not block.isVisible() or block_top >= event.rect().bottom():
                 break
 
-            if self.document_contents.block_hit_breakpoint(block):
-                # If block has hit a breakpoint,
-                # draw a red rectangle by the line number
+            # If block has a breakpoint,
+            # draw a green rectangle by the line number
+            # if the block number matches the current line number
+            # make it red, as it is then a breakpoint hit
+            if self.document_contents.block_has_breakpoint(block):
                 brush = painter.brush()
                 brush.setStyle(Qt.SolidPattern)
-                brush.setColor(Qt.red)
-                painter.setBrush(brush)
-                rect = QRect(0, block_top+2, 7, 7)
-                painter.drawRect(rect)
-                self.document_contents.block_remove_hit_breakpoint(block)
-            elif self.document_contents.block_has_breakpoint(block):
-                # If block has a breakpoint,
-                # draw a green rectangle by the line number
-                brush = painter.brush()
-                brush.setStyle(Qt.SolidPattern)
-                brush.setColor(Qt.darkGreen)
+                if line_number == current_line_number:
+                    brush.setColor(Qt.red)
+                else:
+                    brush.setColor(Qt.darkGreen)
                 painter.setBrush(brush)
                 rect = QRect(0, block_top+2, 7, 7)
                 painter.drawRect(rect)
@@ -133,16 +131,10 @@ class PugdebugDocument(QWidget):
 
     def move_to_line(self, line):
         self.document_contents.move_to_line(line)
+        self.rehighlight_breakpoint_lines()
 
-    def breakpoint_hit(self, line):
-        """Mark line number as breakpoint hit
-
-        If the line has a breakpoint, mark it as
-        the breakpoint is hit.
-
-        Repaint the line numbers.
-        """
-        self.document_contents.breakpoint_hit(line)
+    def remove_line_highlights(self):
+        self.document_contents.remove_line_highlights()
         self.rehighlight_breakpoint_lines()
 
     def rehighlight_breakpoint_lines(self):
@@ -236,22 +228,6 @@ class PugdebugDocumentContents(QPlainTextEdit):
 
         self.setTextCursor(cursor)
 
-    def breakpoint_hit(self, line):
-        """Mark line number as breakpoint hit
-
-        If the line has a breakpoint, mark it as
-        a breakpoint hit.
-        """
-        line = line - 1
-        if line < 0:
-            line = 0
-
-        cursor = self.textCursor()
-        block = cursor.block()
-
-        if self.block_has_breakpoint(block):
-            self.block_set_hit_breakpoint(block)
-
     def highlight(self):
         selection = QTextEdit.ExtraSelection()
 
@@ -289,20 +265,6 @@ class PugdebugDocumentContents(QPlainTextEdit):
         user_data.breakpoint = False
         block.setUserData(user_data)
 
-    def block_hit_breakpoint(self, block):
-        user_data = self.__get_block_user_data(block)
-        return user_data.breakpoint_hit
-
-    def block_set_hit_breakpoint(self, block):
-        user_data = self.__get_block_user_data(block)
-        user_data.breakpoint_hit = True
-        block.setUserData(user_data)
-
-    def block_remove_hit_breakpoint(self, block):
-        user_data = self.__get_block_user_data(block)
-        user_data.breakpoint_hit = False
-        block.setUserData(user_data)
-
     def __get_block_user_data(self, block):
         user_data = block.userData()
         if user_data is None:
@@ -332,7 +294,6 @@ class PugdebugLineNumbers(QWidget):
 class PugdebugBlockData(QTextBlockUserData):
 
     breakpoint = False
-    breakpoint_hit = False
 
     def __init__(self):
         super(PugdebugBlockData, self).__init__()
