@@ -25,7 +25,7 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
     in_block_comment = 2
 
     def __init__(self, document, rules):
-        QSyntaxHighlighter.__init__(self, document)
+        super(PugdebugSyntaxer, self).__init__(document)
         self.rules = rules
         self.formats = rules.get_formats()
 
