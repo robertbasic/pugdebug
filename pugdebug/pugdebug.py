@@ -123,6 +123,9 @@ class Pugdebug(QObject):
         """
         self.main_window.start_debug_action.triggered.connect(self.start_debug)
         self.main_window.stop_debug_action.triggered.connect(self.stop_debug)
+        self.main_window.detach_debug_action.triggered.connect(
+            self.detach_debug
+        )
         self.main_window.run_debug_action.triggered.connect(self.run_debug)
         self.main_window.step_over_action.triggered.connect(self.step_over)
         self.main_window.step_into_action.triggered.connect(self.step_into)
@@ -341,6 +344,15 @@ class Pugdebug(QObject):
         self.main_window.toggle_actions(False)
 
         self.main_window.set_statusbar_text("Debugging stopped...")
+
+    def detach_debug(self):
+        """Detach a debugging session.
+
+        The debugging session will end, but the debuged script
+        will terminate normally.
+        """
+        if self.debugger.is_connected():
+            self.debugger.detach_debug()
 
     def handle_step_command(self):
         """Handle step command

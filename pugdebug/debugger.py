@@ -53,6 +53,9 @@ class PugdebugDebugger(QObject):
             self.handle_server_cancelled
         )
         self.server.server_stopped_signal.connect(self.handle_server_stopped)
+        self.server.server_detached_signal.connect(
+            self.handle_server_detached
+        )
         self.server.server_stepped_signal.connect(self.handle_server_stepped)
         self.server.server_got_variables_signal.connect(
             self.handle_server_got_variables
@@ -127,6 +130,20 @@ class PugdebugDebugger(QObject):
         """Handle when server gets disconnected
 
         Emit a debugging stopped signal.
+        """
+        self.debugging_stopped_signal.emit()
+
+    def detach_debug(self):
+        """Detach a debugging session
+        """
+        self.server.detach()
+
+    def handle_server_detached(self):
+        """Handle when server gets ditached
+
+        Emit a debugging stopped signal, as the
+        debugger should behave the same like when
+        a debugging session is stopped.
         """
         self.debugging_stopped_signal.emit()
 

@@ -128,6 +128,14 @@ class PugdebugMainWindow(QMainWindow):
         )
         self.stop_debug_action.setShortcut(QKeySequence("F2"))
 
+        self.detach_debug_action = toolbar.addAction("Detach")
+        self.detach_debug_action.setToolTip("Detach from server (F3)")
+        self.detach_debug_action.setStatusTip(
+            "Stop the debugging session, but let the PHP process end normally."
+            " Shortcut: F3"
+        )
+        self.detach_debug_action.setShortcut(QKeySequence("F3"))
+
         self.run_debug_action = toolbar.addAction("Run")
         self.run_debug_action.setToolTip("Start/resume the script (F5)")
         self.run_debug_action.setStatusTip(
@@ -168,6 +176,7 @@ class PugdebugMainWindow(QMainWindow):
         self.addToolBar(toolbar)
 
     def toggle_actions(self, enabled):
+        self.detach_debug_action.setEnabled(enabled)
         self.run_debug_action.setEnabled(enabled)
         self.step_over_action.setEnabled(enabled)
         self.step_into_action.setEnabled(enabled)
