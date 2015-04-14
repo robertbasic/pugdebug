@@ -64,6 +64,37 @@ xdebug.remote_port=9000
 xdebug.remote_connect_back=1
 ```
 
+Do note that when debugging CLI scripts from a vagrant virtual machine, the
+`remote_connect_back` setting will not work, and we need to use the
+`remote_host` setting. The xdebug configuration should look something like:
+
+```
+xdebug.idekey=netbeans-xdebug
+xdebug.remote_enable=1
+xdebug.remote_port=9000
+xdebug.remote_host=33.33.33.1
+```
+
+You can find the IP address to use for the remote host setting by issuing the
+following command on the host machine:
+
+```
+ip addr
+```
+
+and a part of the output will include something like this:
+
+```
+6: vboxnet2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UNKNOWN group default qlen 1000
+    link/ether 0a:00:27:00:00:02 brd ff:ff:ff:ff:ff:ff
+    inet 33.33.33.1/24 brd 33.33.33.255 scope global vboxnet2
+       valid_lft forever preferred_lft forever
+    inet6 fe80::800:27ff:fe00:2/64 scope link
+       valid_lft forever preferred_lft forever
+```
+
+and from there we can see the IP address of `33.33.33.1`.
+
 ## using pugdebug
 
 In a terminal go to the directory where you have pugdebug cloned and start it by
