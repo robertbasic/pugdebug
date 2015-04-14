@@ -103,7 +103,6 @@ class Pugdebug(QObject):
 
     def connect_document_viewer_signals(self):
         """Connect document viewer signals
-
         Connects the signal that gets fired when a tab widget is being closed.
         It will call the method that will close the document.
         """
@@ -212,6 +211,11 @@ class Pugdebug(QObject):
             # clicked signal of that document
             document_widget.document_double_clicked_signal.connect(
                 self.handle_document_double_click
+            )
+
+            # Handle when a document gets changed outside of pugdebug
+            self.documents.document_changed.connect(
+                document_widget.handle_document_changed
             )
 
             # Add the newly opened document to the document viewer's tab stack

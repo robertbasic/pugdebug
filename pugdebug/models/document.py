@@ -22,6 +22,11 @@ class PugdebugDocument():
     def __init__(self, path):
         self.path = path
 
+        self.read_file(path)
+
+    def read_file(self, path):
+        """Read in a file
+        """
         file = QFile(path)
         fileinfo = QFileInfo(file)
 
