@@ -54,6 +54,13 @@ class PugdebugDocument(QWidget):
         self.layout.addWidget(self.line_numbers, 0, 0, 1, 1)
         self.layout.addWidget(self.document_contents, 0, 1, 1, 1)
 
+    def handle_document_changed(self, document_model):
+        """Handle when a document gets changed
+
+        Set the new document contents.
+        """
+        self.document_contents.update_contents(document_model)
+
     def handle_document_contents_update_request(self, rect, dy):
         """Handle the update request for document contents
 
@@ -170,6 +177,17 @@ class PugdebugDocumentContents(QPlainTextEdit):
         self.remove_line_highlights()
 
         self.syntaxer = PugdebugSyntaxer(self.document(), syntaxer_rules)
+
+    def update_contents(self, document_model):
+        """Update the contents of the document
+
+        Set the new contents of the document.
+
+        Refresh the syntaxer.
+        """
+        self.setPlainText(document_model.contents)
+        self.syntaxer.setDocument(self.document())
+        self.syntaxer.rehighlight()
 
     def mousePressEvent(self, event):
         pass
