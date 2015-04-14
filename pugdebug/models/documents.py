@@ -41,6 +41,8 @@ class PugdebugDocuments():
         path_key = self.get_path_key(path)
         self.open_documents.pop(path_key, None)
 
+        self.watcher.removePath(path)
+
     def is_document_open(self, path):
         path_key = self.get_path_key(path)
         return path_key in self.open_documents
