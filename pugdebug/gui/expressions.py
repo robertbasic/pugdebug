@@ -13,8 +13,8 @@ import base64
 
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QMenu, QWidget, QTreeWidget, QTreeWidgetItem, \
-                            QAction, QToolBar, QVBoxLayout, QAbstractItemView
+from PyQt5.QtWidgets import (QMenu, QWidget, QTreeWidget, QTreeWidgetItem,
+                             QAction, QToolBar, QVBoxLayout, QAbstractItemView)
 
 from pugdebug.models.settings import get_setting, set_setting, has_setting
 
@@ -32,8 +32,10 @@ class PugdebugExpressionViewer(QWidget):
         self.add_action.triggered.connect(self.handle_add_action)
 
         # Action for deleting selected expressions
-        self.delete_action = QAction(QIcon.fromTheme('list-remove'),
-            "&Delete", self)
+        self.delete_action = QAction(
+            QIcon.fromTheme('list-remove'),
+            "&Delete", self
+        )
         self.delete_action.setShortcut(QKeySequence("Del"))
         self.delete_action.triggered.connect(self.handle_delete_action)
 
@@ -74,7 +76,11 @@ class PugdebugExpressionViewer(QWidget):
 
     def add_expression(self, expression):
         item = QTreeWidgetItem([expression, '', ''])
-        item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsEditable | Qt.ItemIsSelectable)
+        item.setFlags(
+            Qt.ItemIsEnabled |
+            Qt.ItemIsEditable |
+            Qt.ItemIsSelectable
+        )
         self.tree.addTopLevelItem(item)
 
         #  Emit the signal to evaluate the expression
