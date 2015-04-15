@@ -25,22 +25,25 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
     formatter = None
     lexer = None
 
+    document_length = 0
+
     def __init__(self, document):
         super(PugdebugSyntaxer, self).__init__(document)
 
         self.formatter = PugdebugFormatter()
         self.lexer = PhpLexer()
 
+        self.document_length = self.document().characterCount()
+        highlight(self.document().toPlainText(), self.lexer, self.formatter)
+
     def highlightBlock(self, text):
         position = self.currentBlock().position()
 
-        text = self.document().toPlainText()
+        document = self.document()
 
-        highlight(text, self.lexer, self.formatter)
-
-        for i in range(len(text)):
+        for i in range(self.document_length):
             try:
-                format = self.formatter.data[position+i]
+                format = self.formatter.data[position + i]
                 self.setFormat(i, 1, format)
             except IndexError:
                 pass
