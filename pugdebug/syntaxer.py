@@ -27,6 +27,8 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
 
     document_length = 0
 
+    buffer = 0
+
     def __init__(self, document):
         super(PugdebugSyntaxer, self).__init__(document)
 
@@ -37,23 +39,24 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
         highlight(self.document().toPlainText(), self.lexer, self.formatter)
 
     def highlightBlock(self, text):
-        position = self.currentBlock().position()
+        block = self.currentBlock()
 
-        document = self.document()
+        position = block.position()
 
-        for i in range(self.document_length):
-            try:
-                format = self.formatter.data[position + i]
-                self.setFormat(i, 1, format)
-            except IndexError:
-                pass
+        if position != 0:
+            previous_block = block.previous()
+            self.buffer += previous_block.length()
 
+        for format in self.formatter.formats:
+            start = format['start'] - self.buffer
+            end = format['end'] - self.buffer
+            self.setFormat(start, end, format['style'])
 
 class PugdebugFormatter(Formatter):
 
     styles = {}
 
-    data = []
+    formats = []
 
     def __init__(self):
         super(PugdebugFormatter, self).__init__()
@@ -68,7 +71,15 @@ class PugdebugFormatter(Formatter):
             self.styles[token] = format
 
     def format(self, tokensource, outfile):
-        self.data = []
+        self.formats = []
+        start = 0
         for token, value in tokensource:
-            l = len(value)
-            self.data.extend([self.styles[token],]*l)
+            length = len(value)
+            end = start + length
+            format = {
+                'start': start,
+                'end': end,
+                'style': self.styles[token]
+            }
+            self.formats.append(format)
+            start += length
