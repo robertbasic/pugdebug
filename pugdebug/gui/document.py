@@ -33,13 +33,14 @@ class PugdebugDocument(QWidget):
 
     document_double_clicked_signal = pyqtSignal(str, int)
 
-    def __init__(self, document_model):
+    def __init__(self, document_model, formatter):
         super(PugdebugDocument, self).__init__()
 
         # The QPlainTextEdit widget that holds the contents of the document
         self.document_contents = PugdebugDocumentContents(
             self,
-            document_model
+            document_model,
+            formatter
         )
 
         # The QWidget that gets the line numbers
@@ -160,7 +161,7 @@ class PugdebugDocumentContents(QPlainTextEdit):
 
     syntaxer = None
 
-    def __init__(self, document_widget, document_model):
+    def __init__(self, document_widget, document_model, formatter):
         super(PugdebugDocumentContents, self).__init__()
 
         self.document_widget = document_widget
@@ -175,7 +176,7 @@ class PugdebugDocumentContents(QPlainTextEdit):
 
         self.remove_line_highlights()
 
-        self.syntaxer = PugdebugSyntaxer(self.document())
+        self.syntaxer = PugdebugSyntaxer(self.document(), formatter)
 
     def update_contents(self, document_model):
         """Update the contents of the document

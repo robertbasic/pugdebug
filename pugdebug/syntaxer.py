@@ -25,17 +25,14 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
     formatter = None
     lexer = None
 
-    document_length = 0
-
     buffer = 0
 
-    def __init__(self, document):
+    def __init__(self, document, formatter):
         super(PugdebugSyntaxer, self).__init__(document)
 
-        self.formatter = PugdebugFormatter()
+        self.formatter = formatter
         self.lexer = PhpLexer()
 
-        self.document_length = self.document().characterCount()
         highlight(self.document().toPlainText(), self.lexer, self.formatter)
 
     def highlightBlock(self, text):

@@ -12,7 +12,7 @@ __author__ = "robertbasic"
 from PyQt5.QtCore import QObject
 
 from pugdebug.debugger import PugdebugDebugger
-#from pugdebug.syntaxer import PugdebugSyntaxerRules
+from pugdebug.syntaxer import PugdebugFormatter
 from pugdebug.gui.main_window import PugdebugMainWindow
 from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
@@ -37,7 +37,7 @@ class Pugdebug(QObject):
 
         self.debugger = PugdebugDebugger()
 
-        #self.syntaxer_rules = PugdebugSyntaxerRules()
+        self.formatter = PugdebugFormatter()
 
         # UI elements
         self.main_window = PugdebugMainWindow()
@@ -204,9 +204,8 @@ class Pugdebug(QObject):
             document_model = self.documents.open_document(path)
 
             document_widget = PugdebugDocument(
-                document_model
-                #document_model,
-                #self.syntaxer_rules
+                document_model,
+                self.formatter
             )
             # For every new document that gets opened, connect to the double
             # clicked signal of that document
