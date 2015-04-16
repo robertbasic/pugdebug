@@ -120,12 +120,57 @@ class PugdebugExpressionViewer(QWidget):
 
     def set_evaluated(self, index, result):
         """Displays an evaluated expression result"""
-        type = result['type'] if 'type' in result else None
+        type = self.decode_type(result)
         value = self.decode_value(result)
 
         item = self.tree.topLevelItem(index)
         item.setText(1, type)
         item.setText(2, value)
+
+        variables = result['variables'] if 'variables' in result else []
+        self.set_variables(item, variables)
+
+    def set_variables(self, parent, variables):
+        """Display an array of variables for the given parent item"""
+        for index, variable in enumerate(variables):
+            self.set_variable(parent, index, variable)
+
+        # Delete any children which no longer exist
+        # Last displayed index should be len(variables) - 1
+        index = len(variables)
+        while parent.child(index):
+            parent.takeChild(index)
+
+    def set_variable(self, parent, index, variable):
+        """Display a single variable within the given parent item"""
+        name = variable['name']
+        type = self.decode_type(variable)
+        value = self.decode_value(variable)
+
+        item = parent.child(index)
+        if item == None:
+            # Item does not exist, create it
+            item = QTreeWidgetItem([name, type, value])
+            parent.insertChild(index, item)
+        else:
+            # Item exists, modify it
+            item.setData(0, Qt.DisplayRole, name)
+            item.setData(1, Qt.DisplayRole, type)
+            item.setData(2, Qt.DisplayRole, value)
+
+        # Recurse (we need to go deeper)
+        if 'variables' in variable:
+            self.set_variables(item, variable['variables'])
+
+    def decode_type(self, result):
+        if 'type' not in result:
+            return ''
+
+        # Display the class name instead of type for objects
+        if result['type'] == 'object':
+            return result['classname']
+
+        return result['type']
 
     def decode_value(self, result):
         value = None
@@ -166,6 +211,10 @@ class PugdebugExpressionViewer(QWidget):
 
     def handle_item_changed(self, item, column):
         """Called when the user changes an item"""
+
+        # Only check top level items
+        if item.parent():
+            return
 
         # Only check changes to the first column which contains the expressions
         if column > 0:
