@@ -104,6 +104,15 @@ class PugdebugExpressionViewer(QWidget):
         elif next_item:
             next_item.setSelected(True)
 
+    def clear_values(self):
+        """Deletes values for all expressions"""
+        count = self.tree.topLevelItemCount()
+        for index in range(0, count):
+            item = self.tree.topLevelItem(index)
+            item.setData(1, Qt.DisplayRole, '')
+            item.setData(2, Qt.DisplayRole, '')
+            item.takeChildren()
+
     def delete_expression(self, item):
         """Deletes the given item from the tree"""
         index = self.tree.indexOfTopLevelItem(item)
