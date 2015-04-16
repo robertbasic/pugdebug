@@ -34,9 +34,6 @@ class PugdebugMainWindow(QMainWindow):
         if has_setting("window/geometry"):
             self.restoreGeometry(get_setting("window/geometry"))
 
-        if has_setting("window/state"):
-            self.restoreState(get_setting("window/state"))
-
         self.file_browser = PugdebugFileBrowser()
         self.settings_window = PugdebugSettingsWindow(self)
         self.document_viewer = PugdebugDocumentViewer()
@@ -48,6 +45,9 @@ class PugdebugMainWindow(QMainWindow):
         self.setCentralWidget(self.document_viewer)
 
         self.setup_gui_elements()
+
+        if has_setting("window/state"):
+            self.restoreState(get_setting("window/state"))
 
     def closeEvent(self, event):
         set_setting("window/geometry", self.saveGeometry())
