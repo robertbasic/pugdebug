@@ -177,42 +177,6 @@ class PugdebugMainWindow(QMainWindow):
         self.quit_action.setShortcut(QKeySequence("Alt+F4"))
         self.quit_action.triggered.connect(self.close)
 
-        self.show_file_browser_action = QAction("&File browser", self)
-        self.show_file_browser_action.setStatusTip("Show the file browser")
-        self.show_file_browser_action.triggered.connect(
-            lambda: self.__show_dock_widget("dock-widget-file-browser")
-        )
-
-        self.show_settings_action = QAction("&Settings", self)
-        self.show_settings_action.setStatusTip("Show settings")
-        self.show_settings_action.triggered.connect(
-            lambda: self.__show_dock_widget("dock-widget-settings")
-        )
-
-        self.show_variables_action = QAction("&Variables", self)
-        self.show_variables_action.setStatusTip("Show variables viewer")
-        self.show_variables_action.triggered.connect(
-            lambda: self.__show_dock_widget("dock-widget-variables")
-        )
-
-        self.show_expressions_action = QAction("&Expressions", self)
-        self.show_expressions_action.setStatusTip("Show expressions viewer")
-        self.show_expressions_action.triggered.connect(
-            lambda: self.__show_dock_widget("dock-widget-expressions")
-        )
-
-        self.show_breakpoints_action = QAction("&Breakpoints", self)
-        self.show_breakpoints_action.setStatusTip("Show breakpoints viewer")
-        self.show_breakpoints_action.triggered.connect(
-            lambda: self.__show_dock_widget("dock-widget-breakpoints")
-        )
-
-        self.show_stack_traces_action = QAction("&Stack Traces", self)
-        self.show_stack_traces_action.setStatusTip("Show stack traces viewer")
-        self.show_stack_traces_action.triggered.connect(
-            lambda: self.__show_dock_widget("dock-widget-stacktraces")
-        )
-
     def setup_toolbar(self):
         toolbar = QToolBar("Main Toolbar")
         toolbar.setObjectName("main-toolbar")
@@ -235,12 +199,10 @@ class PugdebugMainWindow(QMainWindow):
         file_menu.addAction(self.quit_action)
 
         view_menu = menu_bar.addMenu("&View")
-        view_menu.addAction(self.show_file_browser_action)
-        view_menu.addAction(self.show_settings_action)
-        view_menu.addAction(self.show_variables_action)
-        view_menu.addAction(self.show_expressions_action)
-        view_menu.addAction(self.show_breakpoints_action)
-        view_menu.addAction(self.show_stack_traces_action)
+
+        dockWidgets = self.findChildren(QDockWidget)
+        for widget in dockWidgets:
+            view_menu.addAction(widget.toggleViewAction())
 
         debug_menu = menu_bar.addMenu("&Debug")
         debug_menu.addAction(self.start_debug_action)
@@ -293,7 +255,3 @@ class PugdebugMainWindow(QMainWindow):
         dw.setObjectName(object_name)
         dw.setWidget(widget)
         self.addDockWidget(area, dw)
-
-    def __show_dock_widget(self, name):
-        widget = self.findChild(QDockWidget, name)
-        widget.show()
