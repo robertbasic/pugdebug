@@ -349,6 +349,8 @@ class Pugdebug(QObject):
 
         self.main_window.set_statusbar_text("Debugging stopped...")
 
+        self.expression_viewer.clear_values()
+
     def detach_debug(self):
         """Detach a debugging session.
 
