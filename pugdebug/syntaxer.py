@@ -9,241 +9,174 @@
 
 __author__ = "robertbasic"
 
-import os
-import json
+from pygments import highlight
+from pygments.lexers import PhpLexer
+from pygments.formatter import Formatter
 
-from PyQt5.QtCore import QRegularExpression
 from PyQt5.QtGui import QSyntaxHighlighter, QColor, QTextCharFormat
 
 
 class PugdebugSyntaxer(QSyntaxHighlighter):
 
-    rules = None
-    formats = None
+    formatter = None
+    lexer = None
 
-    in_php_block = 1
-    in_block_comment = 2
-
-    def __init__(self, document, rules):
-        super(PugdebugSyntaxer, self).__init__(document)
-        self.rules = rules
-        self.formats = rules.get_formats()
-
-    def highlightBlock(self, text):
-        """
-        If not in PHP block, only look for PHP blocks.
-
-        If in block comment, match everything as comment
-
-        If line has line comment, match everything from // or # as comment
-        """
-        matches_ = []
-
-        if self.previousBlockState() > 0:
-            self.setCurrentBlockState(self.previousBlockState())
-
-        if text == '':
-            return
-
-        if self.is_current_block_in_state(self.in_block_comment):
-            m = {
-                'start': 0,
-                'end': len(text) - 1,
-                'length': len(text),
-                'format': 'comments'
-            }
-            matches_.append(m)
-
-        """
-        If not in PHP block, see if current line has one-line PHP blocks,
-        get all PHP blocks from the line and get matches for them
-        """
-        skip_matches = False
-        if not self.is_current_block_in_state(self.in_php_block):
-            if text.find('<?php') < 0:
-                return
-            elif text.find('<?php') >= 0 and text.find('?>') >= 0:
-                skip_matches = True
-                matches_ = self.get_one_line_php_matches(text, matches_)
-
-        if not skip_matches:
-            matches_ = self.get_matches(text, matches_)
-
-        if len(matches_) > 0:
-            for match in matches_:
-                format = self.formats[match['format']]
-                self.setFormat(match['start'], match['length'], format)
-
-    def get_one_line_php_matches(self, text, matches_):
-        regex = QRegularExpression(r'.*?(<\?php(.*?)\?>)')
-        php_blocks = regex.globalMatch(text)
-
-        while php_blocks.hasNext():
-            match = php_blocks.next()
-            php_block = match.capturedTexts().pop(1)
-            starts_at = text.find(php_block)
-            matches_ = self.get_matches(php_block, matches_, starts_at)
-
-        return matches_
-
-    def get_matches(self, text, matches_, starts_at=0):
-        for regex, format, options in self.rules.get_rules():
-            if options is not None:
-                regex.setPatternOptions(options)
-
-            if (self.is_current_block_in_state(self.in_block_comment) and
-                    format != 'comments'):
-                continue
-
-            matches = regex.globalMatch(text)
-
-            while matches.hasNext():
-                match = matches.next()
-
-                if match.hasMatch():
-                    if match.capturedTexts().pop() == '<?php':
-                        self.set_current_block(self.in_php_block)
-
-                    if match.capturedTexts().pop() == '?>':
-                        self.set_current_block(-1)
-
-                    if match.capturedTexts().pop().startswith('/*'):
-                        self.set_current_block(self.in_block_comment)
-
-                    if match.capturedTexts().pop().endswith('*/'):
-                        self.unset_current_block(self.in_block_comment)
-
-                    m = {
-                        'start': starts_at + match.capturedStart(),
-                        'end': match.capturedEnd(),
-                        'length': match.capturedLength(),
-                        'format': format
-                    }
-                    matches_.append(m)
-
-        return matches_
-
-    def is_current_block_in_state(self, block_state):
-        state = self.currentBlockState()
-        if state < 0:
-            return False
-        has_state = (state & (1 << block_state))
-        return has_state > 0
-
-    def set_current_block(self, block_state):
-        if block_state < 0:
-            state = block_state
-        else:
-            state = self.previousBlockState()
-            if state < 0:
-                state = 0
-            state |= 1 << block_state
-
-        self.setCurrentBlockState(state)
-
-    def unset_current_block(self, block_state):
-        if block_state < 0:
-            state = block_state
-        else:
-            state = self.previousBlockState()
-            if state < 0:
-                state = 0
-            state &= ~(1 << block_state)
-
-        self.setCurrentBlockState(state)
-
-
-class PugdebugSyntaxerRules():
-
-    keywords = []
-
-    functions = []
-
-    formats = {
-        'phpBlock': {
-            'color': (230, 0, 0)
-        },
-        'keywords': {
-            'color': (0, 0, 230)
-        },
-        'functions': {
-            'color': (0, 0, 230)
-        },
-        'variables': {
-            'color': (0, 153, 0)
-        },
-        'dollarSign': {
-            'color': (150, 150, 0)
-        },
-        'comments': {
-            'color': (150, 150, 150)
-        },
-        'strings': {
-            'color': (206, 123, 0)
-        }
+    token_multilines = {
+        1: 'Token.Literal.String.Doc',
+        2: 'Token.Comment.Multiline',
+        3: 'Token.Literal.String.Single',
+        4: 'Token.Literal.String.Double'
     }
 
+    def __init__(self, document, formatter, lexer):
+        super(PugdebugSyntaxer, self).__init__(document)
+
+        self.formatter = formatter
+        self.lexer = lexer
+
+        self.formatter.document = document
+
+        highlight(self.document().toPlainText(), self.lexer, self.formatter)
+
+    def highlightBlock(self, text):
+        block = self.currentBlock()
+        block_number = block.blockNumber()
+
+        # Formats for the current block
+        block_formats = None
+
+        if block_number in self.formatter.formats:
+            block_formats = self.formatter.formats[block_number]
+
+        # If the current block has no formats
+        # see if the previous was maybe a block format
+        # like a multiline comment or a docblock
+        # and use that format
+        if block_formats is None:
+            previous_block_state = self.previousBlockState()
+            if previous_block_state > 0:
+                block_formats = self.__get_multiline_format(
+                    text,
+                    previous_block_state
+                )
+                self.formatter.formats[block_number] = block_formats
+
+        if block_formats is not None:
+            for block_format in block_formats:
+
+                # Mark the current block state if needed
+                if block_format['token'] == 'Token.Literal.String.Doc':
+                    self.setCurrentBlockState(1)
+                elif block_format['token'] == 'Token.Comment.Multiline':
+                    self.setCurrentBlockState(2)
+                elif block_format['token'] == 'Token.Literal.String.Single':
+                    self.setCurrentBlockState(3)
+                elif block_format['token'] == 'Token.Literal.String.Double':
+                    self.setCurrentBlockState(4)
+
+                # The end of multiline comments/docblocks is a weird Token.Text
+                # so if current token is Token.Text
+                # and the previous state was a multiline state
+                # highlight the current block as a multiline
+                previous_block_state = self.previousBlockState()
+
+                if block_format['token'] == 'Token.Text':
+                    if previous_block_state > 0:
+                        block_format = self.__get_multiline_format(
+                            text, previous_block_state
+                        ).pop()
+
+                if block_format['token'] == 'Token.Punctuation':
+                    self.setCurrentBlockState(-1)
+
+                start = block_format['start']
+                end = block_format['end']
+                style = block_format['style']
+                self.setFormat(start, end, style)
+
+    def __get_multiline_format(self, text, token_index):
+        token = self.token_multilines[token_index]
+        return [{
+            'start': 0,
+            'end': len(text),
+            'style': self.formatter.styles[token],
+            'token': token
+        }]
+
+
+class PugdebugFormatter(Formatter):
+
+    styles = {}
+
+    formats = {}
+
+    document = None
+
     def __init__(self):
-        path = self.get_syntaxer_rules_path()
+        super(PugdebugFormatter, self).__init__()
 
-        keywords_path = "%s/php_keywords.json" % path
-        functions_path = "%s/php_functions.json" % path
+        for token, style in self.style:
+            format = QTextCharFormat()
 
-        with open(keywords_path) as keywords_json:
-            self.keywords = json.load(keywords_json)
+            if style['color']:
+                color = QColor('#'+style['color'])
+                format.setForeground(color)
 
-        with open(functions_path) as functions_json:
-            self.functions = json.load(functions_json)
+            self.styles[str(token)] = format
 
-        rules = []
+    def format(self, tokensource, outfile):
+        """Format source file
 
-        rules += [(r'<\?php', 'phpBlock', None)]
+        Formats are separated block by block.
+        """
+        # Formats for every block, block by block
+        self.formats = {}
+        # Position of value in the source
+        current_value_position = 0
+        # The number of the current block
+        current_block_number = -1
+        # Where does text start in the current block
+        # Used to skip whitespace on the beginning of line
+        start_in_block = 0
+        # The text of the current block
+        block_text = ''
 
-        keywords = r'\b' + r'\b|\b'.join(self.keywords) + r'\b'
-        rules += [(
-            keywords,
-            'keywords',
-            QRegularExpression.CaseInsensitiveOption
-        )]
+        for token, value in tokensource:
+            token = str(token)
+            # Find the block which has the current value, by it's position
+            block = self.document.findBlock(current_value_position)
+            block_number = block.blockNumber()
 
-        functions = r'\b' + r'\b|\b'.join(self.functions) + r'\b'
-        rules += [(functions, 'functions', None)]
+            # If we advanced a block
+            if current_block_number < block_number:
+                block_text = block.text()
+                # Where do we start in the current block, whitespace included?
+                start_in_block = len(block_text) - len(block_text.lstrip())
+                current_block_number = block_number
 
-        # $variables
-        rules += [(r'\$[\w]*', 'variables', None)]
-        rules += [(r'\$(?=[\w])', 'dollarSign', None)]
+            # If this block has no formats yet
+            if block_number not in self.formats:
+                self.formats[block_number] = []
 
-        # strings
-        rules += [(r'"[^"]*"', 'strings', None)]
-        rules += [(r'"[^"]*(?<!\\)"', 'strings', None)]
-        rules += [(r"'[^']*'", 'strings', None)]
-        rules += [(r"'[^']*(?<!\\)'", 'strings', None)]
+            length = len(value)
+            end = start_in_block + length
+            style = self.styles[token]
 
-        # comments
-        rules += [(r'#[^\n]*', 'comments', None)]
-        rules += [(r'//[^\n]*', 'comments', None)]
-        rules += [(r'/\*+', 'comments', None)]
-        rules += [(r'\*+/', 'comments', None)]
+            # Format for the current value
+            format = {
+                'start': start_in_block,
+                'end': end,
+                'style': style,
+                'token': token
+            }
 
-        rules += [(r'\?>', 'phpBlock', None)]
+            start_in_block += length
+            current_value_position += length
 
-        self.rules = [(QRegularExpression(pattern), format, options)
-                      for(pattern, format, options) in rules]
+            self.formats[block_number].append(format)
 
-    def get_rules(self):
-        return self.rules
 
-    def get_formats(self):
-        formats_ = {}
-        for format in self.formats:
-            color = QColor()
-            color.setRed(self.formats[format]['color'][0])
-            color.setGreen(self.formats[format]['color'][1])
-            color.setBlue(self.formats[format]['color'][2])
-            charFormat = QTextCharFormat()
-            charFormat.setForeground(color)
-            formats_[format] = charFormat
-        return formats_
+class PugdebugLexer(PhpLexer):
 
-    def get_syntaxer_rules_path(self):
-        return "%s/data" % os.getcwd()
+    def __init__(self):
+        super(PugdebugLexer, self).__init__()
