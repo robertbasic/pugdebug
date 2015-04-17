@@ -255,9 +255,12 @@ class Pugdebug(QObject):
         Remove the tab.
         """
         document_widget = self.document_viewer.get_document(tab_index)
-        self.documents.close_document(document_widget.get_path())
+        path = document_widget.get_path()
+        self.documents.close_document(path)
         document_widget.deleteLater()
         self.document_viewer.close_tab(tab_index)
+
+        self.remove_stale_breakpoints(path)
 
     def focus_current_line(self):
         """Focus the current line
@@ -493,6 +496,30 @@ class Pugdebug(QObject):
 
         breakpoint_id = int(breakpoint['id'])
         self.debugger.remove_breakpoint(breakpoint_id)
+
+    def remove_stale_breakpoints(self, path):
+        """Remove stale breakpoints for a file
+
+        Breakpoints get stale when a file gets closed.
+        """
+        remote_path = self.__get_path_mapped_to_remote(path)
+
+        breakpoints = []
+
+        if self.debugger.is_connected():
+            breakpoints = list(filter(
+                lambda breakpoint: breakpoint['filename'] != remote_path,
+                self.breakpoints
+            ))
+            self.breakpoints = breakpoints
+        else:
+            breakpoints = list(filter(
+                lambda breakpoint: breakpoint['filename'] != remote_path,
+                self.init_breakpoints
+            ))
+            self.init_breakpoints = breakpoints
+
+        self.breakpoint_viewer.set_breakpoints(breakpoints)
 
     def handle_breakpoint_removed(self, breakpoint_id):
         """Handle when a breakpoint gets removed
