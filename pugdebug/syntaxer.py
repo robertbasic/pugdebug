@@ -23,7 +23,8 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
 
     token_multilines = {
         1: 'Token.Literal.String.Doc',
-        2: 'Token.Comment.Multiline'
+        2: 'Token.Comment.Multiline',
+        3: 'Token.Literal.String.Single'
     }
 
     def __init__(self, document, formatter):
@@ -67,17 +68,23 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
                     self.setCurrentBlockState(1)
                 elif block_format['token'] == 'Token.Comment.Multiline':
                     self.setCurrentBlockState(2)
+                elif block_format['token'] == 'Token.Literal.String.Single':
+                    self.setCurrentBlockState(3)
 
                 # The end of multiline comments/docblocks is a weird Token.Text
                 # so if current token is Token.Text
                 # and the previous state was a multiline state
                 # highlight the current block as a multiline
+                previous_block_state = self.previousBlockState()
+
                 if block_format['token'] == 'Token.Text':
-                    previous_block_state = self.previousBlockState()
                     if previous_block_state > 0:
                         block_format = self.__get_multiline_format(
                             text, previous_block_state
                         ).pop()
+
+                if block_format['token'] == 'Token.Punctuation':
+                    self.setCurrentBlockState(-1)
 
                 start = block_format['start']
                 end = block_format['end']
