@@ -9,14 +9,10 @@
 
 __author__ = "robertbasic"
 
-import os
-import json
-
 from pygments import highlight
 from pygments.lexers import PhpLexer
 from pygments.formatter import Formatter
 
-from PyQt5.QtCore import QRegularExpression
 from PyQt5.QtGui import QSyntaxHighlighter, QColor, QTextCharFormat
 
 
@@ -49,6 +45,7 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
         if block_format is not None:
             for format in block_format:
                 self.setFormat(format['start'], format['end'], format['style'])
+
 
 class PugdebugFormatter(Formatter):
 
