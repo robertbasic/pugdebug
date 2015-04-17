@@ -21,7 +21,10 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
     formatter = None
     lexer = None
 
-    buffer = 0
+    token_multilines = {
+        1: 'Token.Literal.String.Doc',
+        2: 'Token.Comment.Multiline'
+    }
 
     def __init__(self, document, formatter):
         super(PugdebugSyntaxer, self).__init__(document)
@@ -37,14 +40,58 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
         block = self.currentBlock()
         block_number = block.blockNumber()
 
-        block_format = None
+        # Formats for the current block
+        block_formats = None
 
         if block_number in self.formatter.formats:
-            block_format = self.formatter.formats[block_number]
+            block_formats = self.formatter.formats[block_number]
 
-        if block_format is not None:
-            for format in block_format:
-                self.setFormat(format['start'], format['end'], format['style'])
+        # If the current block has no formats
+        # see if the previous was maybe a block format
+        # like a multiline comment or a docblock
+        # and use that format
+        if block_formats is None:
+            previous_block_state = self.previousBlockState()
+            if previous_block_state > 0:
+                block_formats = self.__get_multiline_format(
+                    text,
+                    previous_block_state
+                )
+                self.formatter.formats[block_number] = block_formats
+
+        if block_formats is not None:
+            for block_format in block_formats:
+
+                # Mark the current block state if needed
+                if block_format['token'] == 'Token.Literal.String.Doc':
+                    self.setCurrentBlockState(1)
+                elif block_format['token'] == 'Token.Comment.Multiline':
+                    self.setCurrentBlockState(2)
+
+                # The end of multiline comments/docblocks is a weird Token.Text
+                # so if current token is Token.Text
+                # and the previous state was a multiline state
+                # highlight the current block as a multiline
+                if block_format['token'] == 'Token.Text':
+                    previous_block_state = self.previousBlockState()
+                    if previous_block_state > 0:
+                        block_format = self.__get_multiline_format(
+                            text, previous_block_state
+                        ).pop()
+
+                start = block_format['start']
+                end = block_format['end']
+                style = block_format['style']
+                self.setFormat(start, end, style)
+
+    def __get_multiline_format(self, text, token_index):
+        token = self.token_multilines[token_index]
+        return [{
+            'start': 0,
+            'end': len(text),
+            'style': self.formatter.styles[token],
+            'token': token
+        }]
 
 
 class PugdebugFormatter(Formatter):
@@ -65,7 +112,7 @@ class PugdebugFormatter(Formatter):
                 color = QColor('#'+style['color'])
                 format.setForeground(color)
 
-            self.styles[token] = format
+            self.styles[str(token)] = format
 
     def format(self, tokensource, outfile):
         """Format source file
@@ -85,6 +132,7 @@ class PugdebugFormatter(Formatter):
         block_text = ''
 
         for token, value in tokensource:
+            token = str(token)
             # Find the block which has the current value, by it's position
             block = self.document.findBlock(current_value_position)
             block_number = block.blockNumber()
@@ -102,12 +150,16 @@ class PugdebugFormatter(Formatter):
 
             length = len(value)
             end = start_in_block + length
+            style = self.styles[token]
+
             # Format for the current value
             format = {
                 'start': start_in_block,
                 'end': end,
-                'style': self.styles[token]
+                'style': style,
+                'token': token
             }
+
             start_in_block += length
             current_value_position += length
 
