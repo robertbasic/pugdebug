@@ -187,7 +187,7 @@ class PugdebugDocumentContents(QPlainTextEdit):
         """
         self.setPlainText(document_model.contents)
         self.syntaxer.setDocument(self.document())
-        self.syntaxer.rehighlight()
+        self.syntaxer.highlight()
 
     def mousePressEvent(self, event):
         pass
