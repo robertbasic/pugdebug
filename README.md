@@ -14,8 +14,18 @@ and [PyQt5.4](http://www.riverbankcomputing.com/software/pyqt/download5).
 I wrote a [blog post](http://robertbasic.com/blog/install-pyqt5-in-python-3-virtual-environment)
 about setting up a virtual environment for it.
 
-Clone this repo and after setting up the virtual environment simply doing a
-`python app.py` should start up pugdebug.
+Clone this repo and after setting up the virtual environment, install the application
+requirements by running:
+
+```
+pip install -r requirements.txt
+```
+
+After the requirements are installed, start pugdebug with a simple command:
+
+```
+python app.py
+```
 
 [@ihabunek](https://github.com/ihabunek) and [@vranac](https://github.com/vranac)
 report that this process is pretty painless on Ubuntu and OSX machines. Some
