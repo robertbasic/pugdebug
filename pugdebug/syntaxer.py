@@ -29,11 +29,11 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
         5: 'Token.Literal.String'
     }
 
-    def __init__(self, document, formatter, lexer):
+    def __init__(self, document, formatter):
         super(PugdebugSyntaxer, self).__init__(document)
 
         self.formatter = formatter
-        self.lexer = lexer
+        self.lexer = PhpLexer()
 
         self.formatter.document = document
 
@@ -177,9 +177,3 @@ class PugdebugFormatter(Formatter):
             current_value_position += length
 
             self.formats[block_number].append(format)
-
-
-class PugdebugLexer(PhpLexer):
-
-    def __init__(self):
-        super(PugdebugLexer, self).__init__()
