@@ -215,7 +215,7 @@ class Pugdebug(QObject):
 
             # Handle when a document gets changed outside of pugdebug
             self.documents.document_changed.connect(
-                document_widget.handle_document_changed
+                self.handle_document_changed
             )
 
             # Add the newly opened document to the document viewer's tab stack
@@ -246,6 +246,19 @@ class Pugdebug(QObject):
             self.set_breakpoint(breakpoint)
         else:
             self.remove_breakpoint(breakpoint)
+
+    def handle_document_changed(self, document_model):
+        """Handle when a document gets chaned
+
+        Pass on to the document widget the new document model.
+
+        Remove stale breakpoints.
+        """
+        path = document_model.path
+        document_widget = self.document_viewer.get_document_by_path(path)
+        document_widget.handle_document_changed(document_model)
+
+        self.remove_stale_breakpoints(path)
 
     def close_document(self, tab_index):
         """Close a document
@@ -501,6 +514,9 @@ class Pugdebug(QObject):
         """Remove stale breakpoints for a file
 
         Breakpoints get stale when a file gets closed.
+
+        Breakpoints get stale when a file gets changed
+        outside of the application.
         """
         remote_path = self.__get_path_mapped_to_remote(path)
 
