@@ -25,7 +25,8 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
         1: 'Token.Literal.String.Doc',
         2: 'Token.Comment.Multiline',
         3: 'Token.Literal.String.Single',
-        4: 'Token.Literal.String.Double'
+        4: 'Token.Literal.String.Double',
+        5: 'Token.Literal.String'
     }
 
     def __init__(self, document, formatter, lexer):
@@ -73,6 +74,8 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
                     self.setCurrentBlockState(3)
                 elif block_format['token'] == 'Token.Literal.String.Double':
                     self.setCurrentBlockState(4)
+                elif block_format['token'] == 'Token.Literal.String':
+                    self.setCurrentBlockState(5)
 
                 # The end of multiline comments/docblocks is a weird Token.Text
                 # so if current token is Token.Text
