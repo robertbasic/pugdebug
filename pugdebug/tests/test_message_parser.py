@@ -113,17 +113,20 @@ class PugdebugMessageParserTest(unittest.TestCase):
             {
                 'name': '$_COOKIE',
                 'type': 'array',
-                'variables': []
+                'variables': [],
+                'numchildren': '0'
             },
             {
                 'name': '$_ENV',
                 'type': 'array',
-                'variables': []
+                'variables': [],
+                'numchildren': '0'
             },
             {
                 'name': '$_FILES',
                 'type': 'array',
-                'variables': []
+                'variables': [],
+                'numchildren': '0'
             },
             {
                 'name': '$_GET',
@@ -135,12 +138,14 @@ class PugdebugMessageParserTest(unittest.TestCase):
                         'encoding': 'base64',
                         'value': 'MQ=='
                     }
-                ]
+                ],
+                'numchildren': '1'
             },
             {
                 'name': '$_POST',
                 'type': 'array',
-                'variables': []
+                'variables': [],
+                'numchildren': '0'
             },
             {
                 'name': '$_REQUEST',
@@ -152,7 +157,8 @@ class PugdebugMessageParserTest(unittest.TestCase):
                         'encoding': 'base64',
                         'value': 'MQ=='
                     }
-                ]
+                ],
+                'numchildren': '1'
             },
             {
                 'name': '$_SERVER',
@@ -336,7 +342,8 @@ class PugdebugMessageParserTest(unittest.TestCase):
                         'type': 'int',
                         'value': '1425023978'
                     }
-                ]
+                ],
+                'numchildren': '30'
             }
         ]
 

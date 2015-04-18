@@ -47,6 +47,9 @@ class PugdebugVariableViewer(QTreeWidget):
         if type == 'object':
             type = variable['classname']
 
+        if type == 'array':
+            type = "%s {%d}" % (type, int(variable['numchildren']))
+
         if 'value' in variable:
             value = variable['value']
 
