@@ -10,7 +10,8 @@
 __author__ = "robertbasic"
 
 import base64
-from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
+from PyQt5.QtWidgets import (QTreeWidget, QTreeWidgetItem, QDialog,
+                             QTextEdit, QGridLayout)
 
 
 class PugdebugVariableViewer(QTreeWidget):
@@ -23,6 +24,20 @@ class PugdebugVariableViewer(QTreeWidget):
 
         self.setColumnWidth(0, 250)
         self.setColumnWidth(1, 150)
+
+        self.itemDoubleClicked.connect(
+            self.handle_variable_double_clicked
+        )
+
+    def handle_variable_double_clicked(self, item):
+        """Handle when a variable is double clicked
+
+        If the double clicked item is of string type
+        show it in a dialog. Allows to inspect long
+        strings more easier.
+        """
+        if item.text(1).find('string') > -1:
+            PugdebugVariableDetails(self, item)
 
     def set_variables(self, variables):
         self.clear()
@@ -39,6 +54,7 @@ class PugdebugVariableViewer(QTreeWidget):
 
     def add_variable(self, variable, parent=None):
         type = variable['type']
+        tooltip = None
 
         if type == 'uninitialized':
             return
@@ -52,6 +68,7 @@ class PugdebugVariableViewer(QTreeWidget):
 
         if type == 'string':
             type = "%s {%d}" % (type, int(variable['size']))
+            tooltip = "Double click to inspect"
 
         if 'value' in variable:
             value = variable['value']
@@ -79,3 +96,25 @@ class PugdebugVariableViewer(QTreeWidget):
             self.addTopLevelItem(item)
         else:
             parent.addChild(item)
+
+        if tooltip is not None:
+            item.setToolTip(2, tooltip)
+
+
+class PugdebugVariableDetails(QDialog):
+
+    def __init__(self, parent, item):
+        """Dialog to inspect variables in more detail
+
+        Show the contents of a variable in a text edit.
+        """
+        super(PugdebugVariableDetails, self).__init__(parent)
+
+        edit = QTextEdit(item.text(2))
+
+        layout = QGridLayout(self)
+        layout.addWidget(edit, 0, 0, 0, 0)
+
+        self.setLayout(layout)
+
+        self.show()
