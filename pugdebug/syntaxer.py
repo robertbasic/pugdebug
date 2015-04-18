@@ -156,9 +156,17 @@ class PugdebugFormatter(Formatter):
             # If we advanced a block
             if current_block_number < block_number:
                 block_text = block.text()
-                # Where do we start in the current block, whitespace included?
-                start_in_block = len(block_text) - len(block_text.lstrip())
-                current_block_number = block_number
+
+                # When there are 2 or more indented one line comments
+                # Except for the 1st line, pygments sees the indents as tokens
+                # so if the current value stripped of whitespace from the left
+                # is an empty string, skip it
+                if value.lstrip() != '':
+                    # Where do we start in the current block,
+                    # whitespace included?
+                    start_in_block = len(block_text) - len(block_text.lstrip())
+
+                    current_block_number = block_number
 
             # If this block has no formats yet
             if block_number not in self.formats:
