@@ -15,6 +15,8 @@ from pugdebug.message_parser import PugdebugMessageParser
 
 class PugdebugMessageParserTest(unittest.TestCase):
 
+    #maxDiff = None
+
     def setUp(self):
         self.parser = PugdebugMessageParser()
 
@@ -136,7 +138,8 @@ class PugdebugMessageParserTest(unittest.TestCase):
                         'name': 'XDEBUG_SESSION_START',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'MQ=='
+                        'value': 'MQ==',
+                        'size': '1'
                     }
                 ],
                 'numchildren': '1'
@@ -155,7 +158,8 @@ class PugdebugMessageParserTest(unittest.TestCase):
                         'name': 'XDEBUG_SESSION_START',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'MQ=='
+                        'value': 'MQ==',
+                        'size': '1'
                     }
                 ],
                 'numchildren': '1'
@@ -168,169 +172,197 @@ class PugdebugMessageParserTest(unittest.TestCase):
                         'name': 'UNIQUE_ID',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'VlBBajZpYWgxVGtGQGlDVzFuNzhCZ0FBQUFB'
+                        'value': 'VlBBajZpYWgxVGtGQGlDVzFuNzhCZ0FBQUFB',
+                        'size': '27'
                     },
                     {
                         'name': 'HTTP_HOST',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'bG9jYWxob3N0'
+                        'value': 'bG9jYWxob3N0',
+                        'size': '9'
                     },
                     {
                         'name': 'HTTP_USER_AGENT',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'TW96aWxsYS81LjAgKFgxMTsgRmVkb3JhOyBMaW51eCB4ODZfNjQ7IHJ2OjM2LjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvMzYuMA=='
+                        'value': 'TW96aWxsYS81LjAgKFgxMTsgRmVkb3JhOyBMaW51eCB4ODZfNjQ7IHJ2OjM2LjApIEdlY2tvLzIwMTAwMTAxIEZpcmVmb3gvMzYuMA==',
+                        'size': '76'
                     },
                     {
                         'name': 'HTTP_ACCEPT',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'dGV4dC9odG1sLGFwcGxpY2F0aW9uL3hodG1sK3htbCxhcHBsaWNhdGlvbi94bWw7cT0wLjksKi8qO3E9MC44'
+                        'value': 'dGV4dC9odG1sLGFwcGxpY2F0aW9uL3hodG1sK3htbCxhcHBsaWNhdGlvbi94bWw7cT0wLjksKi8qO3E9MC44',
+                        'size': '63'
                     },
                     {
                         'name': 'HTTP_ACCEPT_LANGUAGE',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'ZW4tVVMsZW47cT0wLjU='
+                        'value': 'ZW4tVVMsZW47cT0wLjU=',
+                        'size': '14'
                     },
                     {
                         'name': 'HTTP_ACCEPT_ENCODING',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'Z3ppcCwgZGVmbGF0ZQ=='
+                        'value': 'Z3ppcCwgZGVmbGF0ZQ==',
+                        'size': '13'
                     },
                     {
                         'name': 'HTTP_CONNECTION',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'a2VlcC1hbGl2ZQ=='
+                        'value': 'a2VlcC1hbGl2ZQ==',
+                        'size': '10'
                     },
                     {
                         'name': 'PATH',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'L3Vzci9sb2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbg=='
+                        'value': 'L3Vzci9sb2NhbC9zYmluOi91c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbg==',
+                        'size': '49'
                     },
                     {
                         'name': 'SERVER_SIGNATURE',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': None
+                        'value': None,
+                        'size': '0'
                     },
                     {
                         'name': 'SERVER_SOFTWARE',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'QXBhY2hlLzIuNC4xMCAoRmVkb3JhKSBPcGVuU1NMLzEuMC4xay1maXBzIFBIUC81LjYuNg=='
+                        'value': 'QXBhY2hlLzIuNC4xMCAoRmVkb3JhKSBPcGVuU1NMLzEuMC4xay1maXBzIFBIUC81LjYuNg==',
+                        'size': '52'
                     },
                     {
                         'name': 'SERVER_NAME',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'bG9jYWxob3N0'
+                        'value': 'bG9jYWxob3N0',
+                        'size': '9'
                     },
                     {
                         'name': 'SERVER_ADDR',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'MTI3LjAuMC4x'
+                        'value': 'MTI3LjAuMC4x',
+                        'size': '9'
                     },
                     {
                         'name': 'SERVER_PORT',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'ODA='
+                        'value': 'ODA=',
+                        'size': '2'
                     },
                     {
                         'name': 'REMOTE_ADDR',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'MTI3LjAuMC4x'
+                        'value': 'MTI3LjAuMC4x',
+                        'size': '9'
                     },
                     {
                         'name': 'DOCUMENT_ROOT',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'L2hvbWUvcm9iZXJ0L3d3dy9weGRlYnVn'
+                        'value': 'L2hvbWUvcm9iZXJ0L3d3dy9weGRlYnVn',
+                        'size': '24'
                     },
                     {
                         'name': 'REQUEST_SCHEME',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'aHR0cA=='
+                        'value': 'aHR0cA==',
+                        'size': '4'
                     },
                     {
                         'name': 'CONTEXT_PREFIX',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': None
+                        'value': None,
+                        'size': '0'
                     },
                     {
                         'name': 'CONTEXT_DOCUMENT_ROOT',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'L2hvbWUvcm9iZXJ0L3d3dy9weGRlYnVn'
+                        'value': 'L2hvbWUvcm9iZXJ0L3d3dy9weGRlYnVn',
+                        'size': '24'
                     },
                     {
                         'name': 'SERVER_ADMIN',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'd2VibWFzdGVyQGxvY2FsaG9zdA=='
+                        'value': 'd2VibWFzdGVyQGxvY2FsaG9zdA==',
+                        'size': '19'
                     },
                     {
                         'name': 'SCRIPT_FILENAME',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'L2hvbWUvcm9iZXJ0L3d3dy9weGRlYnVnL2luZGV4LnBocA=='
+                        'value': 'L2hvbWUvcm9iZXJ0L3d3dy9weGRlYnVnL2luZGV4LnBocA==',
+                        'size': '34'
                     },
                     {
                         'name': 'REMOTE_PORT',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'NTg3MDI='
+                        'value': 'NTg3MDI=',
+                        'size': '5'
                     },
                     {
                         'name': 'GATEWAY_INTERFACE',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'Q0dJLzEuMQ=='
+                        'value': 'Q0dJLzEuMQ==',
+                        'size': '7'
                     },
                     {
                         'name': 'SERVER_PROTOCOL',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'SFRUUC8xLjE='
+                        'value': 'SFRUUC8xLjE=',
+                        'size': '8'
                     },
                     {
                         'name': 'REQUEST_METHOD',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'R0VU'
+                        'value': 'R0VU',
+                        'size': '3'
                     },
                     {
                         'name': 'QUERY_STRING',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'WERFQlVHX1NFU1NJT05fU1RBUlQ9MQ=='
+                        'value': 'WERFQlVHX1NFU1NJT05fU1RBUlQ9MQ==',
+                        'size': '22'
                     },
                     {
                         'name': 'REQUEST_URI',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'Lz9YREVCVUdfU0VTU0lPTl9TVEFSVD0x'
+                        'value': 'Lz9YREVCVUdfU0VTU0lPTl9TVEFSVD0x',
+                        'size': '24'
                     },
                     {
                         'name': 'SCRIPT_NAME',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'L2luZGV4LnBocA=='
+                        'value': 'L2luZGV4LnBocA==',
+                        'size': '10'
                     },
                     {
                         'name': 'PHP_SELF',
                         'type': 'string',
                         'encoding': 'base64',
-                        'value': 'L2luZGV4LnBocA=='
+                        'value': 'L2luZGV4LnBocA==',
+                        'size': '10'
                     },
                     {
                         'name': 'REQUEST_TIME_FLOAT',
@@ -347,13 +379,14 @@ class PugdebugMessageParserTest(unittest.TestCase):
             }
         ]
 
-        self.assertEqual(expected, result)
+        #self.assertEqual(expected, result)
         self.assertEqual(expected[0], result[0])
         self.assertEqual(expected[1], result[1])
         self.assertEqual(expected[2], result[2])
         self.assertEqual(expected[3], result[3])
         self.assertEqual(expected[4], result[4])
         self.assertEqual(expected[5], result[5])
+        self.assertEqual(expected[6], result[6])
         self.assertEqual(expected[6]['variables'][28], result[6]['variables'][28])
 
     def test_parse_successful_breakpoint_set_message(self):

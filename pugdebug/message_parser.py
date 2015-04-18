@@ -174,7 +174,14 @@ class PugdebugMessageParser():
         return result
 
     def get_variable(self, xml):
-        attribs = ['name', 'type', 'encoding', 'classname', 'numchildren']
+        attribs = [
+            'name',
+            'type',
+            'encoding',
+            'classname',
+            'numchildren',
+            'size'
+        ]
         var = {}
         var = self.get_attribs(xml, attribs, var)
 
