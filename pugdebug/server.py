@@ -235,7 +235,7 @@ class PugdebugServer(QThread):
 
     def __init_connection(self):
         if self.sock is None:
-            return
+            raise RuntimeError("Can't init connection without a socket")
 
         idekey = get_setting('debugger/idekey')
 
