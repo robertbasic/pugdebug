@@ -358,8 +358,11 @@ class Pugdebug(QObject):
         """
         self.debugger.cleanup()
 
-        self.init_breakpoints = self.breakpoints
-        self.breakpoints = []
+        # Only set breakpoints as init_breakpoints
+        # if there are any breakpoints set
+        if len(self.breakpoints) > 0:
+            self.init_breakpoints = self.breakpoints
+            self.breakpoints = []
 
         self.main_window.toggle_actions(False)
 
