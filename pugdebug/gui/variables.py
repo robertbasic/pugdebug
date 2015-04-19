@@ -108,6 +108,9 @@ class PugdebugVariableViewer(QTabWidget):
             if value is None:
                 value = 'NULL'
 
+            if type == 'bool':
+                value = ("%s" % (int(value) == 1)).lower()
+
             args = [variable['name'], type, value]
         else:
             args = [variable['name'], type, ' ... ']
