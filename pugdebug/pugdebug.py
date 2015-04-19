@@ -9,6 +9,8 @@
 
 __author__ = "robertbasic"
 
+import os
+
 from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import QErrorMessage
 
@@ -201,9 +203,21 @@ class Pugdebug(QObject):
         tab.
 
         If the document is already open, focus the tab with that document.
+
+        If the path of the document should be mapped, and the file can't
+        be found after mapping, show an error message and stop the debugging
+        session.
         """
 
         path = self.__get_path_mapped_to_local(path, map_paths)
+
+        if path is False:
+            self.handle_error(
+                "File does not exist after mapping. "
+                "Is the path map correct?"
+            )
+            self.stop_debug()
+            return
 
         if not self.documents.is_document_open(path):
             document_model = self.documents.open_document(path)
@@ -636,6 +650,9 @@ class Pugdebug(QObject):
                 path.find(path_map) == 0):
             path = path[len(path_map):]
             path = "%s%s" % (self.file_browser.model().rootPath(), path)
+
+            if not os.path.isfile(path):
+                return False
 
         return path
 
