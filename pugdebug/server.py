@@ -131,8 +131,9 @@ class PugdebugServer(QThread):
         return self.is_waiting
 
     def disconnect(self):
-        self.sock.close()
-        self.sock = None
+        if self.sock is not None:
+            self.sock.close()
+            self.sock = None
 
     def stop(self):
         self.action = 'stop'
@@ -188,6 +189,21 @@ class PugdebugServer(QThread):
         self.start()
 
     def __connect_server(self):
+        """Connect to a server
+
+        We listen to incomming connections and at the same time try
+        to distinguish two different things.
+
+        First, if a connection is accepted, see if we are interested
+        in it at all by checking if our idekey matches with what
+        xdebug sent us back. If the idekeys match, return the init
+        message and carry on. If the idekeys do not match, discard
+        the socket and continue listening to other incomming connections.
+
+        Second, while waiting for a connection to be accepted, also
+        check did the user requested for canceling the connection to
+        the server by unsetting the wait_for_accept flag.
+        """
         socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         socket_server.settimeout(1)
@@ -200,23 +216,40 @@ class PugdebugServer(QThread):
         port_number = int(get_setting('debugger/port_number'))
 
         try:
-            # As long as the wait_for_accept flag is set
-            # try accepting the socket
-            # if the wait_for_accept flag is unset
-            # it means a cancel connection was requested
             socket_server.bind((host, port_number))
             socket_server.listen(5)
 
-            while self.wait_for_accept:
-                try:
-                    self.sock, address = socket_server.accept()
-                    self.sock.settimeout(None)
-                    self.wait_for_accept = False
-                except socket.timeout:
-                    pass
+            while response is None:
+                # As long as the wait_for_accept flag is set
+                # try accepting the socket
+                # if the wait_for_accept flag is unset
+                # it means a cancel connection was requested
+                while self.wait_for_accept:
+                    try:
+                        self.sock, address = socket_server.accept()
+                        self.sock.settimeout(None)
+                        # If we accepted a socket, break out of the inner
+                        # while loop, so we can check if we are accepting
+                        # for the current idekey
+                        if self.sock is not None:
+                            break
+                    except socket.timeout:
+                        pass
 
-            self.is_waiting = False
-            response = self.__init_connection()
+                try:
+                    response = self.__init_connection()
+                except RuntimeError:
+                    break
+
+                # Probably got a response but for a different idekey
+                # discard socket and continue waiting for a connection
+                if response is None:
+                    self.disconnect()
+                    self.wait_for_accept = True
+                else:
+                    self.wait_for_accept = False
+                    self.is_waiting = False
+
         except OSError:
             print(OSError.strerror())
             print("Socket bind failed")
@@ -226,12 +259,30 @@ class PugdebugServer(QThread):
         return response
 
     def __init_connection(self):
+        """Init the connection with the debugger
+
+        Receives the init message from the debugger.
+
+        Sets features for max_depth, max_children and
+        max_data.
+
+        If an init message is received, but has a different
+        idekey than what we set, returns None.
+
+        Otherwise returns the init message.
+        """
         if self.sock is None:
-            return
+            raise RuntimeError("Can't init connection without a socket")
+
+        idekey = get_setting('debugger/idekey')
 
         response = self.__receive_message()
 
         init_message = self.parser.parse_init_message(response)
+
+        # See if the init message from xdebug is meant for us
+        if idekey != '' and init_message['idekey'] != idekey:
+            return None
 
         command = 'feature_set -i %d -n max_depth -v 9' % (
             self.__get_transaction_id()
