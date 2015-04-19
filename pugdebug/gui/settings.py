@@ -53,6 +53,13 @@ class PugdebugSettingsWindow(QWidget):
         port_number = int(get_setting('debugger/port_number'))
         self.port_number.setValue(port_number)
 
+        self.idekey = QLineEdit()
+
+        self.idekey.editingFinished.connect(self.handle_idekey_changed)
+
+        idekey = get_setting('debugger/idekey')
+        self.idekey.setText(idekey)
+
         layout = QFormLayout()
         self.setLayout(layout)
 
@@ -60,6 +67,7 @@ class PugdebugSettingsWindow(QWidget):
         layout.addRow("Maps from:", self.path_mapping)
         layout.addRow("Host", self.host)
         layout.addRow("Port", self.port_number)
+        layout.addRow("IDE Key", self.idekey)
 
     def get_project_root(self):
         return self.project_root.text()
@@ -90,3 +98,7 @@ class PugdebugSettingsWindow(QWidget):
         Set the new value in the application's setting.
         """
         set_setting('debugger/port_number', value)
+
+    def handle_idekey_changed(self):
+        value = self.idekey.text()
+        set_setting('debugger/idekey', value)
