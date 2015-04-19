@@ -39,6 +39,12 @@ class PugdebugVariableViewer(QTabWidget):
         if item.text(1).find('string') > -1:
             PugdebugVariableDetails(self, item)
 
+    def clear(self):
+        """Clear the variable tables
+        """
+        for context_key in self.variable_tables:
+            self.variable_tables[context_key].clear()
+
     def set_variables(self, variables):
         for context in variables:
             table = self.get_variable_table(context)
