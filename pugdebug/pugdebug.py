@@ -10,6 +10,7 @@
 __author__ = "robertbasic"
 
 from PyQt5.QtCore import QObject
+from PyQt5.QtWidgets import QErrorMessage
 
 from pugdebug.debugger import PugdebugDebugger
 from pugdebug.syntaxer import PugdebugFormatter
@@ -170,6 +171,10 @@ class Pugdebug(QObject):
         )
         self.debugger.expressions_evaluated_signal.connect(
             self.handle_expressions_evaluated
+        )
+
+        self.debugger.error_signal.connect(
+            self.handle_error
         )
 
     def connect_expression_viewer_signals(self):
@@ -615,6 +620,10 @@ class Pugdebug(QObject):
         """
         if self.debugger.is_connected():
             self.debugger.evaluate_expression(index, expression)
+
+    def handle_error(self, error):
+        em = QErrorMessage(self.main_window)
+        em.showMessage(error)
 
     def __get_path_mapped_to_local(self, path, map_paths=True):
         """Get a path mapped to local

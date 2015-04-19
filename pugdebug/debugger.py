@@ -34,6 +34,8 @@ class PugdebugDebugger(QObject):
     expression_evaluated_signal = pyqtSignal(int, dict)
     expressions_evaluated_signal = pyqtSignal(list)
 
+    error_signal = pyqtSignal(str)
+
     def __init__(self):
         """Init the debugger object
 
@@ -111,9 +113,12 @@ class PugdebugDebugger(QObject):
 
         Emit a debugging started signal.
         """
-        self.init_message = init_message
+        if 'error' not in init_message:
+            self.init_message = init_message
 
-        self.debugging_started_signal.emit()
+            self.debugging_started_signal.emit()
+        else:
+            self.error_signal.emit(init_message['error'])
 
     def cancel_debug(self):
         self.server.cancel()
