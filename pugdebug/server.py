@@ -207,16 +207,24 @@ class PugdebugServer(QThread):
             socket_server.bind((host, port_number))
             socket_server.listen(5)
 
-            while self.wait_for_accept:
-                try:
-                    self.sock, address = socket_server.accept()
-                    self.sock.settimeout(None)
-                    self.wait_for_accept = False
-                except socket.timeout:
-                    pass
+            response = False
 
-            self.is_waiting = False
-            response = self.__init_connection()
+            while response is False:
+                while self.wait_for_accept:
+                    try:
+                        self.sock, address = socket_server.accept()
+                        self.sock.settimeout(None)
+                        self.wait_for_accept = False
+                    except socket.timeout:
+                        pass
+                self.is_waiting = False
+                response = self.__init_connection()
+
+                if response is False:
+                    self.sock.close()
+                    self.wait_for_accept = True
+                    self.is_waiting = True
+
         except OSError:
             print(OSError.strerror())
             print("Socket bind failed")
@@ -229,9 +237,15 @@ class PugdebugServer(QThread):
         if self.sock is None:
             return
 
+        idekey = get_setting('debugger/idekey')
+
         response = self.__receive_message()
 
         init_message = self.parser.parse_init_message(response)
+
+        # See if the init message from xdebug is meant for us
+        if idekey != '' and init_message['idekey'] != idekey:
+            return False
 
         command = 'feature_set -i %d -n max_depth -v 9' % (
             self.__get_transaction_id()
