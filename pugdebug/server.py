@@ -250,9 +250,8 @@ class PugdebugServer(QThread):
                     self.wait_for_accept = False
                     self.is_waiting = False
 
-        except OSError:
-            print(OSError.strerror())
-            print("Socket bind failed")
+        except OSError as e:
+            response = {'error': e.strerror}
         finally:
             socket_server.close()
 
