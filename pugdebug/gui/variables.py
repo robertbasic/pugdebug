@@ -92,10 +92,10 @@ class PugdebugVariableViewer(QTabWidget):
         if type == 'object':
             type = variable['classname']
 
-        if type == 'array':
+        if type == 'array' and 'numchildren' in variable:
             type = "%s {%d}" % (type, int(variable['numchildren']))
 
-        if type == 'string':
+        if type == 'string' and 'size' in variable:
             type = "%s {%d}" % (type, int(variable['size']))
             tooltip = "Double click to inspect"
 
