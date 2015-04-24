@@ -58,7 +58,7 @@ propely set up for remote debugging.
 A minimal configuration would be something like:
 
 ```
-xdebug.idekey=netbeans-xdebug
+xdebug.idekey=pugdebug
 xdebug.remote_enable=1
 xdebug.remote_port=9000
 xdebug.remote_host=127.0.0.1
@@ -68,7 +68,7 @@ If the project you want to debug is in a vagrant virtual machine, your xdebug
 config should be something like:
 
 ```
-xdebug.idekey=netbeans-xdebug
+xdebug.idekey=pugdebug
 xdebug.remote_enable=1
 xdebug.remote_port=9000
 xdebug.remote_connect_back=1
@@ -79,7 +79,7 @@ Do note that when debugging CLI scripts from a vagrant virtual machine, the
 `remote_host` setting. The xdebug configuration should look something like:
 
 ```
-xdebug.idekey=netbeans-xdebug
+xdebug.idekey=pugdebug
 xdebug.remote_enable=1
 xdebug.remote_port=9000
 xdebug.remote_host=33.33.33.1
@@ -154,7 +154,7 @@ Start pugdebug as stated in the previous section, click `Start` to
 start a debugging session and then in a second terminal type:
 
 ```
-export XDEBUG_CONFIG="idekey=netbeans-xdebug"
+export XDEBUG_CONFIG="idekey=pugdebug"
 ```
 
 (or whatever you set the `xdebug.idekey` setting to) and then start
