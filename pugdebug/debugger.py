@@ -9,6 +9,7 @@
 
 __author__ = "robertbasic"
 
+from collections import deque
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from pugdebug.server import PugdebugServer
@@ -16,6 +17,9 @@ from pugdebug.server import PugdebugServer
 
 class PugdebugDebugger(QObject):
     server = None
+
+    connections = deque()
+    current_connection = None
 
     init_message = None
     step_result = ''
@@ -54,52 +58,67 @@ class PugdebugDebugger(QObject):
         self.server.server_cancelled_signal.connect(
             self.handle_server_cancelled
         )
-        self.server.server_stopped_signal.connect(self.handle_server_stopped)
-        self.server.server_detached_signal.connect(
-            self.handle_server_detached
+
+    def connect_connection_signals(self, connection):
+        connection.server_stopped_signal.connect(
+            self.handle_server_stopped
         )
-        self.server.server_stepped_signal.connect(self.handle_server_stepped)
-        self.server.server_got_variables_signal.connect(
+        connection.server_detached_signal.connect(
+            self.handle_server_stopped
+        )
+
+        connection.server_stepped_signal.connect(
+            self.handle_server_stepped
+        )
+
+        connection.server_got_variables_signal.connect(
             self.handle_server_got_variables
         )
-        self.server.server_got_stacktraces_signal.connect(
+
+        connection.server_got_stacktraces_signal.connect(
             self.handle_server_got_stacktraces
         )
-        self.server.server_set_init_breakpoints_signal.connect(
+
+        connection.server_set_init_breakpoints_signal.connect(
             self.handle_server_set_breakpoint
         )
-        self.server.server_set_breakpoint_signal.connect(
+        connection.server_set_breakpoint_signal.connect(
             self.handle_server_set_breakpoint
         )
-        self.server.server_removed_breakpoint_signal.connect(
+        connection.server_removed_breakpoint_signal.connect(
             self.handle_server_removed_breakpoint
         )
-        self.server.server_listed_breakpoints_signal.connect(
+        connection.server_listed_breakpoints_signal.connect(
             self.handle_server_listed_breakpoints
         )
 
-        self.server.server_expression_evaluated_signal.connect(
+        connection.server_expression_evaluated_signal.connect(
             self.handle_server_expression_evaluated
         )
-        self.server.server_expressions_evaluated_signal.connect(
+        connection.server_expressions_evaluated_signal.connect(
             self.handle_server_expressions_evaluated
         )
 
     def cleanup(self):
         """Cleanup debugger when it's done
         """
-        if self.server.is_connected():
-            self.server.disconnect()
+        if self.is_connected():
+            self.current_connection.disconnect()
+            self.server.cancel()
 
+        self.current_connection = None
         self.step_result = ''
         self.current_file = ''
         self.current_line = 0
 
     def is_connected(self):
-        return self.server.is_connected()
+        return self.current_connection is not None
+
+    def has_pending_connections(self):
+        return len(self.connections) > 0
 
     def is_waiting_for_connection(self):
-        return self.server.is_waiting_for_connection()
+        return len(self.connections) == 0
 
     def start_debug(self):
         """Start a debugging session
@@ -108,17 +127,24 @@ class PugdebugDebugger(QObject):
         """
         self.server.connect()
 
-    def handle_server_connected(self, init_message):
+    def handle_server_connected(self, connection):
         """Handle when server gets connected
 
         Emit a debugging started signal.
         """
-        if 'error' not in init_message:
-            self.init_message = init_message
+        self.connect_connection_signals(connection)
 
-            self.debugging_started_signal.emit()
-        else:
-            self.error_signal.emit(init_message['error'])
+        self.connections.append(connection)
+
+        if self.current_connection is None:
+            self.start_new_connection()
+
+    def start_new_connection(self):
+        connection = self.connections.popleft()
+        self.init_message = connection.init_message
+        self.current_connection = connection
+
+        self.debugging_started_signal.emit()
 
     def cancel_debug(self):
         self.server.cancel()
@@ -129,40 +155,34 @@ class PugdebugDebugger(QObject):
     def stop_debug(self):
         """Stop a debugging session
         """
-        self.server.stop()
+        self.current_connection.stop()
+
+    def detach_debug(self):
+        """Detach a debugging session
+        """
+        self.current_connection.detach()
 
     def handle_server_stopped(self):
         """Handle when server gets disconnected
 
         Emit a debugging stopped signal.
         """
-        self.debugging_stopped_signal.emit()
-
-    def detach_debug(self):
-        """Detach a debugging session
-        """
-        self.server.detach()
-
-    def handle_server_detached(self):
-        """Handle when server gets ditached
-
-        Emit a debugging stopped signal, as the
-        debugger should behave the same like when
-        a debugging session is stopped.
-        """
-        self.debugging_stopped_signal.emit()
+        if self.has_pending_connections():
+            self.start_new_connection()
+        else:
+            self.debugging_stopped_signal.emit()
 
     def run_debug(self):
-        self.server.step_run()
+        self.current_connection.step_run()
 
     def step_over(self):
-        self.server.step_over()
+        self.current_connection.step_over()
 
     def step_into(self):
-        self.server.step_into()
+        self.current_connection.step_into()
 
     def step_out(self):
-        self.server.step_out()
+        self.current_connection.step_out()
 
     def handle_server_stepped(self, step_result):
         """Handle when server executes a step command
@@ -174,7 +194,7 @@ class PugdebugDebugger(QObject):
         self.step_command_signal.emit()
 
     def post_step_command(self, post_step_data):
-        self.server.post_step_command(post_step_data)
+        self.current_connection.post_step_command(post_step_data)
 
     def handle_server_got_variables(self, variables):
         """Handle when server recieves all variables
@@ -191,23 +211,23 @@ class PugdebugDebugger(QObject):
         self.got_stacktraces_signal.emit(stacktraces)
 
     def set_init_breakpoints(self, breakpoints):
-        self.server.set_init_breakpoints(breakpoints)
+        self.current_connection.set_init_breakpoints(breakpoints)
 
     def set_breakpoint(self, breakpoint):
-        self.server.set_breakpoint(breakpoint)
+        self.current_connection.set_breakpoint(breakpoint)
 
     def handle_server_set_breakpoint(self, successful):
         if successful:
             self.list_breakpoints()
 
     def remove_breakpoint(self, breakpoint_id):
-        self.server.remove_breakpoint(breakpoint_id)
+        self.current_connection.remove_breakpoint(breakpoint_id)
 
     def handle_server_removed_breakpoint(self, breakpoint_id):
         self.breakpoint_removed_signal.emit(breakpoint_id)
 
     def list_breakpoints(self):
-        self.server.list_breakpoints()
+        self.current_connection.list_breakpoints()
 
     def handle_server_listed_breakpoints(self, breakpoints):
         self.breakpoints_listed_signal.emit(breakpoints)
@@ -220,11 +240,11 @@ class PugdebugDebugger(QObject):
 
     def evaluate_expression(self, index, expression):
         """Evaluates a single expression"""
-        self.server.evaluate_expression(index, expression)
+        self.current_connection.evaluate_expression(index, expression)
 
     def evaluate_expressions(self, expressions):
         """Evaluates a list of expressions"""
-        self.server.evaluate_expressions(expressions)
+        self.current_connection.evaluate_expressions(expressions)
 
     def handle_server_expression_evaluated(self, index, result):
         """Handle when server evaluates an expression"""

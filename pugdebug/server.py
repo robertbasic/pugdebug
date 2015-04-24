@@ -22,24 +22,85 @@ class PugdebugServer(QThread):
 
     mutex = None
 
-    socket_server = None
-    sock = None
+    wait_for_accept = True
 
-    wait_for_accept = False
-    is_waiting = False
+    server_connected_signal = pyqtSignal(object)
+    server_cancelled_signal = pyqtSignal()
+
+    server_error_signal = pyqtSignal(str)
+
+    def __init__(self):
+        super(PugdebugServer, self).__init__()
+
+        self.mutex = QMutex()
+
+    def run(self):
+        self.mutex.lock()
+
+        self.__connect()
+
+        self.mutex.unlock()
+
+    def connect(self):
+        self.wait_for_accept = True
+        self.start()
+
+    def cancel(self):
+        self.wait_for_accept = False
+
+    def __connect(self):
+        socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        socket_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        socket_server.settimeout(1)
+
+        host = get_setting('debugger/host')
+        port_number = int(get_setting('debugger/port_number'))
+
+        try:
+            socket_server.bind((host, port_number))
+            socket_server.listen(5)
+
+            while self.wait_for_accept:
+                try:
+                    sock, address = socket_server.accept()
+                    sock.settimeout(None)
+
+                    if sock is not None:
+                        connection = PugdebugServerConnection(sock)
+                        connection.init_connection()
+
+                        if connection.is_valid:
+                            self.server_connected_signal.emit(connection)
+                except socket.timeout:
+                    pass
+
+        except OSError as e:
+            self.server_error_signal.emit(e.strerror)
+        finally:
+            socket_server.close()
+
+        if not self.wait_for_accept:
+            self.server_cancelled_signal.emit()
+
+
+class PugdebugServerConnection(QThread):
+
+    socket = None
+
+    mutex = None
 
     parser = None
 
     action = None
-
     data = None
+
+    is_valid = False
+    init_message = None
 
     transaction_id = 0
 
     xdebug_encoding = 'iso-8859-1'
 
-    server_connected_signal = pyqtSignal(dict)
-    server_cancelled_signal = pyqtSignal()
     server_stopped_signal = pyqtSignal()
     server_detached_signal = pyqtSignal()
     server_stepped_signal = pyqtSignal(dict)
@@ -52,11 +113,47 @@ class PugdebugServer(QThread):
     server_expression_evaluated_signal = pyqtSignal(int, dict)
     server_expressions_evaluated_signal = pyqtSignal(list)
 
-    def __init__(self):
-        super(PugdebugServer, self).__init__()
+    def __init__(self, socket):
+        super(PugdebugServerConnection, self).__init__()
+
+        self.socket = socket
 
         self.mutex = QMutex()
+
         self.parser = PugdebugMessageParser()
+
+    def init_connection(self):
+        """
+        No need to do this in a new thread, it is already inside
+        a thread separate from the main thread.
+        """
+        idekey = get_setting('debugger/idekey')
+
+        response = self.__receive_message()
+
+        init_message = self.parser.parse_init_message(response)
+
+        # See if the init message from xdebug is meant for us
+        if idekey != '' and init_message['idekey'] != idekey:
+            self.is_valid = False
+
+        command = 'feature_set -i %d -n max_depth -v 9' % (
+            self.__get_transaction_id()
+        )
+        response = self.__send_command(command)
+
+        command = 'feature_set -i %d -n max_children -v 512' % (
+            self.__get_transaction_id()
+        )
+        response = self.__send_command(command)
+
+        command = 'feature_set -i %d -n max_data -v 4096' % (
+            self.__get_transaction_id()
+        )
+        response = self.__send_command(command)
+
+        self.is_valid = True
+        self.init_message = init_message
 
     def run(self):
         self.mutex.lock()
@@ -64,13 +161,7 @@ class PugdebugServer(QThread):
         data = self.data
         action = self.action
 
-        if action == 'connect':
-            response = self.__connect_server()
-            if response is not None:
-                self.server_connected_signal.emit(response)
-            else:
-                self.server_cancelled_signal.emit()
-        elif action == 'stop':
+        if action == 'stop':
             response = self.__stop()
             self.server_stopped_signal.emit()
         elif action == 'detach':
@@ -115,25 +206,9 @@ class PugdebugServer(QThread):
 
         self.mutex.unlock()
 
-    def connect(self):
-        self.is_waiting = True
-        self.wait_for_accept = True
-        self.action = 'connect'
-        self.start()
-
-    def cancel(self):
-        self.wait_for_accept = False
-
-    def is_connected(self):
-        return self.sock is not None
-
-    def is_waiting_for_connection(self):
-        return self.is_waiting
-
     def disconnect(self):
-        if self.sock is not None:
-            self.sock.close()
-            self.sock = None
+        if self.socket is not None:
+            self.socket.close()
 
     def stop(self):
         self.action = 'stop'
@@ -187,118 +262,6 @@ class PugdebugServer(QThread):
         self.action = 'evaluate_expression'
         self.data = (index, expression)
         self.start()
-
-    def __connect_server(self):
-        """Connect to a server
-
-        We listen to incomming connections and at the same time try
-        to distinguish two different things.
-
-        First, if a connection is accepted, see if we are interested
-        in it at all by checking if our idekey matches with what
-        xdebug sent us back. If the idekeys match, return the init
-        message and carry on. If the idekeys do not match, discard
-        the socket and continue listening to other incomming connections.
-
-        Second, while waiting for a connection to be accepted, also
-        check did the user requested for canceling the connection to
-        the server by unsetting the wait_for_accept flag.
-        """
-        socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        socket_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        socket_server.settimeout(1)
-
-        response = None
-
-        # Read the host from settings
-        host = get_setting('debugger/host')
-        # Read the port number from settings
-        port_number = int(get_setting('debugger/port_number'))
-
-        try:
-            socket_server.bind((host, port_number))
-            socket_server.listen(5)
-
-            while response is None:
-                # As long as the wait_for_accept flag is set
-                # try accepting the socket
-                # if the wait_for_accept flag is unset
-                # it means a cancel connection was requested
-                while self.wait_for_accept:
-                    try:
-                        self.sock, address = socket_server.accept()
-                        self.sock.settimeout(None)
-                        # If we accepted a socket, break out of the inner
-                        # while loop, so we can check if we are accepting
-                        # for the current idekey
-                        if self.sock is not None:
-                            break
-                    except socket.timeout:
-                        pass
-
-                try:
-                    response = self.__init_connection()
-                except RuntimeError:
-                    break
-
-                # Probably got a response but for a different idekey
-                # discard socket and continue waiting for a connection
-                if response is None:
-                    self.disconnect()
-                    self.wait_for_accept = True
-                else:
-                    self.wait_for_accept = False
-                    self.is_waiting = False
-
-        except OSError as e:
-            response = {'error': e.strerror}
-        finally:
-            socket_server.close()
-
-        return response
-
-    def __init_connection(self):
-        """Init the connection with the debugger
-
-        Receives the init message from the debugger.
-
-        Sets features for max_depth, max_children and
-        max_data.
-
-        If an init message is received, but has a different
-        idekey than what we set, returns None.
-
-        Otherwise returns the init message.
-        """
-        if self.sock is None:
-            raise RuntimeError("Can't init connection without a socket")
-
-        idekey = get_setting('debugger/idekey')
-
-        response = self.__receive_message()
-
-        init_message = self.parser.parse_init_message(response)
-
-        # See if the init message from xdebug is meant for us
-        if idekey != '' and init_message['idekey'] != idekey:
-            return None
-
-        command = 'feature_set -i %d -n max_depth -v 9' % (
-            self.__get_transaction_id()
-        )
-        response = self.__send_command(command)
-
-        command = 'feature_set -i %d -n max_children -v 512' % (
-            self.__get_transaction_id()
-        )
-        response = self.__send_command(command)
-
-        command = 'feature_set -i %d -n max_data -v 4096' % (
-            self.__get_transaction_id()
-        )
-        response = self.__send_command(command)
-
-        return init_message
 
     def __stop(self):
         command = 'stop -i %d' % self.__get_transaction_id()
@@ -429,7 +392,7 @@ class PugdebugServer(QThread):
         return self.parser.parse_eval_message(response)
 
     def __send_command(self, command):
-        self.sock.send(bytes(command + '\0', 'utf-8'))
+        self.socket.send(bytes(command + '\0', 'utf-8'))
         return self.__receive_message()
 
     def __receive_message(self):
@@ -442,7 +405,7 @@ class PugdebugServer(QThread):
         length = ''
 
         while True:
-            character = self.sock.recv(1)
+            character = self.socket.recv(1)
 
             if self.__is_eof(character):
                 self.disconnect()
@@ -459,7 +422,7 @@ class PugdebugServer(QThread):
         body = ''
 
         while length > 0:
-            data = self.sock.recv(length)
+            data = self.socket.recv(length)
 
             if self.__is_eof(data):
                 self.disconnect()
@@ -474,7 +437,7 @@ class PugdebugServer(QThread):
 
     def __get_null(self):
         while True:
-            character = self.sock.recv(1)
+            character = self.socket.recv(1)
 
             if self.__is_eof(character):
                 self.disconnect()
