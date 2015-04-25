@@ -9,10 +9,13 @@
 
 __author__ = "robertbasic"
 
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
 
 class PugdebugStacktraceViewer(QTreeWidget):
+
+    item_double_clicked_signal = pyqtSignal(str, int)
 
     def __init__(self):
         super(PugdebugStacktraceViewer, self).__init__()
@@ -22,6 +25,8 @@ class PugdebugStacktraceViewer(QTreeWidget):
 
         self.setColumnWidth(0, 350)
         self.setColumnWidth(1, 100)
+
+        self.itemDoubleClicked.connect(self.handle_item_double_clicked)
 
     def set_stacktraces(self, stacktraces):
         self.clear()
@@ -35,3 +40,9 @@ class PugdebugStacktraceViewer(QTreeWidget):
             item = QTreeWidgetItem(args)
 
             self.addTopLevelItem(item)
+
+    def handle_item_double_clicked(self, item, column):
+        file = item.text(0)
+        line = int(item.text(1))
+
+        self.item_double_clicked_signal.emit(file, line)
