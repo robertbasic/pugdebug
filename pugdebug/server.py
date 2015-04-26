@@ -19,13 +19,12 @@ from pugdebug.models.settings import get_setting
 
 
 class PugdebugServer(QThread):
-
     mutex = None
 
     wait_for_accept = True
 
     server_connected_signal = pyqtSignal(object)
-    server_cancelled_signal = pyqtSignal()
+    server_stopped_signal = pyqtSignal()
 
     server_error_signal = pyqtSignal(str)
 
@@ -45,7 +44,7 @@ class PugdebugServer(QThread):
         self.wait_for_accept = True
         self.start()
 
-    def cancel(self):
+    def stop(self):
         self.wait_for_accept = False
 
     def __connect(self):
@@ -80,7 +79,7 @@ class PugdebugServer(QThread):
             socket_server.close()
 
         if not self.wait_for_accept:
-            self.server_cancelled_signal.emit()
+            self.server_stopped_signal.emit()
 
 
 class PugdebugServerConnection(QThread):

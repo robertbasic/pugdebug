@@ -28,7 +28,6 @@ class PugdebugDebugger(QObject):
     current_line = 0
 
     debugging_started_signal = pyqtSignal()
-    debugging_cancelled_signal = pyqtSignal()
     debugging_stopped_signal = pyqtSignal()
     step_command_signal = pyqtSignal()
     got_all_variables_signal = pyqtSignal(object)
@@ -55,8 +54,8 @@ class PugdebugDebugger(QObject):
         self.server.server_connected_signal.connect(
             self.handle_server_connected
         )
-        self.server.server_cancelled_signal.connect(
-            self.handle_server_cancelled
+        self.server.server_stopped_signal.connect(
+            self.handle_server_stopped
         )
 
     def connect_connection_signals(self, connection):
@@ -104,7 +103,7 @@ class PugdebugDebugger(QObject):
         """
         if self.is_connected():
             self.current_connection.disconnect()
-            self.server.cancel()
+            self.server.stop()
 
         self.current_connection = None
         self.step_result = ''
@@ -146,16 +145,13 @@ class PugdebugDebugger(QObject):
 
         self.debugging_started_signal.emit()
 
-    def cancel_debug(self):
-        self.server.cancel()
-
-    def handle_server_cancelled(self):
-        self.debugging_cancelled_signal.emit()
-
     def stop_debug(self):
         """Stop a debugging session
         """
-        self.current_connection.stop()
+        if self.is_connected():
+            self.current_connection.stop()
+        else:
+            self.server.stop()
 
     def detach_debug(self):
         """Detach a debugging session
