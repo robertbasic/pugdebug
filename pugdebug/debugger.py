@@ -134,7 +134,7 @@ class PugdebugDebugger(QObject):
 
         self.connections.append(connection)
 
-        if self.current_connection is None:
+        if not self.is_connected():
             self.start_new_connection()
 
     def start_new_connection(self):
