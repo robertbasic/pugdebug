@@ -66,9 +66,9 @@ class PugdebugServer(QThread):
 
                     if sock is not None:
                         connection = PugdebugServerConnection(sock)
-                        connection.init_connection()
+                        is_valid = connection.init_connection()
 
-                        if connection.is_valid:
+                        if is_valid:
                             self.server_connected_signal.emit(connection)
                 except socket.timeout:
                     pass
@@ -134,7 +134,7 @@ class PugdebugServerConnection(QThread):
 
         # See if the init message from xdebug is meant for us
         if idekey != '' and init_message['idekey'] != idekey:
-            self.is_valid = False
+            return False
 
         command = 'feature_set -i %d -n max_depth -v 9' % (
             self.__get_transaction_id()
@@ -151,8 +151,9 @@ class PugdebugServerConnection(QThread):
         )
         response = self.__send_command(command)
 
-        self.is_valid = True
         self.init_message = init_message
+
+        return True
 
     def run(self):
         self.mutex.lock()
