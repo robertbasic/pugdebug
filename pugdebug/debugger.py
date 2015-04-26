@@ -117,9 +117,6 @@ class PugdebugDebugger(QObject):
     def has_pending_connections(self):
         return len(self.connections) > 0
 
-    def is_waiting_for_connection(self):
-        return len(self.connections) == 0
-
     def start_debug(self):
         """Start a debugging session
 
