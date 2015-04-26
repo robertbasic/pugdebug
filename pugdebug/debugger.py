@@ -104,7 +104,8 @@ class PugdebugDebugger(QObject):
         if self.is_connected():
             self.current_connection.disconnect()
             self.connections.clear()
-            self.server.stop()
+
+        self.server.stop()
 
         self.current_connection = None
         self.step_result = ''
