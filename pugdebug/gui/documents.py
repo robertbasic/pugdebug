@@ -11,7 +11,7 @@ __author__ = "robertbasic"
 
 
 from PyQt5.QtWidgets import QTabWidget
-
+from pugdebug.gui.widgets.tabbar import PugdebugTabBar;
 
 class PugdebugDocumentViewer(QTabWidget):
 
@@ -19,6 +19,11 @@ class PugdebugDocumentViewer(QTabWidget):
 
     def __init__(self):
         super(PugdebugDocumentViewer, self).__init__()
+
+        # Use the extended tab bar wiget to have middle click close tabs
+        self.tab_bar = PugdebugTabBar()
+        self.tab_bar.middle_clicked_signal.connect(self.close_tab)
+        self.setTabBar(self.tab_bar)
 
         self.setTabsClosable(True)
 
