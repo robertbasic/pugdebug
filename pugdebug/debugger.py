@@ -16,6 +16,7 @@ from pugdebug.server import PugdebugServer
 
 
 class PugdebugDebugger(QObject):
+
     server = None
 
     connections = deque()
@@ -42,15 +43,20 @@ class PugdebugDebugger(QObject):
     def __init__(self):
         """Init the debugger object
 
-        Create a PugdebugServer object used to communicate with xdebug client
-        through TCP.
+        Create a PugdebugServer objects that listens to new connections
+        from xdebug.
 
-        Connect signals to slots.
+        Connect server signals to slots.
         """
         super(PugdebugDebugger, self).__init__()
 
         self.server = PugdebugServer()
 
+        self.connect_server_signals()
+
+    def connect_server_signals(self):
+        """Connect server signals to slots
+        """
         self.server.server_connected_signal.connect(
             self.handle_server_connected
         )
@@ -59,6 +65,15 @@ class PugdebugDebugger(QObject):
         )
 
     def connect_connection_signals(self, connection):
+        """Connect signals for a new connection
+
+        Connect signals that gets emitted when a connection is stopped
+        or detached, when a step command is done, when variables are read,
+        when stacktraces are read, when breakpoints are set or removed,
+        when breakpoints are read, when expressions are evaluated.
+        """
+
+        # Stop/detach signals
         connection.server_stopped_signal.connect(
             self.handle_server_stopped
         )
@@ -66,18 +81,22 @@ class PugdebugDebugger(QObject):
             self.handle_server_stopped
         )
 
+        # Step command signals
         connection.server_stepped_signal.connect(
             self.handle_server_stepped
         )
 
+        # Variables signals
         connection.server_got_variables_signal.connect(
             self.handle_server_got_variables
         )
 
+        # Stacktraces signals
         connection.server_got_stacktraces_signal.connect(
             self.handle_server_got_stacktraces
         )
 
+        # Breakpoints signals
         connection.server_set_init_breakpoints_signal.connect(
             self.handle_server_set_breakpoint
         )
@@ -91,6 +110,7 @@ class PugdebugDebugger(QObject):
             self.handle_server_listed_breakpoints
         )
 
+        # Expressions signals
         connection.server_expression_evaluated_signal.connect(
             self.handle_server_expression_evaluated
         )
@@ -100,6 +120,13 @@ class PugdebugDebugger(QObject):
 
     def cleanup(self):
         """Cleanup debugger when it's done
+
+        If there is an active connection, disconnect from it and clear
+        all the remaining connections.
+
+        Stop the server from listening.
+
+        Clean up attributes.
         """
         if self.is_connected():
             self.current_connection.disconnect()
@@ -113,9 +140,13 @@ class PugdebugDebugger(QObject):
         self.current_line = 0
 
     def is_connected(self):
+        """Is there an active connection
+        """
         return self.current_connection is not None
 
     def has_pending_connections(self):
+        """Are there any pending connections?
+        """
         return len(self.connections) > 0
 
     def start_debug(self):
@@ -126,9 +157,13 @@ class PugdebugDebugger(QObject):
         self.server.connect()
 
     def handle_server_connected(self, connection):
-        """Handle when server gets connected
+        """Handle when the server establishes a new connection
 
-        Emit a debugging started signal.
+        Connect the signals for the new connection.
+
+        Add it to the queue of connections.
+
+        If there is no active connection, start the new connection.
         """
         self.connect_connection_signals(connection)
 
@@ -138,6 +173,12 @@ class PugdebugDebugger(QObject):
             self.start_new_connection()
 
     def start_new_connection(self):
+        """Start a new connection
+
+        Get the first (oldest) connection from the queue, set it's init
+        message as the init message for the session, set it as the current
+        connection and emit the debugging started signal.
+        """
         connection = self.connections.popleft()
         self.init_message = connection.init_message
         self.current_connection = connection
@@ -146,6 +187,9 @@ class PugdebugDebugger(QObject):
 
     def stop_debug(self):
         """Stop a debugging session
+
+        If there is an active connection, stop only that one, otherwise
+        stop the server from listening to new connections.
         """
         if self.is_connected():
             self.current_connection.stop()
@@ -153,15 +197,17 @@ class PugdebugDebugger(QObject):
             self.server.stop()
 
     def detach_debug(self):
-        """Detach a debugging session
+        """Detach the current connection
         """
         if self.is_connected():
             self.current_connection.detach()
 
     def handle_server_stopped(self):
-        """Handle when server gets disconnected
+        """Handle when a server stopped signal is received
 
-        Emit a debugging stopped signal.
+        If there are pending connections, start a new one.
+
+        Otherwise clean up and emit a server stopped signal.
         """
         if self.has_pending_connections():
             self.start_new_connection()

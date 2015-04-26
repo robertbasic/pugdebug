@@ -48,6 +48,13 @@ class PugdebugServer(QThread):
         self.wait_for_accept = False
 
     def __connect(self):
+        """Connect to the server and listen to new incomming connections
+
+        For every accepted connection, see if it is valid and emit a signal
+        with that new connection.
+
+        Otherwise silently disregard that connection.
+        """
         socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         socket_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         socket_server.settimeout(1)
@@ -122,9 +129,14 @@ class PugdebugServerConnection(QThread):
         self.parser = PugdebugMessageParser()
 
     def init_connection(self):
-        """
-        No need to do this in a new thread, it is already inside
-        a thread separate from the main thread.
+        """Init a new connection
+
+        Read in the init message from xdebug and decide based on the
+        idekey should this connection be accepted or not.
+
+        Do note that it is not needed to call it from a new thread, as
+        it is already called from a thread separate from the main application
+        thread and thus should not block the main thread.
         """
         idekey = get_setting('debugger/idekey')
 
