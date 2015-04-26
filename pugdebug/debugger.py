@@ -156,7 +156,8 @@ class PugdebugDebugger(QObject):
     def detach_debug(self):
         """Detach a debugging session
         """
-        self.current_connection.detach()
+        if self.is_connected():
+            self.current_connection.detach()
 
     def handle_server_stopped(self):
         """Handle when server gets disconnected
@@ -166,6 +167,8 @@ class PugdebugDebugger(QObject):
         if self.has_pending_connections():
             self.start_new_connection()
         else:
+            self.cleanup()
+
             self.debugging_stopped_signal.emit()
 
     def run_debug(self):

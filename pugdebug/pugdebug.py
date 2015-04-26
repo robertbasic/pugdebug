@@ -369,8 +369,6 @@ class Pugdebug(QObject):
         This handler should be called when the connection to
         xdebug is terminated.
         """
-        self.debugger.cleanup()
-
         # Only set breakpoints as init_breakpoints
         # if there are any breakpoints set
         if len(self.breakpoints) > 0:
@@ -389,8 +387,7 @@ class Pugdebug(QObject):
         The debugging session will end, but the debuged script
         will terminate normally.
         """
-        if self.debugger.is_connected():
-            self.debugger.detach_debug()
+        self.debugger.detach_debug()
 
     def handle_step_command(self):
         """Handle step command
