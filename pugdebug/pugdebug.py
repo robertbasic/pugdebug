@@ -136,38 +136,45 @@ class Pugdebug(QObject):
     def connect_debugger_signals(self):
         """Connect debugger signals
 
-        Connect signal that gets emitted when the debugging is started.
+        Connecting signals that get emitted when a session starts or stops,
+        when a step command is completed, when variables are read, when
+        stacktraces are read, when a breakpoint gets removed, when breakpoints
+        are read, when one or more expressions are evaluated.
 
-        Connect signal that gets emmitted when the debugging is stopped.
-
-        Connect signal that gets emitted when a step command is execute.
-
-        Connect signal that gets emitted when all variables from xdebug are
-        read.
+        Connect signal that gets emitted when an error happens during the
+        debugging session.
         """
 
+        # Start/stop signals
         self.debugger.debugging_started_signal.connect(
             self.handle_debugging_started
         )
         self.debugger.debugging_stopped_signal.connect(
             self.handle_debugging_stopped
         )
-        self.debugger.debugging_cancelled_signal.connect(
-            self.handle_debugging_stopped
-        )
+
+        # Step command signals
         self.debugger.step_command_signal.connect(self.handle_step_command)
+
+        # Variables signals
         self.debugger.got_all_variables_signal.connect(
             self.handle_got_all_variables
         )
+
+        # Stacktraces signals
         self.debugger.got_stacktraces_signal.connect(
             self.handle_got_stacktraces
         )
+
+        # Breakpoints signals
         self.debugger.breakpoint_removed_signal.connect(
             self.handle_breakpoint_removed
         )
         self.debugger.breakpoints_listed_signal.connect(
             self.handle_breakpoints_listed
         )
+
+        # Expression signals
         self.debugger.expression_evaluated_signal.connect(
             self.handle_expression_evaluated
         )
@@ -175,6 +182,7 @@ class Pugdebug(QObject):
             self.handle_expressions_evaluated
         )
 
+        # Error signals
         self.debugger.error_signal.connect(
             self.handle_error
         )
@@ -342,9 +350,12 @@ class Pugdebug(QObject):
     def handle_debugging_started(self):
         """Handle when debugging starts
 
-        This handler should be called when the connection to
-        xdebug is established and the initial message from xdebug
-        is read.
+        This handle should be called when a new connection is
+        established with xdebug.
+
+        When debugging multiple requests, for example ajax requests,
+        this should be called for every request, as every request
+        has its own connection.
 
         Sets initial breakpoints, breakpoints that were set before the
         debugging session started.
@@ -362,12 +373,13 @@ class Pugdebug(QObject):
     def stop_debug(self):
         """Stop a debugging session
 
-        Stop the currently active debugging session (if any).
+        If the debugging session has a currently active connection,
+        it will stop that connection.
+
+        If there is no active connections, the debugging session will
+        tell the server to stop listening to new connections.
         """
-        if self.debugger.is_connected():
-            self.debugger.stop_debug()
-        elif self.debugger.is_waiting_for_connection():
-            self.debugger.cancel_debug()
+        self.debugger.stop_debug()
 
     def handle_debugging_stopped(self):
         """Handle when debugging stops
@@ -375,8 +387,6 @@ class Pugdebug(QObject):
         This handler should be called when the connection to
         xdebug is terminated.
         """
-        self.debugger.cleanup()
-
         # Only set breakpoints as init_breakpoints
         # if there are any breakpoints set
         if len(self.breakpoints) > 0:
@@ -395,8 +405,7 @@ class Pugdebug(QObject):
         The debugging session will end, but the debuged script
         will terminate normally.
         """
-        if self.debugger.is_connected():
-            self.debugger.detach_debug()
+        self.debugger.detach_debug()
 
     def handle_step_command(self):
         """Handle step command
