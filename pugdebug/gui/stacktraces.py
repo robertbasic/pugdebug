@@ -9,7 +9,7 @@
 
 __author__ = "robertbasic"
 
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
 

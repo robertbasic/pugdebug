@@ -157,7 +157,7 @@ class PugdebugExpressionViewer(QWidget):
         value = self.decode_value(variable)
 
         item = parent.child(index)
-        if item == None:
+        if item is None:
             # Item does not exist, create it
             item = QTreeWidgetItem([name, type, value])
             parent.insertChild(index, item)
