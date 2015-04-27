@@ -74,48 +74,48 @@ class PugdebugDebugger(QObject):
         """
 
         # Stop/detach signals
-        connection.server_stopped_signal.connect(
-            self.handle_server_stopped
+        connection.stopped_signal.connect(
+            self.handle_stopped
         )
-        connection.server_detached_signal.connect(
-            self.handle_server_stopped
+        connection.detached_signal.connect(
+            self.handle_stopped
         )
 
         # Step command signals
-        connection.server_stepped_signal.connect(
-            self.handle_server_stepped
+        connection.stepped_signal.connect(
+            self.handle_stepped
         )
 
         # Variables signals
-        connection.server_got_variables_signal.connect(
-            self.handle_server_got_variables
+        connection.got_variables_signal.connect(
+            self.handle_got_variables
         )
 
         # Stacktraces signals
-        connection.server_got_stacktraces_signal.connect(
-            self.handle_server_got_stacktraces
+        connection.got_stacktraces_signal.connect(
+            self.handle_got_stacktraces
         )
 
         # Breakpoints signals
-        connection.server_set_init_breakpoints_signal.connect(
-            self.handle_server_set_breakpoint
+        connection.set_init_breakpoints_signal.connect(
+            self.handle_set_breakpoint
         )
-        connection.server_set_breakpoint_signal.connect(
-            self.handle_server_set_breakpoint
+        connection.set_breakpoint_signal.connect(
+            self.handle_set_breakpoint
         )
-        connection.server_removed_breakpoint_signal.connect(
-            self.handle_server_removed_breakpoint
+        connection.removed_breakpoint_signal.connect(
+            self.handle_removed_breakpoint
         )
-        connection.server_listed_breakpoints_signal.connect(
-            self.handle_server_listed_breakpoints
+        connection.listed_breakpoints_signal.connect(
+            self.handle_listed_breakpoints
         )
 
         # Expressions signals
-        connection.server_expression_evaluated_signal.connect(
-            self.handle_server_expression_evaluated
+        connection.expression_evaluated_signal.connect(
+            self.handle_expression_evaluated
         )
-        connection.server_expressions_evaluated_signal.connect(
-            self.handle_server_expressions_evaluated
+        connection.expressions_evaluated_signal.connect(
+            self.handle_expressions_evaluated
         )
 
     def cleanup(self):
@@ -202,7 +202,7 @@ class PugdebugDebugger(QObject):
         if self.is_connected():
             self.current_connection.detach()
 
-    def handle_server_stopped(self):
+    def handle_stopped(self):
         """Handle when a server stopped signal is received
 
         If there are pending connections, start a new one.
@@ -228,7 +228,7 @@ class PugdebugDebugger(QObject):
     def step_out(self):
         self.current_connection.step_out()
 
-    def handle_server_stepped(self, step_result):
+    def handle_stepped(self, step_result):
         """Handle when server executes a step command
 
         Save the result of the step command and emit
@@ -240,14 +240,14 @@ class PugdebugDebugger(QObject):
     def post_step_command(self, post_step_data):
         self.current_connection.post_step_command(post_step_data)
 
-    def handle_server_got_variables(self, variables):
+    def handle_got_variables(self, variables):
         """Handle when server recieves all variables
 
         Emit a signal with all variables received.
         """
         self.got_all_variables_signal.emit(variables)
 
-    def handle_server_got_stacktraces(self, stacktraces):
+    def handle_got_stacktraces(self, stacktraces):
         """Handle when server receives stacktraces
 
         Emit a signal with the stacktraces.
@@ -260,20 +260,20 @@ class PugdebugDebugger(QObject):
     def set_breakpoint(self, breakpoint):
         self.current_connection.set_breakpoint(breakpoint)
 
-    def handle_server_set_breakpoint(self, successful):
+    def handle_set_breakpoint(self, successful):
         if successful:
             self.list_breakpoints()
 
     def remove_breakpoint(self, breakpoint_id):
         self.current_connection.remove_breakpoint(breakpoint_id)
 
-    def handle_server_removed_breakpoint(self, breakpoint_id):
+    def handle_removed_breakpoint(self, breakpoint_id):
         self.breakpoint_removed_signal.emit(breakpoint_id)
 
     def list_breakpoints(self):
         self.current_connection.list_breakpoints()
 
-    def handle_server_listed_breakpoints(self, breakpoints):
+    def handle_listed_breakpoints(self, breakpoints):
         self.breakpoints_listed_signal.emit(breakpoints)
 
     def get_index_file(self):
@@ -290,11 +290,11 @@ class PugdebugDebugger(QObject):
         """Evaluates a list of expressions"""
         self.current_connection.evaluate_expressions(expressions)
 
-    def handle_server_expression_evaluated(self, index, result):
+    def handle_expression_evaluated(self, index, result):
         """Handle when server evaluates an expression"""
         self.expression_evaluated_signal.emit(index, result)
 
-    def handle_server_expressions_evaluated(self, results):
+    def handle_expressions_evaluated(self, results):
         """Handle when server evaluates a list of expressions"""
         self.expressions_evaluated_signal.emit(results)
 
