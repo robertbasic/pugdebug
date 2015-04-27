@@ -185,6 +185,11 @@ class PugdebugDebugger(QObject):
 
         self.debugging_started_signal.emit()
 
+    def handle_server_stopped(self):
+        if not self.is_connected():
+            self.cleanup()
+            self.debugging_stopped_signal.emit()
+
     def stop_debug(self):
         """Stop a debugging session
 
