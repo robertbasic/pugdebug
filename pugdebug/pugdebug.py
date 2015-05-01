@@ -168,6 +168,9 @@ class Pugdebug(QObject):
         )
 
         # Breakpoints signals
+        self.debugger.init_breakpoints_set.connect(
+            self.handle_init_breakpoints_set
+        )
         self.debugger.breakpoint_removed_signal.connect(
             self.handle_breakpoint_removed
         )
@@ -586,6 +589,15 @@ class Pugdebug(QObject):
             self.init_breakpoints = breakpoints
 
         self.breakpoint_viewer.set_breakpoints(breakpoints)
+
+    def handle_init_breakpoints_set(self):
+        """Handle when init breakpoints get set
+
+        If the code should not break at first line, run the debugger.
+        """
+        break_at_first_line = int(get_setting('debugger/break_at_first_line'))
+        if break_at_first_line == 0:
+            self.run_debug()
 
     def handle_breakpoint_removed(self, breakpoint_id):
         """Handle when a breakpoint gets removed
