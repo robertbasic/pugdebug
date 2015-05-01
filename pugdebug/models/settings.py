@@ -51,6 +51,11 @@ class PugdebugSettings():
         if not self.application_settings.contains('idekey'):
             self.application_settings.setValue('idekey', 'pugdebug')
 
+        if not self.application_settings.contains('break_at_first_line'):
+            # 2 is the init value because 1 is some weird
+            # between checked and unchecked state
+            self.application_settings.setValue('break_at_first_line', 2)
+
         self.application_settings.endGroup()
 
     def setup_path_settings(self):

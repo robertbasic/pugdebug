@@ -9,7 +9,8 @@
 
 __author__ = "robertbasic"
 
-from PyQt5.QtWidgets import QWidget, QLineEdit, QFormLayout, QSpinBox
+from PyQt5.QtWidgets import (QWidget, QLineEdit, QFormLayout,
+                             QSpinBox, QCheckBox)
 
 from pugdebug.models.settings import get_setting, set_setting
 
@@ -60,6 +61,15 @@ class PugdebugSettingsWindow(QWidget):
         idekey = get_setting('debugger/idekey')
         self.idekey.setText(idekey)
 
+        self.break_at_first_line = QCheckBox("Break at first line")
+
+        self.break_at_first_line.stateChanged.connect(
+            self.handle_break_at_first_line_changed
+        )
+
+        break_at_first_line = int(get_setting('debugger/break_at_first_line'))
+        self.break_at_first_line.setCheckState(break_at_first_line)
+
         layout = QFormLayout()
         self.setLayout(layout)
 
@@ -68,6 +78,7 @@ class PugdebugSettingsWindow(QWidget):
         layout.addRow("Host", self.host)
         layout.addRow("Port", self.port_number)
         layout.addRow("IDE Key", self.idekey)
+        layout.addRow("", self.break_at_first_line)
 
     def get_project_root(self):
         return self.project_root.text()
@@ -102,3 +113,6 @@ class PugdebugSettingsWindow(QWidget):
     def handle_idekey_changed(self):
         value = self.idekey.text()
         set_setting('debugger/idekey', value)
+
+    def handle_break_at_first_line_changed(self, value):
+        set_setting('debugger/break_at_first_line', value)

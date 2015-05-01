@@ -12,7 +12,7 @@ __author__ = "robertbasic"
 import os
 
 from PyQt5.QtCore import QObject
-from PyQt5.QtWidgets import QErrorMessage
+from PyQt5.QtWidgets import QErrorMessage, QMessageBox
 
 from pugdebug.debugger import PugdebugDebugger
 from pugdebug.syntaxer import PugdebugFormatter
@@ -168,6 +168,9 @@ class Pugdebug(QObject):
         )
 
         # Breakpoints signals
+        self.debugger.init_breakpoints_set.connect(
+            self.handle_init_breakpoints_set
+        )
         self.debugger.breakpoint_removed_signal.connect(
             self.handle_breakpoint_removed
         )
@@ -354,13 +357,30 @@ class Pugdebug(QObject):
 
         Start a debugging session.
         """
-        self.variable_viewer.clear()
-        self.stacktrace_viewer.clear()
+        break_at_first_line = int(get_setting('debugger/break_at_first_line'))
 
-        self.document_viewer.remove_line_highlights()
+        start_debugging = True
 
-        self.debugger.start_debug()
-        self.main_window.set_statusbar_text("Waiting for connection...")
+        if break_at_first_line == 0 and len(self.init_breakpoints) == 0:
+            messageBox = QMessageBox()
+            messageBox.setText("There are no breakpoints set and the break at"
+                               " first line setting is turned off.")
+            messageBox.setInformativeText("Are you sure you want to start"
+                                          " debugging?")
+            messageBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            answer = messageBox.exec_()
+
+            if answer == QMessageBox.No:
+                start_debugging = False
+
+        if start_debugging:
+            self.variable_viewer.clear()
+            self.stacktrace_viewer.clear()
+
+            self.document_viewer.remove_line_highlights()
+
+            self.debugger.start_debug()
+            self.main_window.set_statusbar_text("Waiting for connection...")
 
     def handle_debugging_started(self):
         """Handle when debugging starts
@@ -384,6 +404,10 @@ class Pugdebug(QObject):
         self.set_init_breakpoints(self.init_breakpoints)
 
         self.open_document(self.debugger.get_index_file())
+
+        break_at_first_line = int(get_setting('debugger/break_at_first_line'))
+        if break_at_first_line > 0:
+            self.step_into()
 
     def stop_debug(self):
         """Stop a debugging session
@@ -582,6 +606,15 @@ class Pugdebug(QObject):
             self.init_breakpoints = breakpoints
 
         self.breakpoint_viewer.set_breakpoints(breakpoints)
+
+    def handle_init_breakpoints_set(self):
+        """Handle when init breakpoints get set
+
+        If the code should not break at first line, run the debugger.
+        """
+        break_at_first_line = int(get_setting('debugger/break_at_first_line'))
+        if break_at_first_line == 0:
+            self.run_debug()
 
     def handle_breakpoint_removed(self, breakpoint_id):
         """Handle when a breakpoint gets removed
