@@ -368,7 +368,7 @@ class Pugdebug(QObject):
             messageBox.setInformativeText("Are you sure you want to start"
                                           " debugging?")
             messageBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-            answer = messageBox.exec()
+            answer = messageBox.exec_()
 
             if answer == QMessageBox.No:
                 start_debugging = False
