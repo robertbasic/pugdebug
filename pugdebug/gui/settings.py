@@ -68,7 +68,6 @@ class PugdebugSettingsWindow(QWidget):
         )
 
         break_at_first_line = int(get_setting('debugger/break_at_first_line'))
-        print(break_at_first_line)
         self.break_at_first_line.setCheckState(break_at_first_line)
 
         layout = QFormLayout()
