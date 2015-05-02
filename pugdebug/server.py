@@ -148,18 +148,24 @@ class PugdebugServerConnection(QThread):
         if idekey != '' and init_message['idekey'] != idekey:
             return False
 
-        command = 'feature_set -i %d -n max_depth -v 9' % (
-            self.__get_transaction_id()
+        max_depth = int(get_setting('debugger/max_depth'))
+        command = 'feature_set -i %d -n max_depth -v %d' % (
+            self.__get_transaction_id(),
+            max_depth
         )
         response = self.__send_command(command)
 
-        command = 'feature_set -i %d -n max_children -v 512' % (
-            self.__get_transaction_id()
+        max_children = int(get_setting('debugger/max_children'))
+        command = 'feature_set -i %d -n max_children -v %d' % (
+            self.__get_transaction_id(),
+            max_children
         )
         response = self.__send_command(command)
 
-        command = 'feature_set -i %d -n max_data -v 4096' % (
-            self.__get_transaction_id()
+        max_data = int(get_setting('debugger/max_data'))
+        command = 'feature_set -i %d -n max_data -v %d' % (
+            self.__get_transaction_id(),
+            max_data
         )
         response = self.__send_command(command)
 
