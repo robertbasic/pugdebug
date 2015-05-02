@@ -11,7 +11,7 @@ __author__ = "robertbasic"
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QMainWindow, QToolBar, QMenuBar, QDockWidget,
-                             QLabel, QAction)
+                             QLabel, QAction, QWidget, QHBoxLayout)
 from PyQt5.QtGui import QFont, QKeySequence
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
@@ -67,8 +67,9 @@ class PugdebugMainWindow(QMainWindow):
         self.setup_statusbar()
 
     def setup_statusbar(self):
-        self.permanent_statusbar = QLabel("Idle...")
+        self.permanent_statusbar = PugdebugStatusBar()
         self.statusBar().addPermanentWidget(self.permanent_statusbar)
+        self.set_debugging_status(0)
 
     def setup_fonts(self):
         font = QFont('mono')
@@ -246,8 +247,8 @@ class PugdebugMainWindow(QMainWindow):
     def get_expression_viewer(self):
         return self.expression_viewer
 
-    def set_statusbar_text(self, text):
-        self.permanent_statusbar.setText(text)
+    def set_debugging_status(self, status):
+        self.permanent_statusbar.set_debugging_status(status)
 
     def __add_dock_widget(self, widget, title, area):
         dw = QDockWidget(title, self)
@@ -255,3 +256,27 @@ class PugdebugMainWindow(QMainWindow):
         dw.setObjectName(object_name)
         dw.setWidget(widget)
         self.addDockWidget(area, dw)
+
+
+class PugdebugStatusBar(QWidget):
+
+    def __init__(self):
+        super(PugdebugStatusBar, self).__init__()
+        self.label = QLabel(self)
+
+        layout = QHBoxLayout()
+        layout.addWidget(self.label)
+
+        self.setLayout(layout)
+
+    def set_debugging_status(self, status):
+        if status == 0:
+            text = "Idle ..."
+        elif status == 1:
+            text = 'Waiting for connection ...'
+        elif status == 2:
+            text = 'Debugging stopped ...'
+        elif status == 3:
+            text = 'Debugging in progress ...'
+
+        self.label.setText(text)
