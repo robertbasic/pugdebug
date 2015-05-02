@@ -405,10 +405,6 @@ class Pugdebug(QObject):
 
         self.open_document(self.debugger.get_index_file())
 
-        break_at_first_line = int(get_setting('debugger/break_at_first_line'))
-        if break_at_first_line > 0:
-            self.step_into()
-
     def stop_debug(self):
         """Stop a debugging session
 
@@ -615,6 +611,8 @@ class Pugdebug(QObject):
         break_at_first_line = int(get_setting('debugger/break_at_first_line'))
         if break_at_first_line == 0:
             self.run_debug()
+        else:
+            self.step_into()
 
     def handle_breakpoint_removed(self, breakpoint_id):
         """Handle when a breakpoint gets removed
