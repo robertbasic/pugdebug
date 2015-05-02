@@ -11,7 +11,7 @@ __author__ = "robertbasic"
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QMainWindow, QToolBar, QMenuBar, QDockWidget,
-                             QLabel, QAction, QWidget, QHBoxLayout)
+                             QAction)
 from PyQt5.QtGui import QFont, QKeySequence
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
@@ -21,6 +21,7 @@ from pugdebug.gui.variables import PugdebugVariableViewer
 from pugdebug.gui.stacktraces import PugdebugStacktraceViewer
 from pugdebug.gui.breakpoints import PugdebugBreakpointViewer
 from pugdebug.gui.expressions import PugdebugExpressionViewer
+from pugdebug.gui.statusbar import PugdebugStatusBar
 from pugdebug.models.settings import get_setting, set_setting, has_setting
 
 
@@ -256,27 +257,3 @@ class PugdebugMainWindow(QMainWindow):
         dw.setObjectName(object_name)
         dw.setWidget(widget)
         self.addDockWidget(area, dw)
-
-
-class PugdebugStatusBar(QWidget):
-
-    def __init__(self):
-        super(PugdebugStatusBar, self).__init__()
-        self.label = QLabel(self)
-
-        layout = QHBoxLayout()
-        layout.addWidget(self.label)
-
-        self.setLayout(layout)
-
-    def set_debugging_status(self, status):
-        if status == 0:
-            text = "Idle ..."
-        elif status == 1:
-            text = 'Waiting for connection ...'
-        elif status == 2:
-            text = 'Debugging stopped ...'
-        elif status == 3:
-            text = 'Debugging in progress ...'
-
-        self.label.setText(text)
