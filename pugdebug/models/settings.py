@@ -56,6 +56,15 @@ class PugdebugSettings():
             # between checked and unchecked state
             self.application_settings.setValue('break_at_first_line', 2)
 
+        if not self.application_settings.contains('max_depth'):
+            self.application_settings.setValue('max_depth', '3')
+
+        if not self.application_settings.contains('max_children'):
+            self.application_settings.setValue('max_children', '128')
+
+        if not self.application_settings.contains('max_data'):
+            self.application_settings.setValue('max_data', '512')
+
         self.application_settings.endGroup()
 
     def setup_path_settings(self):
