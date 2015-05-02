@@ -70,6 +70,29 @@ class PugdebugSettingsWindow(QWidget):
         break_at_first_line = int(get_setting('debugger/break_at_first_line'))
         self.break_at_first_line.setCheckState(break_at_first_line)
 
+        self.max_depth = QLineEdit()
+
+        self.max_depth.editingFinished.connect(self.handle_max_depth_changed)
+
+        max_depth = get_setting('debugger/max_depth')
+        self.max_depth.setText(max_depth)
+
+        self.max_children = QLineEdit()
+
+        self.max_children.editingFinished.connect(
+            self.handle_max_children_changed
+        )
+
+        max_children = get_setting('debugger/max_children')
+        self.max_children.setText(max_children)
+
+        self.max_data = QLineEdit()
+
+        self.max_data.editingFinished.connect(self.handle_max_data_changed)
+
+        max_data = get_setting('debugger/max_data')
+        self.max_data.setText(max_data)
+
         layout = QFormLayout()
         self.setLayout(layout)
 
@@ -79,6 +102,9 @@ class PugdebugSettingsWindow(QWidget):
         layout.addRow("Port", self.port_number)
         layout.addRow("IDE Key", self.idekey)
         layout.addRow("", self.break_at_first_line)
+        layout.addRow("Max depth", self.max_depth)
+        layout.addRow("Max children", self.max_children)
+        layout.addRow("Max data", self.max_data)
 
     def get_project_root(self):
         return self.project_root.text()
@@ -116,3 +142,15 @@ class PugdebugSettingsWindow(QWidget):
 
     def handle_break_at_first_line_changed(self, value):
         set_setting('debugger/break_at_first_line', value)
+
+    def handle_max_depth_changed(self):
+        value = self.max_depth.text()
+        set_setting('debugger/max_depth', value)
+
+    def handle_max_children_changed(self):
+        value = self.max_children.text()
+        set_setting('debugger/max_children', value)
+
+    def handle_max_data_changed(self):
+        value = self.max_data.text()
+        set_setting('debugger/max_data', value)
