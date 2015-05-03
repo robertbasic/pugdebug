@@ -236,12 +236,17 @@ class PugdebugDocumentContents(QPlainTextEdit):
         cursor.movePosition(QTextCursor.Start, QTextCursor.MoveAnchor, 0)
 
         block_number = cursor.blockNumber()
+
         while block_number < line:
-            cursor.movePosition(
+            cursor_moved = cursor.movePosition(
                 QTextCursor.NextBlock,
                 QTextCursor.MoveAnchor,
                 1
             )
+
+            if cursor_moved is False:
+                break
+
             block_number = cursor.blockNumber()
 
         self.setTextCursor(cursor)
