@@ -16,6 +16,22 @@ from PyQt5.QtCore import QCoreApplication, QSettings, Qt
 
 class PugdebugSettings():
 
+    defaults = {
+        'debugger': {
+            'host': '127.0.0.1',
+            'port_number': 9000,
+            'idekey': 'pugdebug',
+            'break_at_first_line': Qt.Checked,
+            'max_depth': '3',
+            'max_children': '128',
+            'max_data': '512'
+        },
+        'path': {
+            'project_root': os.path.expanduser('~'),
+            'path_mapping': ''
+        }
+    }
+
     def __init__(self):
         """Model object to handle application settings
 
@@ -30,58 +46,19 @@ class PugdebugSettings():
         QCoreApplication.setApplicationName("pugdebug")
         self.application_settings = QSettings()
 
-        self.setup_debugger_settings()
-        self.setup_path_settings()
+        self.setup_default_settings()
 
-    def setup_debugger_settings(self):
-        """Set up initial debugger settings
+    def setup_default_settings(self):
+        """Set up initial debugger settings"""
 
-        Sets up the initial host to 127.0.0.1.
-        Sets up the initial port number to 9000.
-        Sets up the initial IDE key to pugdebug.
-        """
-        self.application_settings.beginGroup("debugger")
+        for group, settings in self.defaults.items():
+            self.application_settings.beginGroup(group)
 
-        if not self.application_settings.contains('host'):
-            self.application_settings.setValue('host', '127.0.0.1')
+            for key, value in settings.items():
+                if not self.application_settings.contains(key):
+                    self.application_settings.setValue(key, value)
 
-        if not self.application_settings.contains('port_number'):
-            self.application_settings.setValue('port_number', 9000)
-
-        if not self.application_settings.contains('idekey'):
-            self.application_settings.setValue('idekey', 'pugdebug')
-
-        if not self.application_settings.contains('break_at_first_line'):
-            self.application_settings.setValue('break_at_first_line', Qt.Checked)
-
-        if not self.application_settings.contains('max_depth'):
-            self.application_settings.setValue('max_depth', '3')
-
-        if not self.application_settings.contains('max_children'):
-            self.application_settings.setValue('max_children', '128')
-
-        if not self.application_settings.contains('max_data'):
-            self.application_settings.setValue('max_data', '512')
-
-        self.application_settings.endGroup()
-
-    def setup_path_settings(self):
-        """Set up initial path settings
-
-        Sets up the initial project root to the user's home directory.
-        Sets up the initial path mapping to an empty string.
-        """
-
-        self.application_settings.beginGroup("path")
-
-        if not self.application_settings.contains('project_root'):
-            home_path = os.path.expanduser('~')
-            self.application_settings.setValue('project_root', home_path)
-
-        if not self.application_settings.contains('path_mapping'):
-            self.application_settings.setValue('path_mapping', '')
-
-        self.application_settings.endGroup()
+            self.application_settings.endGroup()
 
     def get(self, key):
         return self.application_settings.value(key)
