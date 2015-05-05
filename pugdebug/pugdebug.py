@@ -380,7 +380,7 @@ class Pugdebug(QObject):
             self.document_viewer.remove_line_highlights()
 
             self.debugger.start_debug()
-            self.main_window.set_statusbar_text("Waiting for connection...")
+            self.main_window.set_debugging_status(1)
 
     def handle_debugging_started(self):
         """Handle when debugging starts
@@ -397,7 +397,7 @@ class Pugdebug(QObject):
 
         Open the index file in the document viewer.
         """
-        self.main_window.set_statusbar_text("Debugging in progress...")
+        self.main_window.set_debugging_status(3)
 
         self.main_window.toggle_actions(True)
 
@@ -430,7 +430,7 @@ class Pugdebug(QObject):
 
         self.main_window.toggle_actions(False)
 
-        self.main_window.set_statusbar_text("Debugging stopped...")
+        self.main_window.set_debugging_status(2)
 
         self.expression_viewer.clear_values()
 

@@ -11,7 +11,7 @@ __author__ = "robertbasic"
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QMainWindow, QToolBar, QMenuBar, QDockWidget,
-                             QLabel, QAction)
+                             QAction)
 from PyQt5.QtGui import QFont, QKeySequence
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
@@ -21,6 +21,7 @@ from pugdebug.gui.variables import PugdebugVariableViewer
 from pugdebug.gui.stacktraces import PugdebugStacktraceViewer
 from pugdebug.gui.breakpoints import PugdebugBreakpointViewer
 from pugdebug.gui.expressions import PugdebugExpressionViewer
+from pugdebug.gui.statusbar import PugdebugStatusBar
 from pugdebug.models.settings import get_setting, set_setting, has_setting
 
 
@@ -67,8 +68,9 @@ class PugdebugMainWindow(QMainWindow):
         self.setup_statusbar()
 
     def setup_statusbar(self):
-        self.permanent_statusbar = QLabel("Idle...")
+        self.permanent_statusbar = PugdebugStatusBar()
         self.statusBar().addPermanentWidget(self.permanent_statusbar)
+        self.set_debugging_status(0)
 
     def setup_fonts(self):
         font = QFont('mono')
@@ -246,8 +248,8 @@ class PugdebugMainWindow(QMainWindow):
     def get_expression_viewer(self):
         return self.expression_viewer
 
-    def set_statusbar_text(self, text):
-        self.permanent_statusbar.setText(text)
+    def set_debugging_status(self, status):
+        self.permanent_statusbar.set_debugging_status(status)
 
     def __add_dock_widget(self, widget, title, area):
         dw = QDockWidget(title, self)
