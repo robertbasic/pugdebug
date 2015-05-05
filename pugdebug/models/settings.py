@@ -11,7 +11,7 @@ __author__ = "robertbasic"
 
 import os
 
-from PyQt5.QtCore import QCoreApplication, QSettings
+from PyQt5.QtCore import QCoreApplication, QSettings, Qt
 
 
 class PugdebugSettings():
@@ -52,9 +52,7 @@ class PugdebugSettings():
             self.application_settings.setValue('idekey', 'pugdebug')
 
         if not self.application_settings.contains('break_at_first_line'):
-            # 2 is the init value because 1 is some weird
-            # between checked and unchecked state
-            self.application_settings.setValue('break_at_first_line', 2)
+            self.application_settings.setValue('break_at_first_line', Qt.Checked)
 
         if not self.application_settings.contains('max_depth'):
             self.application_settings.setValue('max_depth', '3')
