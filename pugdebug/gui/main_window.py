@@ -86,12 +86,6 @@ class PugdebugMainWindow(QMainWindow):
         )
 
         self.__add_dock_widget(
-            self.settings_window,
-            "Settings",
-            Qt.LeftDockWidgetArea
-        )
-
-        self.__add_dock_widget(
             self.variable_viewer,
             "Variables",
             Qt.RightDockWidgetArea
@@ -179,6 +173,11 @@ class PugdebugMainWindow(QMainWindow):
         self.quit_action.setShortcut(QKeySequence("Alt+F4"))
         self.quit_action.triggered.connect(self.close)
 
+        self.show_settings_action = QAction("&Settings", self)
+        self.show_settings_action.setToolTip("Show settings")
+        self.show_settings_action.setStatusTip("Show the settings window.")
+        self.show_settings_action.triggered.connect(self.settings_window.exec)
+
     def setup_toolbar(self):
         toolbar = QToolBar("Main Toolbar")
         toolbar.setObjectName("main-toolbar")
@@ -199,6 +198,7 @@ class PugdebugMainWindow(QMainWindow):
 
         file_menu = menu_bar.addMenu("&File")
         file_menu.addAction(self.quit_action)
+        file_menu.addAction(self.show_settings_action)
 
         view_menu = menu_bar.addMenu("&View")
 
