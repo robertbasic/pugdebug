@@ -9,13 +9,13 @@
 
 __author__ = "robertbasic"
 
-from PyQt5.QtWidgets import (QWidget, QLineEdit, QFormLayout,
+from PyQt5.QtWidgets import (QDialog, QLineEdit, QFormLayout,
                              QSpinBox, QCheckBox)
 
 from pugdebug.models.settings import get_setting, set_setting
 
 
-class PugdebugSettingsWindow(QWidget):
+class PugdebugSettingsWindow(QDialog):
 
     layout = QFormLayout()
 
