@@ -54,6 +54,9 @@ class PugdebugSettings():
     def get(self, key):
         return self.application_settings.value(key)
 
+    def get_default(self, key):
+        return self.defaults[key] if key in self.defaults else None
+
     def has(self, key):
         return self.application_settings.contains(key)
 
