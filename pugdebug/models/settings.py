@@ -17,19 +17,16 @@ from PyQt5.QtCore import QCoreApplication, QSettings, Qt
 class PugdebugSettings():
 
     defaults = {
-        'debugger': {
-            'host': '127.0.0.1',
-            'port_number': 9000,
-            'idekey': 'pugdebug',
-            'break_at_first_line': Qt.Checked,
-            'max_depth': '3',
-            'max_children': '128',
-            'max_data': '512'
-        },
-        'path': {
-            'project_root': os.path.expanduser('~'),
-            'path_mapping': ''
-        }
+        'debugger/host': '127.0.0.1',
+        'debugger/port_number': 9000,
+        'debugger/idekey': 'pugdebug',
+        'debugger/break_at_first_line': Qt.Checked,
+        'debugger/max_depth': '3',
+        'debugger/max_children': '128',
+        'debugger/max_data': '512',
+
+        'path/project_root': os.path.expanduser('~'),
+        'path/path_mapping': ''
     }
 
     def __init__(self):
@@ -49,16 +46,10 @@ class PugdebugSettings():
         self.setup_default_settings()
 
     def setup_default_settings(self):
-        """Set up initial debugger settings"""
-
-        for group, settings in self.defaults.items():
-            self.application_settings.beginGroup(group)
-
-            for key, value in settings.items():
-                if not self.application_settings.contains(key):
-                    self.application_settings.setValue(key, value)
-
-            self.application_settings.endGroup()
+        """Set the default values for settings which don't have a value."""
+        for key, value in self.defaults.items():
+            if not self.has(key):
+                self.set(key, value)
 
     def get(self, key):
         return self.application_settings.value(key)
