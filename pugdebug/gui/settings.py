@@ -17,8 +17,6 @@ from pugdebug.models.settings import get_setting, set_setting
 
 class PugdebugSettingsWindow(QDialog):
 
-    layout = QFormLayout()
-
     def __init__(self, parent):
         super(PugdebugSettingsWindow, self).__init__(parent)
 
