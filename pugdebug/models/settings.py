@@ -71,6 +71,10 @@ def get_setting(key):
     return settings.get(key)
 
 
+def get_default_setting(key):
+    return settings.get_default(key)
+
+
 def has_setting(key):
     return settings.has(key)
 

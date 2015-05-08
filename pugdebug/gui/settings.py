@@ -10,9 +10,11 @@
 __author__ = "robertbasic"
 
 from PyQt5.QtWidgets import (QDialog, QLineEdit, QFormLayout,
-                             QSpinBox, QCheckBox)
+                             QSpinBox, QCheckBox, QPushButton,
+                             QVBoxLayout, QHBoxLayout)
 
-from pugdebug.models.settings import get_setting, set_setting
+from pugdebug.models.settings import (get_setting, set_setting,
+                                      get_default_setting)
 
 
 class PugdebugSettingsWindow(QDialog):
@@ -91,18 +93,29 @@ class PugdebugSettingsWindow(QDialog):
         max_data = get_setting('debugger/max_data')
         self.max_data.setText(max_data)
 
-        layout = QFormLayout()
-        self.setLayout(layout)
+        # Buttons
+        self.reset_button = QPushButton("Reset to defaults")
+        self.reset_button.clicked.connect(self.reset_defaults)
 
-        layout.addRow("Root:", self.project_root)
-        layout.addRow("Maps from:", self.path_mapping)
-        layout.addRow("Host", self.host)
-        layout.addRow("Port", self.port_number)
-        layout.addRow("IDE Key", self.idekey)
-        layout.addRow("", self.break_at_first_line)
-        layout.addRow("Max depth", self.max_depth)
-        layout.addRow("Max children", self.max_children)
-        layout.addRow("Max data", self.max_data)
+        form_layout = QFormLayout()
+        form_layout.addRow("Root:", self.project_root)
+        form_layout.addRow("Maps from:", self.path_mapping)
+        form_layout.addRow("Host", self.host)
+        form_layout.addRow("Port", self.port_number)
+        form_layout.addRow("IDE Key", self.idekey)
+        form_layout.addRow("", self.break_at_first_line)
+        form_layout.addRow("Max depth", self.max_depth)
+        form_layout.addRow("Max children", self.max_children)
+        form_layout.addRow("Max data", self.max_data)
+
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(self.reset_button)
+
+        box_layout = QVBoxLayout()
+        box_layout.addLayout(form_layout)
+        box_layout.addLayout(button_layout)
+
+        self.setLayout(box_layout)
 
     def get_project_root(self):
         return self.project_root.text()
@@ -152,3 +165,29 @@ class PugdebugSettingsWindow(QDialog):
     def handle_max_data_changed(self):
         value = self.max_data.text()
         set_setting('debugger/max_data', value)
+
+    def reset_defaults(self):
+        """Resets all settings to their deafult values"""
+        self.reset_default('debugger/host', self.host)
+        self.reset_default('debugger/port_number', self.port_number)
+        self.reset_default('debugger/idekey', self.idekey)
+        self.reset_default('debugger/break_at_first_line',
+            self.break_at_first_line)
+        self.reset_default('debugger/max_depth', self.max_depth)
+        self.reset_default('debugger/max_children', self.max_children)
+        self.reset_default('debugger/max_data', self.max_data)
+        self.reset_default('path/project_root', self.project_root)
+        self.reset_default('path/path_mapping', self.path_mapping)
+
+    def reset_default(self, setting, widget):
+        value = get_default_setting(setting)
+
+        if isinstance(widget, QLineEdit):
+            widget.setText(value)
+        elif isinstance(widget, QSpinBox):
+            widget.setValue(value)
+        elif isinstance(widget, QCheckBox):
+            widget.setCheckState(value)
+        else:
+            name = type(widget).__name__
+            raise Exception("Don't know how to set a value for %s" % name)
