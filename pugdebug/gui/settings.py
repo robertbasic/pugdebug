@@ -11,7 +11,7 @@ __author__ = "robertbasic"
 
 from PyQt5.QtWidgets import (QDialog, QLineEdit, QFormLayout,
                              QSpinBox, QCheckBox, QPushButton,
-                             QVBoxLayout, QHBoxLayout)
+                             QVBoxLayout, QHBoxLayout, QGroupBox)
 
 from pugdebug.models.settings import (get_setting, set_setting,
                                       get_default_setting)
@@ -97,22 +97,31 @@ class PugdebugSettingsWindow(QDialog):
         self.reset_button = QPushButton("Reset to defaults")
         self.reset_button.clicked.connect(self.reset_defaults)
 
-        form_layout = QFormLayout()
-        form_layout.addRow("Root:", self.project_root)
-        form_layout.addRow("Maps from:", self.path_mapping)
-        form_layout.addRow("Host", self.host)
-        form_layout.addRow("Port", self.port_number)
-        form_layout.addRow("IDE Key", self.idekey)
-        form_layout.addRow("", self.break_at_first_line)
-        form_layout.addRow("Max depth", self.max_depth)
-        form_layout.addRow("Max children", self.max_children)
-        form_layout.addRow("Max data", self.max_data)
+        path_layout = QFormLayout()
+        path_layout.addRow("Root:", self.project_root)
+        path_layout.addRow("Maps from:", self.path_mapping)
+
+        debugger_layout = QFormLayout()
+        debugger_layout.addRow("Host", self.host)
+        debugger_layout.addRow("Port", self.port_number)
+        debugger_layout.addRow("IDE Key", self.idekey)
+        debugger_layout.addRow("", self.break_at_first_line)
+        debugger_layout.addRow("Max depth", self.max_depth)
+        debugger_layout.addRow("Max children", self.max_children)
+        debugger_layout.addRow("Max data", self.max_data)
+
+        path_group = QGroupBox("Path")
+        path_group.setLayout(path_layout)
+
+        debugger_group = QGroupBox("Debugger")
+        debugger_group.setLayout(debugger_layout)
 
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.reset_button)
 
         box_layout = QVBoxLayout()
-        box_layout.addLayout(form_layout)
+        box_layout.addWidget(path_group)
+        box_layout.addWidget(debugger_group)
         box_layout.addLayout(button_layout)
 
         self.setLayout(box_layout)
