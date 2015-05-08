@@ -168,20 +168,24 @@ class PugdebugSettingsWindow(QDialog):
 
     def reset_defaults(self):
         """Resets all settings to their deafult values"""
-        self.reset_default('debugger/host', self.host)
-        self.reset_default('debugger/port_number', self.port_number)
-        self.reset_default('debugger/idekey', self.idekey)
-        self.reset_default('debugger/break_at_first_line',
-            self.break_at_first_line)
-        self.reset_default('debugger/max_depth', self.max_depth)
-        self.reset_default('debugger/max_children', self.max_children)
-        self.reset_default('debugger/max_data', self.max_data)
-        self.reset_default('path/project_root', self.project_root)
-        self.reset_default('path/path_mapping', self.path_mapping)
+        self.reset_default(self.host, 'debugger/host')
+        self.reset_default(self.port_number, 'debugger/port_number')
+        self.reset_default(self.idekey, 'debugger/idekey')
+        self.reset_default(self.break_at_first_line, 'debugger/break_at_first_line')
+        self.reset_default(self.max_depth, 'debugger/max_depth')
+        self.reset_default(self.max_children, 'debugger/max_children')
+        self.reset_default(self.max_data, 'debugger/max_data')
+        self.reset_default(self.project_root, 'path/project_root')
+        self.reset_default(self.path_mapping, 'path/path_mapping')
 
-    def reset_default(self, setting, widget):
+    def reset_default(self, widget, setting):
+        """Resets a single setting to its default value"""
         value = get_default_setting(setting)
+        self.set_widget_value(widget, value)
 
+    def set_widget_value(self, widget, value):
+        """A generic method which can set the value of any of the used widgets.
+        """
         if isinstance(widget, QLineEdit):
             widget.setText(value)
         elif isinstance(widget, QSpinBox):
