@@ -24,7 +24,7 @@ class PugdebugSettingsWindow(QDialog):
 
         self.project_root = QLineEdit()
 
-        self.project_root.editingFinished.connect(
+        self.project_root.textChanged.connect(
             self.handle_project_root_changed
         )
 
@@ -33,7 +33,7 @@ class PugdebugSettingsWindow(QDialog):
 
         self.path_mapping = QLineEdit()
 
-        self.path_mapping.editingFinished.connect(
+        self.path_mapping.textChanged.connect(
             self.handle_path_mapping_changed
         )
         path_mapping = get_setting('path/path_mapping')
@@ -41,7 +41,7 @@ class PugdebugSettingsWindow(QDialog):
 
         self.host = QLineEdit()
 
-        self.host.editingFinished.connect(self.handle_host_changed)
+        self.host.textChanged.connect(self.handle_host_changed)
 
         host = get_setting('debugger/host')
         self.host.setText(host)
@@ -56,7 +56,7 @@ class PugdebugSettingsWindow(QDialog):
 
         self.idekey = QLineEdit()
 
-        self.idekey.editingFinished.connect(self.handle_idekey_changed)
+        self.idekey.textChanged.connect(self.handle_idekey_changed)
 
         idekey = get_setting('debugger/idekey')
         self.idekey.setText(idekey)
@@ -72,14 +72,14 @@ class PugdebugSettingsWindow(QDialog):
 
         self.max_depth = QLineEdit()
 
-        self.max_depth.editingFinished.connect(self.handle_max_depth_changed)
+        self.max_depth.textChanged.connect(self.handle_max_depth_changed)
 
         max_depth = get_setting('debugger/max_depth')
         self.max_depth.setText(max_depth)
 
         self.max_children = QLineEdit()
 
-        self.max_children.editingFinished.connect(
+        self.max_children.textChanged.connect(
             self.handle_max_children_changed
         )
 
@@ -88,7 +88,7 @@ class PugdebugSettingsWindow(QDialog):
 
         self.max_data = QLineEdit()
 
-        self.max_data.editingFinished.connect(self.handle_max_data_changed)
+        self.max_data.textChanged.connect(self.handle_max_data_changed)
 
         max_data = get_setting('debugger/max_data')
         self.max_data.setText(max_data)
