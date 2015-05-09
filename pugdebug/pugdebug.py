@@ -101,8 +101,8 @@ class Pugdebug(QObject):
 
         Connects the signal that gets fired when project root gets changed.
         """
-        self.settings.project_root.editingFinished.connect(
-            self.handle_project_root_changed
+        self.settings.settings_changed_signal.connect(
+            self.handle_settings_changed
         )
 
     def connect_document_viewer_signals(self):
@@ -333,6 +333,14 @@ class Pugdebug(QObject):
 
         document_widget = self.document_viewer.get_current_document()
         document_widget.move_to_line(current_line)
+
+    def handle_settings_changed(self, changed_settings):
+        """Handle when settings have changed.
+
+        Given argument is a set of settings's names which have been changed.
+        """
+        if 'path/project_root' in changed_settings:
+            self.handle_project_root_changed()
 
     def handle_project_root_changed(self):
         """Handle when the project root is changed
