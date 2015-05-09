@@ -10,147 +10,153 @@
 __author__ = "robertbasic"
 
 from PyQt5.QtWidgets import (QDialog, QLineEdit, QFormLayout,
-                             QSpinBox, QCheckBox)
+                             QSpinBox, QCheckBox, QPushButton,
+                             QVBoxLayout, QHBoxLayout, QGroupBox)
 
-from pugdebug.models.settings import get_setting, set_setting
+from PyQt5.QtCore import pyqtSignal
+
+from pugdebug.models.settings import (get_setting, has_setting, set_setting,
+                                      get_default_setting)
 
 
 class PugdebugSettingsWindow(QDialog):
 
-    layout = QFormLayout()
+    settings_changed_signal = pyqtSignal(set)
 
     def __init__(self, parent):
         super(PugdebugSettingsWindow, self).__init__(parent)
 
-        self.project_root = QLineEdit()
+        # Construct the widgets
+        self.widgets = {
+            'path/project_root': QLineEdit(),
+            'path/path_mapping': QLineEdit(),
+            'debugger/host': QLineEdit(),
+            'debugger/port_number': QSpinBox(),
+            'debugger/idekey': QLineEdit(),
+            'debugger/break_at_first_line': QCheckBox("Break at first line"),
+            'debugger/max_depth': QLineEdit(),
+            'debugger/max_children': QLineEdit(),
+            'debugger/max_data': QLineEdit(),
+        }
 
-        self.project_root.editingFinished.connect(
-            self.handle_project_root_changed
-        )
+        # Widget settings
+        self.widgets['debugger/port_number'].setRange(1, 65535)
 
-        project_root = get_setting('path/project_root')
-        self.project_root.setText(project_root)
+        # Save values on accepted (clicked Save button)
+        self.accepted.connect(self.save_settings)
 
-        self.path_mapping = QLineEdit()
+        self.setup_layout()
 
-        self.path_mapping.editingFinished.connect(
-            self.handle_path_mapping_changed
-        )
-        path_mapping = get_setting('path/path_mapping')
-        self.path_mapping.setText(path_mapping)
+    def setup_layout(self):
+        # Buttons
+        reset_button = QPushButton("&Reset")
+        reset_button.clicked.connect(self.reset_defaults)
 
-        self.host = QLineEdit()
+        save_button = QPushButton("&Save")
+        save_button.clicked.connect(self.accept)
 
-        self.host.editingFinished.connect(self.handle_host_changed)
+        cancel_button = QPushButton("&Cancel")
+        cancel_button.clicked.connect(self.reject)
 
-        host = get_setting('debugger/host')
-        self.host.setText(host)
+        # Layout
+        path_layout = QFormLayout()
+        path_layout.addRow("Root:", self.widgets['path/project_root'])
+        path_layout.addRow("Maps from:", self.widgets['path/path_mapping'])
 
-        self.port_number = QSpinBox()
-        self.port_number.setRange(1, 65535)
+        debugger_layout = QFormLayout()
+        debugger_layout.addRow("Host", self.widgets['debugger/host'])
+        debugger_layout.addRow("Port", self.widgets['debugger/port_number'])
+        debugger_layout.addRow("IDE Key", self.widgets['debugger/idekey'])
+        debugger_layout.addRow("", self.widgets['debugger/break_at_first_line'])
+        debugger_layout.addRow("Max depth", self.widgets['debugger/max_depth'])
+        debugger_layout.addRow("Max children", self.widgets['debugger/max_children'])
+        debugger_layout.addRow("Max data", self.widgets['debugger/max_data'])
 
-        self.port_number.valueChanged.connect(self.handle_port_number_changed)
+        path_group = QGroupBox("Path")
+        path_group.setLayout(path_layout)
 
-        port_number = int(get_setting('debugger/port_number'))
-        self.port_number.setValue(port_number)
+        debugger_group = QGroupBox("Debugger")
+        debugger_group.setLayout(debugger_layout)
 
-        self.idekey = QLineEdit()
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(save_button)
+        button_layout.addWidget(cancel_button)
+        button_layout.addWidget(reset_button)
 
-        self.idekey.editingFinished.connect(self.handle_idekey_changed)
+        box_layout = QVBoxLayout()
+        box_layout.addWidget(path_group)
+        box_layout.addWidget(debugger_group)
+        box_layout.addLayout(button_layout)
 
-        idekey = get_setting('debugger/idekey')
-        self.idekey.setText(idekey)
+        self.setLayout(box_layout)
 
-        self.break_at_first_line = QCheckBox("Break at first line")
-
-        self.break_at_first_line.stateChanged.connect(
-            self.handle_break_at_first_line_changed
-        )
-
-        break_at_first_line = int(get_setting('debugger/break_at_first_line'))
-        self.break_at_first_line.setCheckState(break_at_first_line)
-
-        self.max_depth = QLineEdit()
-
-        self.max_depth.editingFinished.connect(self.handle_max_depth_changed)
-
-        max_depth = get_setting('debugger/max_depth')
-        self.max_depth.setText(max_depth)
-
-        self.max_children = QLineEdit()
-
-        self.max_children.editingFinished.connect(
-            self.handle_max_children_changed
-        )
-
-        max_children = get_setting('debugger/max_children')
-        self.max_children.setText(max_children)
-
-        self.max_data = QLineEdit()
-
-        self.max_data.editingFinished.connect(self.handle_max_data_changed)
-
-        max_data = get_setting('debugger/max_data')
-        self.max_data.setText(max_data)
-
-        layout = QFormLayout()
-        self.setLayout(layout)
-
-        layout.addRow("Root:", self.project_root)
-        layout.addRow("Maps from:", self.path_mapping)
-        layout.addRow("Host", self.host)
-        layout.addRow("Port", self.port_number)
-        layout.addRow("IDE Key", self.idekey)
-        layout.addRow("", self.break_at_first_line)
-        layout.addRow("Max depth", self.max_depth)
-        layout.addRow("Max children", self.max_children)
-        layout.addRow("Max data", self.max_data)
+    def showEvent(self, event):
+        """Load setting from store when showing the dialog."""
+        super(PugdebugSettingsWindow, self).showEvent(event)
+        self.load_settings()
 
     def get_project_root(self):
-        return self.project_root.text()
+        widget = self.widgets['path/project_root']
+        return self.get_widget_value(widget)
 
     def get_path_mapping(self):
-        path_map = self.path_mapping.text()
+        widget = self.widgets['path/path_mapping']
+        path_map = self.get_widget_value(widget)
 
         if len(path_map) > 0:
             return path_map
 
         return False
 
-    def handle_project_root_changed(self):
-        value = self.project_root.text()
-        set_setting('path/project_root', value)
+    def load_settings(self):
+        """Loads all settings from QSettings into the form"""
+        for name, widget in self.widgets.items():
+            value = get_setting(name) if has_setting(name) \
+                else get_default_setting(name)
+            self.set_widget_value(widget, value)
 
-    def handle_path_mapping_changed(self):
-        value = self.path_mapping.text()
-        set_setting('path/path_mapping', value)
+    def save_settings(self):
+        """Saves all settings from the form to QSettings"""
+        changed_settings = set()
 
-    def handle_host_changed(self):
-        value = self.host.text()
-        set_setting('debugger/host', value)
+        for name, widget in self.widgets.items():
+            value = self.get_widget_value(widget)
 
-    def handle_port_number_changed(self, value):
-        """Handle when port number gets changed
+            if not has_setting(name) or get_setting(name) != value:
+                set_setting(name, value)
+                changed_settings.add(name)
 
-        Set the new value in the application's setting.
+        if len(changed_settings) > 0:
+            self.settings_changed_signal.emit(changed_settings)
+
+    def reset_defaults(self):
+        """Resets all settings to their deafult values"""
+        for name, widget in self.widgets.items():
+            value = get_default_setting(name)
+            self.set_widget_value(widget, value)
+
+    def set_widget_value(self, widget, value):
+        """A generic method which can set the value of any of the used widgets.
         """
-        set_setting('debugger/port_number', value)
+        if isinstance(widget, QLineEdit):
+            widget.setText(value)
+        elif isinstance(widget, QSpinBox):
+            widget.setValue(int(value))
+        elif isinstance(widget, QCheckBox):
+            widget.setCheckState(value)
+        else:
+            name = type(widget).__name__
+            raise Exception("Don't know how to set a value for %s" % name)
 
-    def handle_idekey_changed(self):
-        value = self.idekey.text()
-        set_setting('debugger/idekey', value)
-
-    def handle_break_at_first_line_changed(self, value):
-        set_setting('debugger/break_at_first_line', value)
-
-    def handle_max_depth_changed(self):
-        value = self.max_depth.text()
-        set_setting('debugger/max_depth', value)
-
-    def handle_max_children_changed(self):
-        value = self.max_children.text()
-        set_setting('debugger/max_children', value)
-
-    def handle_max_data_changed(self):
-        value = self.max_data.text()
-        set_setting('debugger/max_data', value)
+    def get_widget_value(self, widget):
+        """A generic method which can set the value of any of the used widgets.
+        """
+        if isinstance(widget, QLineEdit):
+            return widget.text()
+        elif isinstance(widget, QSpinBox):
+            return widget.value()
+        elif isinstance(widget, QCheckBox):
+            return widget.checkState()
+        else:
+            name = type(widget).__name__
+            raise Exception("Don't know how to get a value for %s" % name)
