@@ -143,7 +143,7 @@ class PugdebugSettingsWindow(QDialog):
         elif isinstance(widget, QSpinBox):
             widget.setValue(int(value))
         elif isinstance(widget, QCheckBox):
-            widget.setCheckState(value)
+            widget.setCheckState(int(value))
         else:
             name = type(widget).__name__
             raise Exception("Don't know how to set a value for %s" % name)
