@@ -182,3 +182,9 @@ Contributions are more than welcome! Report bugs, tell me your ideas and needs,
 write code, test it on different platforms ...
 
 [Homebrew]: http://brew.sh/
+
+## slack
+
+There's a slack created for pugdebug at https://pugdebug.slack.com/
+
+If you would like access, open a [new ticket](https://github.com/robertbasic/pugdebug/issues).
