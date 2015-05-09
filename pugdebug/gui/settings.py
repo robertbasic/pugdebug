@@ -49,13 +49,13 @@ class PugdebugSettingsWindow(QDialog):
 
     def setup_layout(self):
         # Buttons
-        reset_button = QPushButton("Reset")
+        reset_button = QPushButton("&Reset")
         reset_button.clicked.connect(self.reset_defaults)
 
-        save_button = QPushButton("Save")
+        save_button = QPushButton("&Save")
         save_button.clicked.connect(self.accept)
 
-        cancel_button = QPushButton("Cancel")
+        cancel_button = QPushButton("&Cancel")
         cancel_button.clicked.connect(self.reject)
 
         # Layout
