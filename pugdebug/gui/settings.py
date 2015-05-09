@@ -141,7 +141,7 @@ class PugdebugSettingsWindow(QDialog):
         if isinstance(widget, QLineEdit):
             widget.setText(value)
         elif isinstance(widget, QSpinBox):
-            widget.setValue(value)
+            widget.setValue(int(value))
         elif isinstance(widget, QCheckBox):
             widget.setCheckState(value)
         else:
