@@ -167,16 +167,16 @@ class PugdebugMainWindow(QMainWindow):
         )
         self.step_out_action.setShortcut(QKeySequence("F8"))
 
+        self.show_settings_action = QAction("&Settings", self)
+        self.show_settings_action.setToolTip("Show settings")
+        self.show_settings_action.setStatusTip("Show the settings window.")
+        self.show_settings_action.triggered.connect(self.settings_window.exec)
+
         self.quit_action = QAction("&Quit", self)
         self.quit_action.setToolTip("Exit the application (Alt+F4)")
         self.quit_action.setStatusTip("Exit the application. Shortcut: Alt+F4")
         self.quit_action.setShortcut(QKeySequence("Alt+F4"))
         self.quit_action.triggered.connect(self.close)
-
-        self.show_settings_action = QAction("&Settings", self)
-        self.show_settings_action.setToolTip("Show settings")
-        self.show_settings_action.setStatusTip("Show the settings window.")
-        self.show_settings_action.triggered.connect(self.settings_window.exec)
 
     def setup_toolbar(self):
         toolbar = QToolBar("Main Toolbar")
@@ -197,8 +197,9 @@ class PugdebugMainWindow(QMainWindow):
         menu_bar = QMenuBar()
 
         file_menu = menu_bar.addMenu("&File")
-        file_menu.addAction(self.quit_action)
         file_menu.addAction(self.show_settings_action)
+        file_menu.addSeparator()
+        file_menu.addAction(self.quit_action)
 
         view_menu = menu_bar.addMenu("&View")
 
