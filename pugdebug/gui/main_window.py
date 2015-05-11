@@ -112,6 +112,15 @@ class PugdebugMainWindow(QMainWindow):
         )
 
     def setup_file_actions(self):
+        self.projects_action = QAction("&Projects", self)
+        self.projects_action.setToolTip(
+            "View and create new projects (Ctrl+P)"
+        )
+        self.projects_action.setStatusTip(
+            "View and create new projects. Shortcut: Ctrl+P"
+        )
+        self.projects_action.setShortcut(QKeySequence("Ctrl+P"))
+
         self.show_settings_action = QAction("&Settings", self)
         self.show_settings_action.setToolTip("Show settings")
         self.show_settings_action.setStatusTip("Show the settings window.")
@@ -122,7 +131,6 @@ class PugdebugMainWindow(QMainWindow):
         self.quit_action.setStatusTip("Exit the application. Shortcut: Alt+F4")
         self.quit_action.setShortcut(QKeySequence("Alt+F4"))
         self.quit_action.triggered.connect(self.close)
-
 
     def setup_actions(self):
         self.start_debug_action = QAction("Start", self)
@@ -201,6 +209,7 @@ class PugdebugMainWindow(QMainWindow):
         menu_bar = QMenuBar()
 
         file_menu = menu_bar.addMenu("&File")
+        file_menu.addAction(self.projects_action)
         file_menu.addAction(self.show_settings_action)
         file_menu.addSeparator()
         file_menu.addAction(self.quit_action)
