@@ -122,8 +122,11 @@ class PugdebugMainWindow(QMainWindow):
         self.projects_action.setShortcut(QKeySequence("Ctrl+P"))
 
         self.show_settings_action = QAction("&Settings", self)
-        self.show_settings_action.setToolTip("Show settings")
-        self.show_settings_action.setStatusTip("Show the settings window.")
+        self.show_settings_action.setToolTip("Show settings (Ctrl+S)")
+        self.show_settings_action.setStatusTip(
+            "Show the settings window. Shortcut: Ctrl+S"
+        )
+        self.show_settings_action.setShortcut(QKeySequence("Ctrl+S"))
         self.show_settings_action.triggered.connect(self.settings_window.exec)
 
         self.quit_action = QAction("&Quit", self)
