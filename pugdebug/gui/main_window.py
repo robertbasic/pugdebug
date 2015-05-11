@@ -60,6 +60,8 @@ class PugdebugMainWindow(QMainWindow):
         self.setup_fonts()
         self.setup_docks()
 
+        self.setup_file_actions()
+
         self.setup_actions()
         self.toggle_actions(False)
 
@@ -108,6 +110,19 @@ class PugdebugMainWindow(QMainWindow):
             "Stacktraces",
             Qt.BottomDockWidgetArea
         )
+
+    def setup_file_actions(self):
+        self.show_settings_action = QAction("&Settings", self)
+        self.show_settings_action.setToolTip("Show settings")
+        self.show_settings_action.setStatusTip("Show the settings window.")
+        self.show_settings_action.triggered.connect(self.settings_window.exec)
+
+        self.quit_action = QAction("&Quit", self)
+        self.quit_action.setToolTip("Exit the application (Alt+F4)")
+        self.quit_action.setStatusTip("Exit the application. Shortcut: Alt+F4")
+        self.quit_action.setShortcut(QKeySequence("Alt+F4"))
+        self.quit_action.triggered.connect(self.close)
+
 
     def setup_actions(self):
         self.start_debug_action = QAction("Start", self)
@@ -166,17 +181,6 @@ class PugdebugMainWindow(QMainWindow):
             "Shortcut: F8"
         )
         self.step_out_action.setShortcut(QKeySequence("F8"))
-
-        self.show_settings_action = QAction("&Settings", self)
-        self.show_settings_action.setToolTip("Show settings")
-        self.show_settings_action.setStatusTip("Show the settings window.")
-        self.show_settings_action.triggered.connect(self.settings_window.exec)
-
-        self.quit_action = QAction("&Quit", self)
-        self.quit_action.setToolTip("Exit the application (Alt+F4)")
-        self.quit_action.setStatusTip("Exit the application. Shortcut: Alt+F4")
-        self.quit_action.setShortcut(QKeySequence("Alt+F4"))
-        self.quit_action.triggered.connect(self.close)
 
     def setup_toolbar(self):
         toolbar = QToolBar("Main Toolbar")
