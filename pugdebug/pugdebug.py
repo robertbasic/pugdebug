@@ -463,6 +463,8 @@ class Pugdebug(QObject):
         If the debugger is in a stopping state, stop the debugging session.
         """
 
+        self.main_window.set_debugging_status(3)
+
         if self.debugger.is_breaking():
             self.focus_current_line()
 
