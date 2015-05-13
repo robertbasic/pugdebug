@@ -463,6 +463,8 @@ class Pugdebug(QObject):
         If the debugger is in a stopping state, stop the debugging session.
         """
 
+        self.main_window.set_debugging_status(3)
+
         if self.debugger.is_breaking():
             self.focus_current_line()
 
@@ -480,6 +482,8 @@ class Pugdebug(QObject):
 
         This gets called when the "Run" action button is pressed.
         """
+        self.main_window.set_debugging_status(4)
+
         self.debugger.run_debug()
 
     def step_over(self):
@@ -487,6 +491,8 @@ class Pugdebug(QObject):
 
         This gets called when the "Step over" action button is pressed.
         """
+        self.main_window.set_debugging_status(4)
+
         self.debugger.step_over()
 
     def step_into(self):
@@ -494,6 +500,8 @@ class Pugdebug(QObject):
 
         This gets called when the "Step into" action button is pressed.
         """
+        self.main_window.set_debugging_status(4)
+
         self.debugger.step_into()
 
     def step_out(self):
@@ -501,6 +509,8 @@ class Pugdebug(QObject):
 
         This gets called when the "Step out" action button is pressed.
         """
+        self.main_window.set_debugging_status(4)
+
         self.debugger.step_out()
 
     def handle_got_all_variables(self, variables):
