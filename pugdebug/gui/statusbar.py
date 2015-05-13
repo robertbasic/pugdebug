@@ -39,6 +39,9 @@ class PugdebugStatusBar(QWidget):
         elif status == 3:
             text = 'Debugging in progress ...'
             color = "green"
+        elif status == 4:
+            text = 'Running ...'
+            color = "blue"
 
         self.label.setText(text)
 
