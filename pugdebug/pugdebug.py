@@ -591,8 +591,9 @@ class Pugdebug(QObject):
 
             return
 
-        breakpoint_id = int(breakpoint['id'])
-        self.debugger.remove_breakpoint(breakpoint_id)
+        if 'id' in breakpoint:
+            breakpoint_id = int(breakpoint['id'])
+            self.debugger.remove_breakpoint(breakpoint_id)
 
     def remove_stale_breakpoints(self, path):
         """Remove stale breakpoints for a file
