@@ -87,6 +87,7 @@ class Pugdebug(QObject):
         self.connect_debugger_signals()
         self.connect_expression_viewer_signals()
         self.connect_stacktrace_viewer_signals()
+        self.connect_breakpoint_viewer_signals()
 
     def connect_file_browser_signals(self):
         """Connect file browser signals
@@ -201,6 +202,11 @@ class Pugdebug(QObject):
 
     def connect_stacktrace_viewer_signals(self):
         self.stacktrace_viewer.item_double_clicked_signal.connect(
+            self.jump_to_line_in_file
+        )
+
+    def connect_breakpoint_viewer_signals(self):
+        self.breakpoint_viewer.item_double_clicked_signal.connect(
             self.jump_to_line_in_file
         )
 
