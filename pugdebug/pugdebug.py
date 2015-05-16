@@ -201,7 +201,7 @@ class Pugdebug(QObject):
 
     def connect_stacktrace_viewer_signals(self):
         self.stacktrace_viewer.item_double_clicked_signal.connect(
-            self.handle_stacktrace_double_clicked
+            self.jump_to_line_in_file
         )
 
     def file_browser_item_activated(self, index):
@@ -709,7 +709,7 @@ class Pugdebug(QObject):
         if self.debugger.is_connected():
             self.debugger.evaluate_expression(index, expression)
 
-    def handle_stacktrace_double_clicked(self, file, line):
+    def jump_to_line_in_file(self, file, line):
         """Handle when an item in the stack trace viewer is double clicked.
 
         Show the document, and scroll to the given line.
