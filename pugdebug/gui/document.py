@@ -250,7 +250,7 @@ class PugdebugDocumentContents(QPlainTextEdit):
 
             block_number = cursor.blockNumber()
 
-        # Mark block on which the cursor is as the current on
+        # Mark block on which the cursor is as the current one
         block = cursor.block()
         self.block_set_is_current(block, is_current)
 

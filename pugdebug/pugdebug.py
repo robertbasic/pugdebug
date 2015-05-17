@@ -333,7 +333,7 @@ class Pugdebug(QObject):
         document_widget.move_to_line(current_line)
 
     def jump_to_line_in_file(self, file, line):
-        """Handle when an item in the stack trace viewer is double clicked.
+        """Jump to a line in a file.
 
         Show the document, and scroll to the given line.
         """
