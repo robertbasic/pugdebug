@@ -332,6 +332,16 @@ class Pugdebug(QObject):
         document_widget = self.document_viewer.get_current_document()
         document_widget.move_to_line(current_line)
 
+    def jump_to_line_in_file(self, file, line):
+        """Handle when an item in the stack trace viewer is double clicked.
+
+        Show the document, and scroll to the given line.
+        """
+        self.open_document(file)
+
+        document_widget = self.document_viewer.get_current_document()
+        document_widget.move_to_line(line)
+
     def handle_settings_changed(self, changed_settings):
         """Handle when settings have changed.
 
@@ -706,13 +716,6 @@ class Pugdebug(QObject):
         """
         if self.debugger.is_connected():
             self.debugger.evaluate_expression(index, expression)
-
-    def jump_to_line_in_file(self, file, line):
-        """Handle when an item in the stack trace viewer is double clicked.
-
-        Show the document, and scroll to the given line.
-        """
-        self.open_document(file, True, line)
 
     def handle_error(self, error):
         em = QErrorMessage(self.main_window)
