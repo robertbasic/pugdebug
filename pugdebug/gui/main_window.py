@@ -112,14 +112,12 @@ class PugdebugMainWindow(QMainWindow):
         )
 
     def setup_file_actions(self):
-        self.projects_action = QAction("&Projects", self)
-        self.projects_action.setToolTip(
-            "View and create new projects (Ctrl+P)"
+        self.new_project_action = QAction("&Projects", self)
+        self.new_project_action.setToolTip("Create a new project (Ctrl+N)")
+        self.new_project_action.setStatusTip(
+            "Create a new project. Shortcut: Ctrl+N"
         )
-        self.projects_action.setStatusTip(
-            "View and create new projects. Shortcut: Ctrl+P"
-        )
-        self.projects_action.setShortcut(QKeySequence("Ctrl+P"))
+        self.new_project_action.setShortcut(QKeySequence("Ctrl+N"))
 
         self.show_settings_action = QAction("&Settings", self)
         self.show_settings_action.setToolTip("Show settings (Ctrl+S)")
@@ -212,7 +210,7 @@ class PugdebugMainWindow(QMainWindow):
         menu_bar = QMenuBar()
 
         file_menu = menu_bar.addMenu("&File")
-        file_menu.addAction(self.projects_action)
+        file_menu.addAction(self.new_project_action)
         file_menu.addAction(self.show_settings_action)
         file_menu.addSeparator()
         file_menu.addAction(self.quit_action)
