@@ -87,6 +87,7 @@ class Pugdebug(QObject):
         self.connect_debugger_signals()
         self.connect_expression_viewer_signals()
         self.connect_stacktrace_viewer_signals()
+        self.connect_breakpoint_viewer_signals()
 
     def connect_file_browser_signals(self):
         """Connect file browser signals
@@ -201,7 +202,12 @@ class Pugdebug(QObject):
 
     def connect_stacktrace_viewer_signals(self):
         self.stacktrace_viewer.item_double_clicked_signal.connect(
-            self.handle_stacktrace_double_clicked
+            self.jump_to_line_in_file
+        )
+
+    def connect_breakpoint_viewer_signals(self):
+        self.breakpoint_viewer.item_double_clicked_signal.connect(
+            self.jump_to_line_in_file
         )
 
     def file_browser_item_activated(self, index):
@@ -213,7 +219,7 @@ class Pugdebug(QObject):
         if path is not None:
             self.open_document(path, False)
 
-    def open_document(self, path, map_paths=True, line=None):
+    def open_document(self, path, map_paths=True):
         """Open a document
 
         If a document is not already open, open it and add it as a new
@@ -260,18 +266,10 @@ class Pugdebug(QObject):
                 document_model.filename,
                 path
             )
-
-            # If a line is given, move to that line
-            if line:
-                document_widget.move_to_line(line)
         else:
             # Just focus the tab that has the opened document
             index = self.document_viewer.find_tab_index_by_path(path)
             self.document_viewer.setCurrentIndex(index)
-
-            # If a line is given, move to that line
-            if line:
-                self.document_viewer.get_document(index).move_to_line(line)
 
     def handle_document_double_click(self, path, line_number):
         """Handle when a document gets double clicked
@@ -333,6 +331,16 @@ class Pugdebug(QObject):
 
         document_widget = self.document_viewer.get_current_document()
         document_widget.move_to_line(current_line)
+
+    def jump_to_line_in_file(self, file, line):
+        """Jump to a line in a file.
+
+        Show the document, and scroll to the given line.
+        """
+        self.open_document(file)
+
+        document_widget = self.document_viewer.get_current_document()
+        document_widget.move_to_line(line, False)
 
     def handle_settings_changed(self, changed_settings):
         """Handle when settings have changed.
@@ -708,13 +716,6 @@ class Pugdebug(QObject):
         """
         if self.debugger.is_connected():
             self.debugger.evaluate_expression(index, expression)
-
-    def handle_stacktrace_double_clicked(self, file, line):
-        """Handle when an item in the stack trace viewer is double clicked.
-
-        Show the document, and scroll to the given line.
-        """
-        self.open_document(file, True, line)
 
     def handle_error(self, error):
         em = QErrorMessage(self.main_window)

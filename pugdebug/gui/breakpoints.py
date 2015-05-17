@@ -9,10 +9,13 @@
 
 __author__ = "robertbasic"
 
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
 
 class PugdebugBreakpointViewer(QTreeWidget):
+
+    item_double_clicked_signal = pyqtSignal(str, int)
 
     def __init__(self):
         super(PugdebugBreakpointViewer, self).__init__()
@@ -21,6 +24,8 @@ class PugdebugBreakpointViewer(QTreeWidget):
         self.setHeaderLabels(['File', 'Line'])
 
         self.setColumnWidth(0, 350)
+
+        self.itemDoubleClicked.connect(self.handle_item_double_clicked)
 
     def set_breakpoints(self, breakpoints):
         self.clear()
@@ -31,3 +36,9 @@ class PugdebugBreakpointViewer(QTreeWidget):
             item = QTreeWidgetItem(args)
 
             self.addTopLevelItem(item)
+
+    def handle_item_double_clicked(self, item, column):
+        file = item.text(0)
+        line = int(item.text(1))
+
+        self.item_double_clicked_signal.emit(file, line)

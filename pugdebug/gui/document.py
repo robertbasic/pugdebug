@@ -91,9 +91,6 @@ class PugdebugDocument(QWidget):
         height = font_metrics.height()
         width = line_numbers.width()
 
-        cursor = self.document_contents.textCursor()
-        current_line_number = cursor.blockNumber() + 1
-
         while block.isValid():
             # blocks are numbered from zero
             line_number += 1
@@ -116,7 +113,7 @@ class PugdebugDocument(QWidget):
             if self.document_contents.block_has_breakpoint(block):
                 brush = painter.brush()
                 brush.setStyle(Qt.SolidPattern)
-                if line_number == current_line_number:
+                if self.document_contents.block_is_current(block):
                     brush.setColor(Qt.red)
                 else:
                     brush.setColor(Qt.darkGreen)
@@ -136,8 +133,8 @@ class PugdebugDocument(QWidget):
     def get_path(self):
         return self.document_contents.document_model.path
 
-    def move_to_line(self, line):
-        self.document_contents.move_to_line(line)
+    def move_to_line(self, line, is_current=True):
+        self.document_contents.move_to_line(line, is_current)
         self.rehighlight_breakpoint_lines()
 
     def remove_line_highlights(self):
@@ -219,7 +216,7 @@ class PugdebugDocumentContents(QPlainTextEdit):
     def contextMenuEvent(self, event):
         pass
 
-    def move_to_line(self, line):
+    def move_to_line(self, line, is_current=True):
         """Move cursor to line
 
         Move the cursor of the QPlainTextEdit that holds the document
@@ -244,10 +241,18 @@ class PugdebugDocumentContents(QPlainTextEdit):
                 1
             )
 
+            # Unmark block as current
+            block = cursor.block()
+            self.block_set_is_current(block, False)
+
             if cursor_moved is False:
                 break
 
             block_number = cursor.blockNumber()
+
+        # Mark block on which the cursor is as the current one
+        block = cursor.block()
+        self.block_set_is_current(block, is_current)
 
         self.setTextCursor(cursor)
 
@@ -288,6 +293,15 @@ class PugdebugDocumentContents(QPlainTextEdit):
         user_data.breakpoint = False
         block.setUserData(user_data)
 
+    def block_is_current(self, block):
+        user_data = self.__get_block_user_data(block)
+        return user_data.is_current
+
+    def block_set_is_current(self, block, is_current):
+        user_data = self.__get_block_user_data(block)
+        user_data.is_current = is_current
+        block.setUserData(user_data)
+
     def __get_block_user_data(self, block):
         user_data = block.userData()
         if user_data is None:
@@ -317,6 +331,7 @@ class PugdebugLineNumbers(QWidget):
 class PugdebugBlockData(QTextBlockUserData):
 
     breakpoint = False
+    is_current = False
 
     def __init__(self):
         super(PugdebugBlockData, self).__init__()
