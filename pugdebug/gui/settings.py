@@ -62,11 +62,11 @@ class PugdebugSettingsWindow(QDialog):
 
     def get_project_root(self):
         widget = self.form.widgets['path/project_root']
-        return self.get_widget_value(widget)
+        return self.form.get_widget_value(widget)
 
     def get_path_mapping(self):
         widget = self.form.widgets['path/path_mapping']
-        path_map = self.get_widget_value(widget)
+        path_map = self.form.get_widget_value(widget)
 
         if len(path_map) > 0:
             return path_map
@@ -78,14 +78,14 @@ class PugdebugSettingsWindow(QDialog):
         for name, widget in self.form.widgets.items():
             value = get_setting(name) if has_setting(name) \
                 else get_default_setting(name)
-            self.set_widget_value(widget, value)
+            self.form.set_widget_value(widget, value)
 
     def save_settings(self):
         """Saves all settings from the form to QSettings"""
         changed_settings = set()
 
         for name, widget in self.form.widgets.items():
-            value = self.get_widget_value(widget)
+            value = self.form.get_widget_value(widget)
 
             if not has_setting(name) or get_setting(name) != value:
                 set_setting(name, value)
@@ -98,30 +98,4 @@ class PugdebugSettingsWindow(QDialog):
         """Resets all settings to their deafult values"""
         for name, widget in self.form.widgets.items():
             value = get_default_setting(name)
-            self.set_widget_value(widget, value)
-
-    def set_widget_value(self, widget, value):
-        """A generic method which can set the value of any of the used widgets.
-        """
-        if isinstance(widget, QLineEdit):
-            widget.setText(value)
-        elif isinstance(widget, QSpinBox):
-            widget.setValue(int(value))
-        elif isinstance(widget, QCheckBox):
-            widget.setCheckState(int(value))
-        else:
-            name = type(widget).__name__
-            raise Exception("Don't know how to set a value for %s" % name)
-
-    def get_widget_value(self, widget):
-        """A generic method which can set the value of any of the used widgets.
-        """
-        if isinstance(widget, QLineEdit):
-            return widget.text()
-        elif isinstance(widget, QSpinBox):
-            return widget.value()
-        elif isinstance(widget, QCheckBox):
-            return widget.checkState()
-        else:
-            name = type(widget).__name__
-            raise Exception("Don't know how to get a value for %s" % name)
+            self.form.set_widget_value(widget, value)

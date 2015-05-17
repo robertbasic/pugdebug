@@ -61,3 +61,29 @@ class PugdebugSettingsForm():
 
         self.debugger_group = QGroupBox("Debugger")
         self.debugger_group.setLayout(debugger_layout)
+
+    def set_widget_value(self, widget, value):
+        """A generic method which can set the value of any of the used widgets.
+        """
+        if isinstance(widget, QLineEdit):
+            widget.setText(value)
+        elif isinstance(widget, QSpinBox):
+            widget.setValue(int(value))
+        elif isinstance(widget, QCheckBox):
+            widget.setCheckState(int(value))
+        else:
+            name = type(widget).__name__
+            raise Exception("Don't know how to set a value for %s" % name)
+
+    def get_widget_value(self, widget):
+        """A generic method which can set the value of any of the used widgets.
+        """
+        if isinstance(widget, QLineEdit):
+            return widget.text()
+        elif isinstance(widget, QSpinBox):
+            return widget.value()
+        elif isinstance(widget, QCheckBox):
+            return widget.checkState()
+        else:
+            name = type(widget).__name__
+            raise Exception("Don't know how to get a value for %s" % name)
