@@ -340,7 +340,7 @@ class Pugdebug(QObject):
         self.open_document(file)
 
         document_widget = self.document_viewer.get_current_document()
-        document_widget.move_to_line(line)
+        document_widget.move_to_line(line, False)
 
     def handle_settings_changed(self, changed_settings):
         """Handle when settings have changed.
