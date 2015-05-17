@@ -16,6 +16,7 @@ from PyQt5.QtGui import QFont, QKeySequence
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
 from pugdebug.gui.settings import PugdebugSettingsWindow
+from pugdebug.gui.projects import PugdebugNewProjectWindow
 from pugdebug.gui.documents import PugdebugDocumentViewer
 from pugdebug.gui.variables import PugdebugVariableViewer
 from pugdebug.gui.stacktraces import PugdebugStacktraceViewer
@@ -37,6 +38,7 @@ class PugdebugMainWindow(QMainWindow):
 
         self.file_browser = PugdebugFileBrowser()
         self.settings_window = PugdebugSettingsWindow(self)
+        self.new_project_window = PugdebugNewProjectWindow(self)
         self.document_viewer = PugdebugDocumentViewer()
         self.variable_viewer = PugdebugVariableViewer()
         self.breakpoint_viewer = PugdebugBreakpointViewer()
@@ -118,6 +120,7 @@ class PugdebugMainWindow(QMainWindow):
             "Create a new project. Shortcut: Ctrl+N"
         )
         self.new_project_action.setShortcut(QKeySequence("Ctrl+N"))
+        self.new_project_action.triggered.connect(self.new_project_window.exec)
 
         self.show_settings_action = QAction("&Settings", self)
         self.show_settings_action.setToolTip("Show settings (Ctrl+S)")
