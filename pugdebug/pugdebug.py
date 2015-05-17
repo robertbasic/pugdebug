@@ -219,7 +219,7 @@ class Pugdebug(QObject):
         if path is not None:
             self.open_document(path, False)
 
-    def open_document(self, path, map_paths=True, line=None):
+    def open_document(self, path, map_paths=True):
         """Open a document
 
         If a document is not already open, open it and add it as a new
@@ -266,18 +266,10 @@ class Pugdebug(QObject):
                 document_model.filename,
                 path
             )
-
-            # If a line is given, move to that line
-            if line:
-                document_widget.move_to_line(line)
         else:
             # Just focus the tab that has the opened document
             index = self.document_viewer.find_tab_index_by_path(path)
             self.document_viewer.setCurrentIndex(index)
-
-            # If a line is given, move to that line
-            if line:
-                self.document_viewer.get_document(index).move_to_line(line)
 
     def handle_document_double_click(self, path, line_number):
         """Handle when a document gets double clicked
