@@ -10,8 +10,7 @@
 __author__ = "robertbasic"
 
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import (QDialog, QLineEdit, QSpinBox, QCheckBox,
-                             QPushButton, QVBoxLayout, QHBoxLayout)
+from PyQt5.QtWidgets import QDialog, QPushButton, QVBoxLayout, QHBoxLayout
 
 from pugdebug.gui.forms import PugdebugSettingsForm
 from pugdebug.models.settings import (get_setting, has_setting, set_setting,
