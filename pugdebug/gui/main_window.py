@@ -112,7 +112,7 @@ class PugdebugMainWindow(QMainWindow):
         )
 
     def setup_file_actions(self):
-        self.new_project_action = QAction("&Projects", self)
+        self.new_project_action = QAction("&New project", self)
         self.new_project_action.setToolTip("Create a new project (Ctrl+N)")
         self.new_project_action.setStatusTip(
             "Create a new project. Shortcut: Ctrl+N"
