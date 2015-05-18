@@ -12,6 +12,8 @@ __author__ = "robertbasic"
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 
+from pugdebug.models.settings import get_setting
+
 
 class PugdebugStacktraceViewer(QTreeWidget):
 
@@ -32,8 +34,9 @@ class PugdebugStacktraceViewer(QTreeWidget):
         self.clear()
 
         for stacktrace in stacktraces:
+            filename = self.__cut_filename(stacktrace['filename'])
             args = [
-                stacktrace['filename'],
+                filename,
                 stacktrace['lineno'],
                 stacktrace['where']
             ]
@@ -46,3 +49,12 @@ class PugdebugStacktraceViewer(QTreeWidget):
         line = int(item.text(1))
 
         self.item_double_clicked_signal.emit(file, line)
+
+    def __cut_filename(self, filename):
+        path_map = get_setting('path/path_mapping')
+        if len(path_map) > 0:
+            filename = filename[len(path_map):]
+        else:
+            root = get_setting('path/project_root')
+            filename = filename[len(root):]
+        return "~%s" % filename
