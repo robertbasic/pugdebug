@@ -37,6 +37,7 @@ class PugdebugBreakpointViewer(QTreeWidget):
             args = [filename, str(breakpoint['lineno'])]
 
             item = QTreeWidgetItem(args)
+            item.setToolTip(0, breakpoint['filename'])
 
             self.addTopLevelItem(item)
 

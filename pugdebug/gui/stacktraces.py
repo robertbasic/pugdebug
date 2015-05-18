@@ -41,6 +41,7 @@ class PugdebugStacktraceViewer(QTreeWidget):
                 stacktrace['where']
             ]
             item = QTreeWidgetItem(args)
+            item.setToolTip(0, stacktrace['filename'])
 
             self.addTopLevelItem(item)
 
