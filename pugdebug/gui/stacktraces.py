@@ -23,10 +23,11 @@ class PugdebugStacktraceViewer(QTreeWidget):
         super(PugdebugStacktraceViewer, self).__init__()
 
         self.setColumnCount(3)
-        self.setHeaderLabels(['File', 'Line', 'Where'])
+        self.setHeaderLabels(['File', 'Line', 'Where', 'Full filename'])
 
         self.setColumnWidth(0, 350)
         self.setColumnWidth(1, 100)
+        self.setColumnHidden(3, True)
 
         self.itemDoubleClicked.connect(self.handle_item_double_clicked)
 
@@ -38,7 +39,8 @@ class PugdebugStacktraceViewer(QTreeWidget):
             args = [
                 filename,
                 stacktrace['lineno'],
-                stacktrace['where']
+                stacktrace['where'],
+                stacktrace['filename']
             ]
             item = QTreeWidgetItem(args)
             item.setToolTip(0, stacktrace['filename'])
@@ -46,7 +48,7 @@ class PugdebugStacktraceViewer(QTreeWidget):
             self.addTopLevelItem(item)
 
     def handle_item_double_clicked(self, item, column):
-        file = item.text(0)
+        file = item.text(3)
         line = int(item.text(1))
 
         self.item_double_clicked_signal.emit(file, line)

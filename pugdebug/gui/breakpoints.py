@@ -23,9 +23,10 @@ class PugdebugBreakpointViewer(QTreeWidget):
         super(PugdebugBreakpointViewer, self).__init__()
 
         self.setColumnCount(2)
-        self.setHeaderLabels(['File', 'Line'])
+        self.setHeaderLabels(['File', 'Line', 'Full filename'])
 
         self.setColumnWidth(0, 350)
+        self.setColumnHidden(2, True)
 
         self.itemDoubleClicked.connect(self.handle_item_double_clicked)
 
@@ -34,7 +35,11 @@ class PugdebugBreakpointViewer(QTreeWidget):
 
         for breakpoint in breakpoints:
             filename = self.__cut_filename(breakpoint['filename'])
-            args = [filename, str(breakpoint['lineno'])]
+            args = [
+                filename,
+                str(breakpoint['lineno']),
+                breakpoint['filename']
+            ]
 
             item = QTreeWidgetItem(args)
             item.setToolTip(0, breakpoint['filename'])
@@ -42,7 +47,7 @@ class PugdebugBreakpointViewer(QTreeWidget):
             self.addTopLevelItem(item)
 
     def handle_item_double_clicked(self, item, column):
-        file = item.text(0)
+        file = item.text(2)
         line = int(item.text(1))
 
         self.item_double_clicked_signal.emit(file, line)
