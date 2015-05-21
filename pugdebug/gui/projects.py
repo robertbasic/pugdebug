@@ -27,6 +27,8 @@ class PugdebugNewProjectWindow(QDialog):
 
         self.setup_layout()
 
+        self.load_settings()
+
     def setup_layout(self):
         project_name_layout = QFormLayout()
         project_name_layout.addRow("Project name:", self.project_name)
@@ -50,13 +52,8 @@ class PugdebugNewProjectWindow(QDialog):
 
         self.setLayout(box_layout)
 
-    def showEvent(self, event):
-        """Load setting from store when showing the dialog."""
-        super(PugdebugNewProjectWindow, self).showEvent(event)
-        self.load_settings()
-
     def load_settings(self):
-        """Loads all settings from QSettings into the form"""
+        """Load default settings into the form"""
         for name, widget in self.form.widgets.items():
             value = get_default_setting(name)
             self.form.set_widget_value(widget, value)
