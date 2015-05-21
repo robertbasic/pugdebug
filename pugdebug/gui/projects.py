@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import (QDialog, QPushButton, QVBoxLayout, QHBoxLayout,
                              QFormLayout, QLineEdit)
 
 from pugdebug.gui.forms import PugdebugSettingsForm
+from pugdebug.models.projects import PugdebugProject
 from pugdebug.models.settings import get_default_setting
 
 
@@ -24,6 +25,8 @@ class PugdebugNewProjectWindow(QDialog):
         self.form = PugdebugSettingsForm()
 
         self.project_name = QLineEdit()
+
+        self.accepted.connect(self.create_new_project)
 
         self.setup_layout()
 
@@ -51,6 +54,11 @@ class PugdebugNewProjectWindow(QDialog):
         box_layout.addLayout(button_layout)
 
         self.setLayout(box_layout)
+
+    def create_new_project(self):
+        project_name = self.project_name.text()
+        project = PugdebugProject(project_name)
+        project.sync()
 
     def load_settings(self):
         """Load default settings into the form"""
