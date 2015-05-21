@@ -187,7 +187,7 @@ class Pugdebug(QObject):
         )
 
         # Breakpoints signals
-        self.debugger.init_breakpoints_set.connect(
+        self.debugger.init_breakpoints_set_signal.connect(
             self.handle_init_breakpoints_set
         )
         self.debugger.breakpoint_removed_signal.connect(
