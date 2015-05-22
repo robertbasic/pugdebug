@@ -64,16 +64,30 @@ class PugdebugSettings():
         return self.application_settings.setValue(key, value)
 
     def add_project(self, project):
-        number_of_projects = self.__get_number_of_projects()
-        self.application_settings.beginWriteArray('projects')
-        self.application_settings.setArrayIndex(number_of_projects)
-        self.application_settings.setValue('projects', project)
+        index = self.__get_next_index(project)
+
+        if index is not False:
+            self.application_settings.beginWriteArray('projects')
+            self.application_settings.setArrayIndex(index)
+            self.application_settings.setValue('projects', project)
+            self.application_settings.endArray()
+
+    def __get_next_index(self, project):
+        size = self.application_settings.beginReadArray('projects')
+
+        index = None
+
+        for i in range(0, size):
+            self.application_settings.setArrayIndex(i)
+            existing_project = self.application_settings.value('projects')
+
+            if existing_project == project:
+                index = i
+                break
+
         self.application_settings.endArray()
 
-    def __get_number_of_projects(self):
-        size = self.application_settings.beginReadArray('projects')
-        self.application_settings.endArray()
-        return size
+        return False if index is not None else size
 
 
 settings = PugdebugSettings()
