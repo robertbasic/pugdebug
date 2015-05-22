@@ -20,6 +20,7 @@ from pugdebug.gui.main_window import PugdebugMainWindow
 from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
 from pugdebug.models.file_browser import PugdebugFileBrowser
+from pugdebug.models.projects import PugdebugProjects
 from pugdebug.models.settings import get_setting
 
 
@@ -56,6 +57,8 @@ class Pugdebug(QObject):
 
         self.setup_file_browser()
 
+        self.setup_projects_browser()
+
         self.connect_signals()
 
     def setup_file_browser(self):
@@ -72,6 +75,12 @@ class Pugdebug(QObject):
         self.file_browser.setModel(model)
         self.file_browser.setRootIndex(model.start_index)
         self.file_browser.hide_columns()
+
+    def setup_projects_browser(self):
+        model = PugdebugProjects(self)
+
+        projects_browser = self.main_window.get_projects_browser()
+        projects_browser.setModel(model)
 
     def connect_signals(self):
         """Connect all signals to their slots
