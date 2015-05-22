@@ -10,7 +10,9 @@
 __author__ = "robertbasic"
 
 from PyQt5.QtCore import QCoreApplication, QSettings
-from PyQt5.QtGui import QStandardItemModel
+from PyQt5.QtGui import QStandardItemModel, QStandardItem
+
+from pugdebug.models.settings import get_projects
 
 
 class PugdebugProject(QSettings):
@@ -39,3 +41,12 @@ class PugdebugProjects(QStandardItemModel):
 
     def __init__(self, parent):
         super(PugdebugProjects, self).__init__(parent)
+
+        self.setHorizontalHeaderLabels(['Name'])
+
+        self.load_projects()
+
+    def load_projects(self):
+        for project in get_projects():
+            item = QStandardItem(project)
+            self.appendRow(item)

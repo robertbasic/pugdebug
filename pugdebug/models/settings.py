@@ -72,6 +72,18 @@ class PugdebugSettings():
             self.application_settings.setValue('projects', project)
             self.application_settings.endArray()
 
+    def get_projects(self):
+        size = self.application_settings.beginReadArray('projects')
+
+        projects = []
+        for i in range(0, size):
+            self.application_settings.setArrayIndex(i)
+            projects.append(self.application_settings.value('projects'))
+
+        self.application_settings.endArray()
+
+        return projects
+
     def __get_next_index(self, project):
         size = self.application_settings.beginReadArray('projects')
 
@@ -111,3 +123,7 @@ def set_setting(key, value):
 
 def add_project(project):
     settings.add_project(project)
+
+
+def get_projects():
+    return settings.get_projects()
