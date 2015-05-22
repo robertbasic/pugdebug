@@ -21,7 +21,7 @@ from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
 from pugdebug.models.file_browser import PugdebugFileBrowser
 from pugdebug.models.projects import PugdebugProjects
-from pugdebug.models.settings import get_setting
+from pugdebug.models.settings import get_setting, save_settings
 
 
 class Pugdebug(QObject):
@@ -227,6 +227,11 @@ class Pugdebug(QObject):
 
     def projects_browser_item_activated(self, index):
         project = self.projects_browser.model().get_project_by_index(index)
+        project_settings = project.get_settings()
+
+        changed_settings = save_settings(project_settings)
+
+        self.handle_settings_changed(changed_settings)
 
     def file_browser_item_activated(self, index):
         """Handle when file browser item gets activated

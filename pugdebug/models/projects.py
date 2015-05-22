@@ -12,7 +12,7 @@ __author__ = "robertbasic"
 from PyQt5.QtCore import QCoreApplication, QSettings
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
-from pugdebug.models.settings import get_projects
+from pugdebug.models.settings import get_projects, save_settings, has_setting
 
 
 class PugdebugProject(QSettings):
@@ -35,6 +35,15 @@ class PugdebugProject(QSettings):
 
     def get_project_name(self):
         return self.project_name
+
+    def get_settings(self):
+        project_settings = {}
+
+        for key in self.allKeys():
+            if has_setting(key):
+                project_settings[key] = self.value(key)
+
+        return project_settings
 
 
 class PugdebugProjects(QStandardItemModel):
