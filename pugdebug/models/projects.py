@@ -51,6 +51,7 @@ class PugdebugProjects(QStandardItemModel):
 
         for project in get_projects():
             item = QStandardItem(project)
+            item.setEditable(False)
             self.appendRow(item)
 
         self.sort(0)
