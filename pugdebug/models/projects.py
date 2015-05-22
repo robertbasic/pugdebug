@@ -26,3 +26,6 @@ class PugdebugProject(QSettings):
         )
 
         self.setValue('project/name', self.project_name)
+
+    def get_project_name(self):
+        return self.project_name

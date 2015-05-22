@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (QDialog, QPushButton, QVBoxLayout, QHBoxLayout,
 
 from pugdebug.gui.forms import PugdebugSettingsForm
 from pugdebug.models.projects import PugdebugProject
-from pugdebug.models.settings import get_default_setting
+from pugdebug.models.settings import get_default_setting, add_project
 
 
 class PugdebugNewProjectWindow(QDialog):
@@ -62,6 +62,8 @@ class PugdebugNewProjectWindow(QDialog):
         for name, widget in self.form.widgets.items():
             value = self.form.get_widget_value(widget)
             project.setValue(name, value)
+
+        add_project(project.get_project_name())
 
     def load_settings(self):
         """Load default settings into the form"""

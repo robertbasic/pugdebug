@@ -63,6 +63,18 @@ class PugdebugSettings():
     def set(self, key, value):
         return self.application_settings.setValue(key, value)
 
+    def add_project(self, project):
+        number_of_projects = self.__get_number_of_projects()
+        self.application_settings.beginWriteArray('projects')
+        self.application_settings.setArrayIndex(number_of_projects)
+        self.application_settings.setValue('projects', project)
+        self.application_settings.endArray()
+
+    def __get_number_of_projects(self):
+        size = self.application_settings.beginReadArray('projects')
+        self.application_settings.endArray()
+        return size
+
 
 settings = PugdebugSettings()
 
@@ -81,3 +93,7 @@ def has_setting(key):
 
 def set_setting(key, value):
     settings.set(key, value)
+
+
+def add_project(project):
+    settings.add_project(project)
