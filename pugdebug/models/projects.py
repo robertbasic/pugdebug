@@ -15,14 +15,16 @@ from PyQt5.QtCore import QCoreApplication, QSettings
 class PugdebugProject(QSettings):
 
     project_name = None
+    safe_name = None
 
     def __init__(self, project_name):
-        self.project_name = project_name.lower().replace(' ', '-')
+        self.project_name = project_name
+        self.safe_name = project_name.lower().replace(' ', '-')
         super(PugdebugProject, self).__init__(
             QSettings.IniFormat,
             QSettings.UserScope,
             QCoreApplication.organizationName(),
-            self.project_name
+            self.safe_name
         )
 
         self.setValue('project/name', self.project_name)
