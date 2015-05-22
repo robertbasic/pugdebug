@@ -51,6 +51,10 @@ class PugdebugMainWindow(QMainWindow):
 
         self.setup_gui_elements()
 
+        self.new_project_window.new_project_created_signal.connect(
+            self.projects_browser.load_projects
+        )
+
         if has_setting("window/state"):
             self.restoreState(get_setting("window/state"))
 

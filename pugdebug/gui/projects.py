@@ -81,3 +81,7 @@ class PugdebugProjectsBrowser(QTreeView):
 
     def __init__(self):
         super(PugdebugProjectsBrowser, self).__init__()
+
+    def load_projects(self):
+        model = self.model()
+        model.load_projects()

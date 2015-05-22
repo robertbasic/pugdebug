@@ -42,11 +42,13 @@ class PugdebugProjects(QStandardItemModel):
     def __init__(self, parent):
         super(PugdebugProjects, self).__init__(parent)
 
-        self.setHorizontalHeaderLabels(['Name'])
-
         self.load_projects()
 
     def load_projects(self):
+        self.clear()
+
+        self.setHorizontalHeaderLabels(['Name'])
+
         for project in get_projects():
             item = QStandardItem(project)
             self.appendRow(item)
