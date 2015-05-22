@@ -10,6 +10,7 @@
 __author__ = "robertbasic"
 
 from PyQt5.QtCore import QCoreApplication, QSettings
+from PyQt5.QtGui import QStandardItemModel
 
 
 class PugdebugProject(QSettings):
@@ -32,3 +33,9 @@ class PugdebugProject(QSettings):
 
     def get_project_name(self):
         return self.project_name
+
+
+class PugdebugProjects(QStandardItemModel):
+
+    def __init__(self, parent):
+        super(PugdebugProjects, self).__init__(parent)
