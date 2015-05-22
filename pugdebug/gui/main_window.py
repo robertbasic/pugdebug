@@ -16,7 +16,8 @@ from PyQt5.QtGui import QFont, QKeySequence
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
 from pugdebug.gui.settings import PugdebugSettingsWindow
-from pugdebug.gui.projects import PugdebugNewProjectWindow
+from pugdebug.gui.projects import (PugdebugNewProjectWindow,
+                                   PugdebugProjectsBrowser)
 from pugdebug.gui.documents import PugdebugDocumentViewer
 from pugdebug.gui.variables import PugdebugVariableViewer
 from pugdebug.gui.stacktraces import PugdebugStacktraceViewer
@@ -37,6 +38,7 @@ class PugdebugMainWindow(QMainWindow):
             self.restoreGeometry(get_setting("window/geometry"))
 
         self.file_browser = PugdebugFileBrowser()
+        self.projects_browser = PugdebugProjectsBrowser()
         self.settings_window = PugdebugSettingsWindow(self)
         self.new_project_window = PugdebugNewProjectWindow(self)
         self.document_viewer = PugdebugDocumentViewer()
@@ -86,6 +88,12 @@ class PugdebugMainWindow(QMainWindow):
         self.__add_dock_widget(
             self.file_browser,
             "File Browser",
+            Qt.LeftDockWidgetArea
+        )
+
+        self.__add_dock_widget(
+            self.projects_browser,
+            "Projects Browser",
             Qt.LeftDockWidgetArea
         )
 
@@ -247,6 +255,9 @@ class PugdebugMainWindow(QMainWindow):
 
     def get_file_browser(self):
         return self.file_browser
+
+    def get_projects_browser(self):
+        return self.projects_browser
 
     def get_settings(self):
         return self.settings_window

@@ -10,7 +10,7 @@
 __author__ = "robertbasic"
 
 from PyQt5.QtWidgets import (QDialog, QPushButton, QVBoxLayout, QHBoxLayout,
-                             QFormLayout, QLineEdit)
+                             QFormLayout, QLineEdit, QTreeView)
 
 from pugdebug.gui.forms import PugdebugSettingsForm
 from pugdebug.models.projects import PugdebugProject
@@ -70,3 +70,9 @@ class PugdebugNewProjectWindow(QDialog):
         for name, widget in self.form.widgets.items():
             value = get_default_setting(name)
             self.form.set_widget_value(widget, value)
+
+
+class PugdebugProjectsBrowser(QTreeView):
+
+    def __init__(self):
+        super(PugdebugProjectsBrowser, self).__init__()
