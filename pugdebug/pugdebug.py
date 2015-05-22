@@ -111,6 +111,9 @@ class Pugdebug(QObject):
         self.projects_browser.activated.connect(
             self.projects_browser_item_activated
         )
+        self.main_window.new_project_created_signal.connect(
+            self.handle_new_project_created
+        )
 
     def connect_settings_signals(self):
         """Connect settings signals
@@ -224,6 +227,14 @@ class Pugdebug(QObject):
         self.breakpoint_viewer.item_double_clicked_signal.connect(
             self.jump_to_line_in_file
         )
+
+    def handle_new_project_created(self, project_name):
+        self.projects_browser.load_projects()
+
+        item = self.projects_browser.model().findItems(project_name)[0]
+        project = self.projects_browser.model().get_project_by_item(item)
+
+        self.load_project(project)
 
     def projects_browser_item_activated(self, index):
         project = self.projects_browser.model().get_project_by_index(index)
