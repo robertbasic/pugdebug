@@ -66,6 +66,9 @@ class PugdebugProjects(QStandardItemModel):
         self.sort(0)
 
     def get_project_by_index(self, index):
-        project_name = self.itemFromIndex(index).text()
+        item = self.itemFromIndex(index)
+        return self.get_project_by_item(item)
 
+    def get_project_by_item(self, item):
+        project_name = item.text()
         return PugdebugProject(project_name)
