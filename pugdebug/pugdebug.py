@@ -227,6 +227,9 @@ class Pugdebug(QObject):
 
     def projects_browser_item_activated(self, index):
         project = self.projects_browser.model().get_project_by_index(index)
+        self.load_project(project)
+
+    def load_project(self, project):
         project_settings = project.get_settings()
 
         changed_settings = save_settings(project_settings)
