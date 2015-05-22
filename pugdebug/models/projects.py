@@ -27,7 +27,8 @@ class PugdebugProject(QSettings):
             self.safe_name
         )
 
-        self.setValue('project/name', self.project_name)
+        if not self.contains('project/name'):
+            self.setValue('project/name', self.project_name)
 
     def get_project_name(self):
         return self.project_name
