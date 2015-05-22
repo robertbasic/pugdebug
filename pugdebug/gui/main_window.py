@@ -9,7 +9,7 @@
 
 __author__ = "robertbasic"
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (QMainWindow, QToolBar, QMenuBar, QDockWidget,
                              QAction)
 from PyQt5.QtGui import QFont, QKeySequence
@@ -28,6 +28,8 @@ from pugdebug.models.settings import get_setting, set_setting, has_setting
 
 
 class PugdebugMainWindow(QMainWindow):
+
+    new_project_created_signal = pyqtSignal(str)
 
     def __init__(self):
         super(PugdebugMainWindow, self).__init__()
@@ -50,10 +52,6 @@ class PugdebugMainWindow(QMainWindow):
         self.setCentralWidget(self.document_viewer)
 
         self.setup_gui_elements()
-
-        self.new_project_window.new_project_created_signal.connect(
-            self.projects_browser.load_projects
-        )
 
         if has_setting("window/state"):
             self.restoreState(get_setting("window/state"))

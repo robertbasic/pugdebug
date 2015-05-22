@@ -20,10 +20,10 @@ from pugdebug.models.settings import get_default_setting, add_project
 
 class PugdebugNewProjectWindow(QDialog):
 
-    new_project_created_signal = pyqtSignal()
-
     def __init__(self, parent):
         super(PugdebugNewProjectWindow, self).__init__(parent)
+
+        self.parent = parent
 
         self.form = PugdebugSettingsForm()
 
@@ -66,9 +66,11 @@ class PugdebugNewProjectWindow(QDialog):
             value = self.form.get_widget_value(widget)
             project.setValue(name, value)
 
-        add_project(project.get_project_name())
+        project_name = project.get_project_name()
 
-        self.new_project_created_signal.emit()
+        add_project(project_name)
+
+        self.parent.new_project_created_signal.emit(project_name)
 
     def load_settings(self):
         """Load default settings into the form"""
