@@ -59,6 +59,10 @@ class PugdebugNewProjectWindow(QDialog):
         project_name = self.project_name.text()
         project = PugdebugProject(project_name)
 
+        for name, widget in self.form.widgets.items():
+            value = self.form.get_widget_value(widget)
+            project.setValue(name, value)
+
     def load_settings(self):
         """Load default settings into the form"""
         for name, widget in self.form.widgets.items():
