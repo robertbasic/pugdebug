@@ -55,3 +55,8 @@ class PugdebugProjects(QStandardItemModel):
             self.appendRow(item)
 
         self.sort(0)
+
+    def get_project_by_index(self, index):
+        project_name = self.itemFromIndex(index).text()
+
+        return PugdebugProject(project_name)
