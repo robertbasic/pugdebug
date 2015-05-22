@@ -58,7 +58,6 @@ class PugdebugNewProjectWindow(QDialog):
     def create_new_project(self):
         project_name = self.project_name.text()
         project = PugdebugProject(project_name)
-        project.sync()
 
     def load_settings(self):
         """Load default settings into the form"""
