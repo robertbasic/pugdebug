@@ -9,6 +9,7 @@
 
 __author__ = "robertbasic"
 
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import (QDialog, QPushButton, QVBoxLayout, QHBoxLayout,
                              QFormLayout, QLineEdit, QTreeView)
 
@@ -18,6 +19,8 @@ from pugdebug.models.settings import get_default_setting, add_project
 
 
 class PugdebugNewProjectWindow(QDialog):
+
+    new_project_created_signal = pyqtSignal()
 
     def __init__(self, parent):
         super(PugdebugNewProjectWindow, self).__init__(parent)
@@ -64,6 +67,8 @@ class PugdebugNewProjectWindow(QDialog):
             project.setValue(name, value)
 
         add_project(project.get_project_name())
+
+        self.new_project_created_signal.emit()
 
     def load_settings(self):
         """Load default settings into the form"""
