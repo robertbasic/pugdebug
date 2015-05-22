@@ -121,6 +121,18 @@ def set_setting(key, value):
     settings.set(key, value)
 
 
+def save_settings(new_settings):
+    changed_settings = set()
+
+    for key in new_settings:
+        value = new_settings[key]
+        if not has_setting(key) or get_setting(key) != value:
+            set_setting(key, value)
+            changed_settings.add(key)
+
+    return changed_settings
+
+
 def add_project(project):
     settings.add_project(project)
 
