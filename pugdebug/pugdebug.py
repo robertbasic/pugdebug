@@ -20,7 +20,8 @@ from pugdebug.gui.main_window import PugdebugMainWindow
 from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
 from pugdebug.models.file_browser import PugdebugFileBrowser
-from pugdebug.models.settings import get_setting
+from pugdebug.models.projects import PugdebugProjects
+from pugdebug.models.settings import get_setting, save_settings
 
 
 class Pugdebug(QObject):
@@ -45,6 +46,7 @@ class Pugdebug(QObject):
         # UI elements
         self.main_window = PugdebugMainWindow()
         self.file_browser = self.main_window.get_file_browser()
+        self.projects_browser = self.main_window.get_projects_browser()
         self.settings = self.main_window.get_settings()
         self.document_viewer = self.main_window.get_document_viewer()
         self.variable_viewer = self.main_window.get_variable_viewer()
@@ -55,6 +57,8 @@ class Pugdebug(QObject):
         self.documents = PugdebugDocuments()
 
         self.setup_file_browser()
+
+        self.setup_projects_browser()
 
         self.connect_signals()
 
@@ -73,6 +77,11 @@ class Pugdebug(QObject):
         self.file_browser.setRootIndex(model.start_index)
         self.file_browser.hide_columns()
 
+    def setup_projects_browser(self):
+        model = PugdebugProjects(self)
+
+        self.projects_browser.setModel(model)
+
     def connect_signals(self):
         """Connect all signals to their slots
 
@@ -81,6 +90,7 @@ class Pugdebug(QObject):
         """
 
         self.connect_file_browser_signals()
+        self.connect_projects_browser_signals()
         self.connect_settings_signals()
         self.connect_document_viewer_signals()
         self.connect_toolbar_action_signals()
@@ -96,6 +106,14 @@ class Pugdebug(QObject):
         slot that gets called when a file browser item is activated.
         """
         self.file_browser.activated.connect(self.file_browser_item_activated)
+
+    def connect_projects_browser_signals(self):
+        self.projects_browser.activated.connect(
+            self.projects_browser_item_activated
+        )
+        self.main_window.new_project_created_signal.connect(
+            self.handle_new_project_created
+        )
 
     def connect_settings_signals(self):
         """Connect settings signals
@@ -209,6 +227,25 @@ class Pugdebug(QObject):
         self.breakpoint_viewer.item_double_clicked_signal.connect(
             self.jump_to_line_in_file
         )
+
+    def handle_new_project_created(self, project_name):
+        self.projects_browser.load_projects()
+
+        item = self.projects_browser.model().findItems(project_name)[0]
+        project = self.projects_browser.model().get_project_by_item(item)
+
+        self.load_project(project)
+
+    def projects_browser_item_activated(self, index):
+        project = self.projects_browser.model().get_project_by_index(index)
+        self.load_project(project)
+
+    def load_project(self, project):
+        project_settings = project.get_settings()
+
+        changed_settings = save_settings(project_settings)
+
+        self.handle_settings_changed(changed_settings)
 
     def file_browser_item_activated(self, index):
         """Handle when file browser item gets activated

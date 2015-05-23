@@ -9,13 +9,15 @@
 
 __author__ = "robertbasic"
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (QMainWindow, QToolBar, QMenuBar, QDockWidget,
                              QAction)
 from PyQt5.QtGui import QFont, QKeySequence
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
 from pugdebug.gui.settings import PugdebugSettingsWindow
+from pugdebug.gui.projects import (PugdebugNewProjectWindow,
+                                   PugdebugProjectsBrowser)
 from pugdebug.gui.documents import PugdebugDocumentViewer
 from pugdebug.gui.variables import PugdebugVariableViewer
 from pugdebug.gui.stacktraces import PugdebugStacktraceViewer
@@ -27,6 +29,8 @@ from pugdebug.models.settings import get_setting, set_setting, has_setting
 
 class PugdebugMainWindow(QMainWindow):
 
+    new_project_created_signal = pyqtSignal(str)
+
     def __init__(self):
         super(PugdebugMainWindow, self).__init__()
         self.setObjectName("pugdebug")
@@ -36,7 +40,9 @@ class PugdebugMainWindow(QMainWindow):
             self.restoreGeometry(get_setting("window/geometry"))
 
         self.file_browser = PugdebugFileBrowser()
+        self.projects_browser = PugdebugProjectsBrowser()
         self.settings_window = PugdebugSettingsWindow(self)
+        self.new_project_window = PugdebugNewProjectWindow(self)
         self.document_viewer = PugdebugDocumentViewer()
         self.variable_viewer = PugdebugVariableViewer()
         self.breakpoint_viewer = PugdebugBreakpointViewer()
@@ -59,6 +65,8 @@ class PugdebugMainWindow(QMainWindow):
     def setup_gui_elements(self):
         self.setup_fonts()
         self.setup_docks()
+
+        self.setup_file_actions()
 
         self.setup_actions()
         self.toggle_actions(False)
@@ -86,6 +94,12 @@ class PugdebugMainWindow(QMainWindow):
         )
 
         self.__add_dock_widget(
+            self.projects_browser,
+            "Projects Browser",
+            Qt.LeftDockWidgetArea
+        )
+
+        self.__add_dock_widget(
             self.variable_viewer,
             "Variables",
             Qt.RightDockWidgetArea
@@ -108,6 +122,29 @@ class PugdebugMainWindow(QMainWindow):
             "Stacktraces",
             Qt.BottomDockWidgetArea
         )
+
+    def setup_file_actions(self):
+        self.new_project_action = QAction("&New project", self)
+        self.new_project_action.setToolTip("Create a new project (Ctrl+N)")
+        self.new_project_action.setStatusTip(
+            "Create a new project. Shortcut: Ctrl+N"
+        )
+        self.new_project_action.setShortcut(QKeySequence("Ctrl+N"))
+        self.new_project_action.triggered.connect(self.new_project_window.exec)
+
+        self.show_settings_action = QAction("&Settings", self)
+        self.show_settings_action.setToolTip("Show settings (Ctrl+S)")
+        self.show_settings_action.setStatusTip(
+            "Show the settings window. Shortcut: Ctrl+S"
+        )
+        self.show_settings_action.setShortcut(QKeySequence("Ctrl+S"))
+        self.show_settings_action.triggered.connect(self.settings_window.exec)
+
+        self.quit_action = QAction("&Quit", self)
+        self.quit_action.setToolTip("Exit the application (Alt+F4)")
+        self.quit_action.setStatusTip("Exit the application. Shortcut: Alt+F4")
+        self.quit_action.setShortcut(QKeySequence("Alt+F4"))
+        self.quit_action.triggered.connect(self.close)
 
     def setup_actions(self):
         self.start_debug_action = QAction("Start", self)
@@ -167,17 +204,6 @@ class PugdebugMainWindow(QMainWindow):
         )
         self.step_out_action.setShortcut(QKeySequence("F8"))
 
-        self.show_settings_action = QAction("&Settings", self)
-        self.show_settings_action.setToolTip("Show settings")
-        self.show_settings_action.setStatusTip("Show the settings window.")
-        self.show_settings_action.triggered.connect(self.settings_window.exec)
-
-        self.quit_action = QAction("&Quit", self)
-        self.quit_action.setToolTip("Exit the application (Alt+F4)")
-        self.quit_action.setStatusTip("Exit the application. Shortcut: Alt+F4")
-        self.quit_action.setShortcut(QKeySequence("Alt+F4"))
-        self.quit_action.triggered.connect(self.close)
-
     def setup_toolbar(self):
         toolbar = QToolBar("Main Toolbar")
         toolbar.setObjectName("main-toolbar")
@@ -197,6 +223,7 @@ class PugdebugMainWindow(QMainWindow):
         menu_bar = QMenuBar()
 
         file_menu = menu_bar.addMenu("&File")
+        file_menu.addAction(self.new_project_action)
         file_menu.addAction(self.show_settings_action)
         file_menu.addSeparator()
         file_menu.addAction(self.quit_action)
@@ -230,6 +257,9 @@ class PugdebugMainWindow(QMainWindow):
 
     def get_file_browser(self):
         return self.file_browser
+
+    def get_projects_browser(self):
+        return self.projects_browser
 
     def get_settings(self):
         return self.settings_window
