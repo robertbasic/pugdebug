@@ -324,6 +324,10 @@ class PugdebugDebugger(QObject):
         error = error + " during %s action" % action
         self.error_signal.emit(error)
 
+        # The current connection is FUBAR so just set it to None
+        self.current_connection = None
+        self.stop_debug()
+
     def get_current_file(self):
         if 'filename' in self.step_result:
             self.current_file = self.step_result['filename']
