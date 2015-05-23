@@ -9,8 +9,10 @@
 
 __author__ = "robertbasic"
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QDialog, QPushButton, QVBoxLayout, QHBoxLayout,
-                             QFormLayout, QLineEdit, QTreeView)
+                             QFormLayout, QLineEdit, QTreeView, QAction, QMenu)
+from PyQt5.QtGui import QIcon
 
 from pugdebug.gui.forms import PugdebugSettingsForm
 from pugdebug.models.projects import PugdebugProject
@@ -83,6 +85,30 @@ class PugdebugProjectsBrowser(QTreeView):
     def __init__(self):
         super(PugdebugProjectsBrowser, self).__init__()
 
+        self.delete_action = QAction(
+            QIcon.fromTheme('list-remove'),
+            "&Delete",
+            self
+        )
+        self.delete_action.triggered.connect(self.handle_delete_action)
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.show_context_menu)
+
     def load_projects(self):
         model = self.model()
         model.load_projects()
+
+    def show_context_menu(self, point):
+        context_menu = QMenu(self)
+
+        if self.indexAt(point):
+            context_menu.addAction(self.delete_action)
+
+        point = self.mapToGlobal(point)
+        context_menu.popup(point)
+
+    def handle_delete_action(self):
+        for index in self.selectedIndexes():
+            project = self.model().get_project_by_index(index)
+            print(project.get_project_name())
