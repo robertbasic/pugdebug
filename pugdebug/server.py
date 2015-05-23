@@ -107,6 +107,7 @@ class PugdebugServerConnection(QThread):
 
     xdebug_encoding = 'iso-8859-1'
 
+    post_start_signal = pyqtSignal()
     stopped_signal = pyqtSignal()
     detached_signal = pyqtSignal()
     stepped_signal = pyqtSignal(dict)
@@ -182,7 +183,14 @@ class PugdebugServerConnection(QThread):
         action = self.action
 
         try:
-            if action == 'stop':
+            if action == 'post_start':
+                response = self.__post_start(data)
+
+                self.listed_breakpoints_signal.emit(
+                    response['breakpoints']
+                )
+                self.post_start_signal.emit()
+            elif action == 'stop':
                 response = self.__stop()
                 self.stopped_signal.emit()
             elif action == 'detach':
@@ -233,6 +241,11 @@ class PugdebugServerConnection(QThread):
     def disconnect(self):
         if self.socket is not None:
             self.socket.close()
+
+    def post_start_command(self, post_start_data):
+        self.data = post_start_data
+        self.action = 'post_start'
+        self.start()
 
     def stop(self):
         self.action = 'stop'
@@ -286,6 +299,16 @@ class PugdebugServerConnection(QThread):
         self.action = 'evaluate_expression'
         self.data = (index, expression)
         self.start()
+
+    def __post_start(self, data):
+        post_start_response = {
+            'init_breakpoints': self.__set_init_breakpoints(
+                data['init_breakpoints']
+            ),
+            'breakpoints': self.__list_breakpoints()
+        }
+
+        return post_start_response
 
     def __stop(self):
         command = 'stop -i %d' % self.__get_transaction_id()

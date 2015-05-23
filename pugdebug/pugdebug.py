@@ -169,6 +169,9 @@ class Pugdebug(QObject):
         self.debugger.debugging_started_signal.connect(
             self.handle_debugging_started
         )
+        self.debugger.debugging_post_start_signal.connect(
+            self.handle_debugging_post_start
+        )
         self.debugger.debugging_stopped_signal.connect(
             self.handle_debugging_stopped
         )
@@ -454,9 +457,21 @@ class Pugdebug(QObject):
 
         self.main_window.toggle_actions(True)
 
-        self.set_init_breakpoints(self.init_breakpoints)
+        post_start_data = {
+            'init_breakpoints': self.init_breakpoints
+        }
+        self.debugger.post_start_command(post_start_data)
 
-        self.open_document(self.debugger.get_index_file())
+    def handle_debugging_post_start(self):
+        """Handle post start debugging
+
+        If the code should not break at first line, run the debugger.
+        """
+        break_at_first_line = int(get_setting('debugger/break_at_first_line'))
+        if break_at_first_line == 0:
+            self.run_debug()
+        else:
+            self.step_into()
 
     def stop_debug(self):
         """Stop a debugging session
