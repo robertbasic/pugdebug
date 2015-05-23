@@ -64,6 +64,9 @@ class PugdebugDebugger(QObject):
         self.server.server_stopped_signal.connect(
             self.handle_server_stopped
         )
+        self.server.server_error_signal.connect(
+            self.handle_server_error
+        )
 
     def connect_connection_signals(self, connection):
         """Connect signals for a new connection
@@ -117,6 +120,11 @@ class PugdebugDebugger(QObject):
         )
         connection.expressions_evaluated_signal.connect(
             self.handle_expressions_evaluated
+        )
+
+        # Error signals
+        connection.connection_error_signal.connect(
+            self.handle_connection_error
         )
 
     def cleanup(self):
@@ -308,6 +316,17 @@ class PugdebugDebugger(QObject):
     def handle_expressions_evaluated(self, results):
         """Handle when server evaluates a list of expressions"""
         self.expressions_evaluated_signal.emit(results)
+
+    def handle_server_error(self, error):
+        self.error_signal.emit(error)
+
+    def handle_connection_error(self, action, error):
+        error = error + " during %s action" % action
+        self.error_signal.emit(error)
+
+        # The current connection is FUBAR so just set it to None
+        self.current_connection = None
+        self.stop_debug()
 
     def get_current_file(self):
         if 'filename' in self.step_result:

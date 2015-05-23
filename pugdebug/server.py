@@ -119,6 +119,8 @@ class PugdebugServerConnection(QThread):
     expression_evaluated_signal = pyqtSignal(int, dict)
     expressions_evaluated_signal = pyqtSignal(list)
 
+    connection_error_signal = pyqtSignal(str, str)
+
     def __init__(self, socket):
         super(PugdebugServerConnection, self).__init__()
 
@@ -179,48 +181,52 @@ class PugdebugServerConnection(QThread):
         data = self.data
         action = self.action
 
-        if action == 'stop':
-            response = self.__stop()
-            self.stopped_signal.emit()
-        elif action == 'detach':
-            response = self.__detach()
-            self.detached_signal.emit()
-        elif action == 'step_run':
-            response = self.__step_run()
-            self.stepped_signal.emit(response)
-        elif action == 'step_into':
-            response = self.__step_into()
-            self.stepped_signal.emit(response)
-        elif action == 'step_over':
-            response = self.__step_over()
-            self.stepped_signal.emit(response)
-        elif action == 'step_out':
-            response = self.__step_out()
-            self.stepped_signal.emit(response)
-        elif action == 'post_step':
-            response = self.__post_step(data)
+        try:
+            if action == 'stop':
+                response = self.__stop()
+                self.stopped_signal.emit()
+            elif action == 'detach':
+                response = self.__detach()
+                self.detached_signal.emit()
+            elif action == 'step_run':
+                response = self.__step_run()
+                self.stepped_signal.emit(response)
+            elif action == 'step_into':
+                response = self.__step_into()
+                self.stepped_signal.emit(response)
+            elif action == 'step_over':
+                response = self.__step_over()
+                self.stepped_signal.emit(response)
+            elif action == 'step_out':
+                response = self.__step_out()
+                self.stepped_signal.emit(response)
+            elif action == 'post_step':
+                response = self.__post_step(data)
 
-            self.got_variables_signal.emit(response['variables'])
-            self.got_stacktraces_signal.emit(response['stacktraces'])
-            self.expressions_evaluated_signal.emit(
-                response['expressions']
-            )
-        elif action == 'init_breakpoint_set':
-            response = self.__set_init_breakpoints(data)
-            self.set_init_breakpoints_signal.emit(response)
-        elif action == 'breakpoint_set':
-            response = self.__set_breakpoint(data)
-            self.set_breakpoint_signal.emit(response)
-        elif action == 'breakpoint_remove':
-            response = self.__remove_breakpoint(data)
-            self.removed_breakpoint_signal.emit(response)
-        elif action == 'breakpoint_list':
-            response = self.__list_breakpoints()
-            self.listed_breakpoints_signal.emit(response)
-        elif action == 'evaluate_expression':
-            (index, expression) = data
-            response = self.__evaluate_expression(expression)
-            self.expression_evaluated_signal.emit(index, response)
+                self.got_variables_signal.emit(response['variables'])
+                self.got_stacktraces_signal.emit(response['stacktraces'])
+                self.expressions_evaluated_signal.emit(
+                    response['expressions']
+                )
+            elif action == 'init_breakpoint_set':
+                response = self.__set_init_breakpoints(data)
+                self.set_init_breakpoints_signal.emit(response)
+            elif action == 'breakpoint_set':
+                response = self.__set_breakpoint(data)
+                self.set_breakpoint_signal.emit(response)
+            elif action == 'breakpoint_remove':
+                response = self.__remove_breakpoint(data)
+                self.removed_breakpoint_signal.emit(response)
+            elif action == 'breakpoint_list':
+                response = self.__list_breakpoints()
+                self.listed_breakpoints_signal.emit(response)
+            elif action == 'evaluate_expression':
+                (index, expression) = data
+                response = self.__evaluate_expression(expression)
+                self.expression_evaluated_signal.emit(index, response)
+        except OSError as error:
+            self.disconnect()
+            self.connection_error_signal.emit(action, error.strerror)
 
         self.mutex.unlock()
 
