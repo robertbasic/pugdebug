@@ -29,11 +29,11 @@ class PugdebugDebugger(QObject):
     current_line = 0
 
     debugging_started_signal = pyqtSignal()
+    debugging_post_start_signal = pyqtSignal()
     debugging_stopped_signal = pyqtSignal()
     step_command_signal = pyqtSignal()
     got_all_variables_signal = pyqtSignal(object)
     got_stacktraces_signal = pyqtSignal(object)
-    init_breakpoints_set = pyqtSignal()
     breakpoint_removed_signal = pyqtSignal(int)
     breakpoints_listed_signal = pyqtSignal(list)
     expression_evaluated_signal = pyqtSignal(int, dict)
@@ -78,6 +78,9 @@ class PugdebugDebugger(QObject):
         """
 
         # Stop/detach signals
+        connection.post_start_signal.connect(
+            self.handle_post_start
+        )
         connection.stopped_signal.connect(
             self.handle_stopped
         )
@@ -101,9 +104,6 @@ class PugdebugDebugger(QObject):
         )
 
         # Breakpoints signals
-        connection.set_init_breakpoints_signal.connect(
-            self.handle_set_init_breakpoint
-        )
         connection.set_breakpoint_signal.connect(
             self.handle_set_breakpoint
         )
@@ -194,6 +194,12 @@ class PugdebugDebugger(QObject):
 
         self.debugging_started_signal.emit()
 
+    def post_start_command(self, post_start_data):
+        self.current_connection.post_start_command(post_start_data)
+
+    def handle_post_start(self):
+        self.debugging_post_start_signal.emit()
+
     def handle_server_stopped(self):
         if not self.is_connected():
             self.cleanup()
@@ -268,20 +274,12 @@ class PugdebugDebugger(QObject):
         """
         self.got_stacktraces_signal.emit(stacktraces)
 
-    def set_init_breakpoints(self, breakpoints):
-        self.current_connection.set_init_breakpoints(breakpoints)
-
     def set_breakpoint(self, breakpoint):
         self.current_connection.set_breakpoint(breakpoint)
 
     def handle_set_breakpoint(self, successful):
         if successful:
             self.list_breakpoints()
-
-    def handle_set_init_breakpoint(self, successful):
-        if successful:
-            self.list_breakpoints()
-            self.init_breakpoints_set.emit()
 
     def remove_breakpoint(self, breakpoint_id):
         self.current_connection.remove_breakpoint(breakpoint_id)
