@@ -122,6 +122,11 @@ class PugdebugDebugger(QObject):
             self.handle_expressions_evaluated
         )
 
+        # Error signals
+        connection.connection_error_signal.connect(
+            self.handle_connection_error
+        )
+
     def cleanup(self):
         """Cleanup debugger when it's done
 
@@ -313,6 +318,10 @@ class PugdebugDebugger(QObject):
         self.expressions_evaluated_signal.emit(results)
 
     def handle_server_error(self, error):
+        self.error_signal.emit(error)
+
+    def handle_connection_error(self, action, error):
+        error = error + " during %s action" % action
         self.error_signal.emit(error)
 
     def get_current_file(self):
