@@ -225,6 +225,7 @@ class PugdebugServerConnection(QThread):
                 response = self.__evaluate_expression(expression)
                 self.expression_evaluated_signal.emit(index, response)
         except OSError as error:
+            self.disconnect()
             self.connection_error_signal.emit(action, error.strerror)
 
         self.mutex.unlock()
