@@ -111,4 +111,4 @@ class PugdebugProjectsBrowser(QTreeView):
     def handle_delete_action(self):
         for index in self.selectedIndexes():
             project = self.model().get_project_by_index(index)
-            print(project.get_project_name())
+            project.delete()

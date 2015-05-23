@@ -9,10 +9,12 @@
 
 __author__ = "robertbasic"
 
+import os
+
 from PyQt5.QtCore import QCoreApplication, QSettings
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
-from pugdebug.models.settings import get_projects, has_setting
+from pugdebug.models.settings import get_projects, has_setting, delete_project
 
 
 class PugdebugProject(QSettings):
@@ -44,6 +46,15 @@ class PugdebugProject(QSettings):
                 project_settings[key] = self.value(key)
 
         return project_settings
+
+    def delete(self):
+        delete_project(self.get_project_name())
+
+        filename = self.fileName()
+        try:
+            os.unlink(filename)
+        except OSError as e:
+            print(e)
 
 
 class PugdebugProjects(QStandardItemModel):
