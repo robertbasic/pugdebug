@@ -113,7 +113,6 @@ class PugdebugServerConnection(QThread):
     stepped_signal = pyqtSignal(dict)
     got_variables_signal = pyqtSignal(object)
     got_stacktraces_signal = pyqtSignal(object)
-    set_init_breakpoints_signal = pyqtSignal(bool)
     set_breakpoint_signal = pyqtSignal(bool)
     removed_breakpoint_signal = pyqtSignal(object)
     listed_breakpoints_signal = pyqtSignal(list)
@@ -216,9 +215,6 @@ class PugdebugServerConnection(QThread):
                 self.expressions_evaluated_signal.emit(
                     response['expressions']
                 )
-            elif action == 'init_breakpoint_set':
-                response = self.__set_init_breakpoints(data)
-                self.set_init_breakpoints_signal.emit(response)
             elif action == 'breakpoint_set':
                 response = self.__set_breakpoint(data)
                 self.set_breakpoint_signal.emit(response)
@@ -274,11 +270,6 @@ class PugdebugServerConnection(QThread):
     def post_step_command(self, post_step_data):
         self.data = post_step_data
         self.action = 'post_step'
-        self.start()
-
-    def set_init_breakpoints(self, breakpoints):
-        self.action = 'init_breakpoint_set'
-        self.data = breakpoints
         self.start()
 
     def set_breakpoint(self, breakpoint):
