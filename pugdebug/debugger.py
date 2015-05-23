@@ -64,6 +64,9 @@ class PugdebugDebugger(QObject):
         self.server.server_stopped_signal.connect(
             self.handle_server_stopped
         )
+        self.server.server_error_signal.connect(
+            self.handle_server_error
+        )
 
     def connect_connection_signals(self, connection):
         """Connect signals for a new connection
@@ -308,6 +311,9 @@ class PugdebugDebugger(QObject):
     def handle_expressions_evaluated(self, results):
         """Handle when server evaluates a list of expressions"""
         self.expressions_evaluated_signal.emit(results)
+
+    def handle_server_error(self, error):
+        self.error_signal.emit(error)
 
     def get_current_file(self):
         if 'filename' in self.step_result:
