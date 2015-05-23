@@ -12,7 +12,7 @@ __author__ = "robertbasic"
 from PyQt5.QtCore import QCoreApplication, QSettings
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
-from pugdebug.models.settings import get_projects, save_settings, has_setting
+from pugdebug.models.settings import get_projects, has_setting
 
 
 class PugdebugProject(QSettings):
