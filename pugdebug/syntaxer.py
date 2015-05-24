@@ -9,7 +9,9 @@
 
 __author__ = "robertbasic"
 
-from pygments import highlight, lexers, formatter
+from pygments import highlight, formatter
+from pygments.lexers.php import PhpLexer
+from pygments.styles.default import DefaultStyle
 
 from PyQt5.QtGui import QSyntaxHighlighter, QColor, QTextCharFormat
 
@@ -31,7 +33,7 @@ class PugdebugSyntaxer(QSyntaxHighlighter):
         super(PugdebugSyntaxer, self).__init__(document)
 
         self.formatter = formatter
-        self.lexer = lexers.PhpLexer()
+        self.lexer = PhpLexer()
 
         self.highlight()
 
