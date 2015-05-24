@@ -4,6 +4,14 @@ pugdebug is (well, should be) a PHP standalone debugger.
 
 A python 3.4.x, pyqt5 project.
 
+## current release
+
+The current release of pugdebug is [1.0.0-alpha](https://github.com/robertbasic/pugdebug/releases/tag/v1.0.0-alpha). 
+It includes a ZIP package with the binary, so far, only for Linux distributions. It should include everyting
+needed for pugdebug to work correctly, so just download the package, unpack it and start pugdebug.
+
+Please report any [issues](https://github.com/robertbasic/pugdebug/issues) you encounter.
+
 ## setting up the environment
 
 The main dependencies are Python 3.4,
