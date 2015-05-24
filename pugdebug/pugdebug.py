@@ -78,6 +78,10 @@ class Pugdebug(QObject):
         self.file_browser.hide_columns()
 
     def setup_projects_browser(self):
+        """Setup the projects browser
+
+        Sets the model on the projects browser.
+        """
         model = PugdebugProjects(self)
 
         self.projects_browser.setModel(model)
@@ -108,6 +112,14 @@ class Pugdebug(QObject):
         self.file_browser.activated.connect(self.file_browser_item_activated)
 
     def connect_projects_browser_signals(self):
+        """Connect projects browser signals
+
+        Connects the projects browser's activated signal to the
+        slot that gets called when a project browser item is activated.
+
+        Connects the signal that gets emitted from the main window
+        when a new project gets created.
+        """
         self.projects_browser.activated.connect(
             self.projects_browser_item_activated
         )
@@ -229,6 +241,12 @@ class Pugdebug(QObject):
         )
 
     def handle_new_project_created(self, project_name):
+        """Handle when a new project gets created
+
+        Reload the projects in the projects browser.
+
+        Find the project that was just created and load it.
+        """
         self.projects_browser.load_projects()
 
         item = self.projects_browser.model().findItems(project_name)[0]
@@ -237,10 +255,19 @@ class Pugdebug(QObject):
         self.load_project(project)
 
     def projects_browser_item_activated(self, index):
+        """Handle when a projects browser item gets activated
+
+        Find the project and load it.
+        """
         project = self.projects_browser.model().get_project_by_index(index)
         self.load_project(project)
 
     def load_project(self, project):
+        """Load a project
+
+        Get the settings for the project and load them as the current
+        application settings.
+        """
         project_settings = project.get_settings()
 
         changed_settings = save_settings(project_settings)
@@ -745,6 +772,10 @@ class Pugdebug(QObject):
             self.debugger.evaluate_expression(index, expression)
 
     def handle_error(self, error):
+        """Handle when an error occurs
+
+        Show the error in an error message window.
+        """
         em = QErrorMessage(self.main_window)
         em.showMessage(error)
 

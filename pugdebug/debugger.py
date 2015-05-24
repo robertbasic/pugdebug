@@ -71,10 +71,11 @@ class PugdebugDebugger(QObject):
     def connect_connection_signals(self, connection):
         """Connect signals for a new connection
 
-        Connect signals that gets emitted when a connection is stopped
-        or detached, when a step command is done, when variables are read,
-        when stacktraces are read, when breakpoints are set or removed,
-        when breakpoints are read, when expressions are evaluated.
+        Connect signals that gets emitted when post start commands are done,
+        a connection is stopped or detached, when a step command is done,
+        when variables are read, when stacktraces are read, when breakpoints
+        are set or removed, when breakpoints are read, when expressions are
+        evaluated.
         """
 
         # Stop/detach signals
@@ -195,12 +196,24 @@ class PugdebugDebugger(QObject):
         self.debugging_started_signal.emit()
 
     def post_start_command(self, post_start_data):
+        """Issue a post start command
+
+        After a debugging session is started, set the init breakpoints
+        and list the breakpoints.
+        """
         self.current_connection.post_start_command(post_start_data)
 
     def handle_post_start(self):
+        """Handle post start command
+        """
         self.debugging_post_start_signal.emit()
 
     def handle_server_stopped(self):
+        """Handle when the server is stopped
+
+        If the current connection is terminated, cleanup the debugging
+        session and emit the debugging stopped signal.
+        """
         if not self.is_connected():
             self.cleanup()
             self.debugging_stopped_signal.emit()
@@ -310,9 +323,15 @@ class PugdebugDebugger(QObject):
         self.expressions_evaluated_signal.emit(results)
 
     def handle_server_error(self, error):
+        """Handle when an error occurs in the server
+        """
         self.error_signal.emit(error)
 
     def handle_connection_error(self, action, error):
+        """Handle when an error occurs in the connection
+
+        Kill the current connection and stop debugging.
+        """
         error = error + " during %s action" % action
         self.error_signal.emit(error)
 
