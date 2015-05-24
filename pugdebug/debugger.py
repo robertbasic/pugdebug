@@ -293,12 +293,6 @@ class PugdebugDebugger(QObject):
     def handle_listed_breakpoints(self, breakpoints):
         self.breakpoints_listed_signal.emit(breakpoints)
 
-    def get_index_file(self):
-        if 'fileuri' in self.init_message:
-            return self.init_message['fileuri']
-        else:
-            return None
-
     def evaluate_expression(self, index, expression):
         """Evaluates a single expression"""
         self.current_connection.evaluate_expression(index, expression)
