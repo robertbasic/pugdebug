@@ -1,6 +1,7 @@
 env
 build
 dist
+pugdebug.spec
 __pycache__/
 *.pyc
 *.log
