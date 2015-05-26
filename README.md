@@ -118,27 +118,48 @@ and from there we can see the IP address of `33.33.33.1`.
 
 ## using pugdebug
 
-In a terminal go to the directory where you have pugdebug cloned and start it by
-issuing a `python app.py` command.
+If you are using a pugdebug build, just execute the binary, that should bring up
+pugdebug.
 
-On the left side you can see a simple file browser that should list your home
-directory.
+If you cloned this repository, go to the sources directory, activate the Python
+virtual environment and start pugdebug by issuing a `python app.py` command.
 
-Under it is an input field with the label `Root:`, containing the path to your
-home directory.
+## pugdebug settings
 
-By entering a new root path in the `root` input field will change the root
-directory of the file browser.
+To bring up the `Settings` window, navigate to `Files -> Settings` (shortcut: `Ctrl+S`).
 
-For example, on my laptop it starts with `/home/robert` and the file browser
-lists my home directory. If I enter `/home/robert/www/pugdebug` into the `root`
-input field, the file browser will change to the pugdebug web project.
+### pugdebug path settings
 
-But this is just temporary, it will be nicer in the future.
+The `Path` section refers to the path settings.
+
+The `Root` under the `Path` section is the root path where the project you want to debug is
+located.
+
+The `Maps from` under the `Path` section is for when the project you want to debug is under
+a virtual machine, like Vagrant. Here you would enter the path of the project under that VM.
+
+For example, if a project I'm working on is in `/home/robert/wwww/pugdebug` and that maps to
+`/var/www` under the VM, the `Root` would be set to `/home/robert/www/pugdebug` and the
+`Maps from` would be set to `/var/www`.
+
+### pugdebug debugger settings
+
+The `Host` setting should be the IP address of the machine on which pugdebug runs. In most cases
+it is perfectly fine to leave this field blank.
+
+The `Port` setting is the port number on which xdebug will attempt to connect to the machin on
+which pugdebug runs. The default port is `9000`.
+
+The `IDE Key` setting allows to filter out messages from xdebug based on this value.
+
+`Break at first line` tells the debugger should it break on the first line or not.
+
+`Max depth`, `Max children` and `Max data` settings control the amount of information
+about variables is retrieved from xdebug.
 
 ## debugging sessions
 
-To start a debugging session, click the "Start" button in the top left corner.
+To start a debugging session, click the "Start" button in the top left corner (Shortcut: F2).
 
 Load your web project in your browser and start a
 [HTTP debugging session](http://xdebug.org/docs/remote#browser_session).
@@ -162,7 +183,7 @@ Double clicking the line with a breakpoint should remove that breakpoint.
 It is also possible to debug CLI scripts with pugdebug.
 
 Start pugdebug as stated in the previous section, click `Start` to
-start a debugging session and then in a second terminal type:
+start a debugging session and then in a new terminal type:
 
 ```
 export XDEBUG_CONFIG="idekey=pugdebug"
