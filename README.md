@@ -6,13 +6,18 @@ A python 3.4.x, pyqt5 project.
 
 ## current release
 
-The current release of pugdebug is [1.0.0-alpha](https://github.com/robertbasic/pugdebug/releases/tag/v1.0.0-alpha). 
-It includes a ZIP package with the binary, so far, only for Linux distributions. It should include everyting
-needed for pugdebug to work correctly, so just download the package, unpack it and start pugdebug.
+The current release of pugdebug is [1.0.0-alpha](https://github.com/robertbasic/pugdebug/releases/tag/v1.0.0-alpha).
+
+It includes a ZIP package with the binary, for both Linux and Windows. It should include everything
+needed for pugdebug to work correctly, so just download the package for your operating system,
+unpack it and start pugdebug.
 
 Please report any [issues](https://github.com/robertbasic/pugdebug/issues) you encounter.
 
 ## setting up the environment
+
+> NOTE: Setting up the environment should be needed only when you want to help out with
+> developing pugdebug itself. And for OS X as there are no current builds for it yet.
 
 The main dependencies are Python 3.4,
 [QT5.4](http://doc.qt.io/qt-5/gettingstarted.html),
@@ -40,11 +45,9 @@ report that this process is pretty painless on Ubuntu and OSX machines. Some
 package names might differ from what I used, but a document explaining the venv
 setup process on different systems should be available soon.
 
-Do note that I'm trying to figure out how to build executables for this beast.
-
 ### OS X setup with Homebrew
 
-Easiest way to install dependencies on OS X is to use [Homebrew].
+Easiest way to install dependencies on OS X is to use [Homebrew](http://brew.sh/).
 To install the dependencies, execute the following commands from your terminal:
 ```
 brew install python3
@@ -176,9 +179,7 @@ pugdebug should pick up the debugging session and let you debug your script.
 
 ## executables
 
-I'm trying to make executables with
-[pyqtdeploy](http://www.riverbankcomputing.com/software/pyqtdeploy/download).
-So far I managed to create one for Fedora 21.
+Take a look at the [releases](https://github.com/robertbasic/pugdebug/releases).
 
 ## todo
 
@@ -188,8 +189,6 @@ Take a look at the [issue tracker](https://github.com/robertbasic/pugdebug/issue
 
 Contributions are more than welcome! Report bugs, tell me your ideas and needs,
 write code, test it on different platforms ...
-
-[Homebrew]: http://brew.sh/
 
 ## slack
 
