@@ -1,8 +1,8 @@
 # pugdebug
 
-pugdebug is (well, should be) a PHP standalone debugger.
+pugdebug is a standalone debugging client for PHP applications that uses XDebug as the debugging engine.
 
-A python 3.4.x, pyqt5 project.
+A python 3.4, PyQt5 project.
 
 ## current release
 
