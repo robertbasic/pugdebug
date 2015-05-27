@@ -1,3 +1,7 @@
+---
+layout: index
+---
+
 # pugdebug
 
 pugdebug is a standalone debugging client for PHP applications that uses XDebug as the debugging engine.
