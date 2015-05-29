@@ -228,6 +228,8 @@ class PugdebugServerConnection(QThread):
                 (index, expression) = data
                 response = self.__evaluate_expression(expression)
                 self.expression_evaluated_signal.emit(index, response)
+            elif action == 'set_debugger_features':
+                self.__set_debugger_features()
         except OSError as error:
             self.disconnect()
             self.connection_error_signal.emit(action, error.strerror)
@@ -289,6 +291,10 @@ class PugdebugServerConnection(QThread):
     def evaluate_expression(self, index, expression):
         self.action = 'evaluate_expression'
         self.data = (index, expression)
+        self.start()
+
+    def set_debugger_features(self):
+        self.action = 'set_debugger_features'
         self.start()
 
     def __post_start(self, data):
@@ -428,6 +434,30 @@ class PugdebugServerConnection(QThread):
         response = self.__send_command(command)
 
         return self.parser.parse_eval_message(response)
+
+    def __set_debugger_features(self):
+        max_depth = int(get_setting('debugger/max_depth'))
+        command = 'feature_set -i %d -n max_depth -v %d' % (
+            self.__get_transaction_id(),
+            max_depth
+        )
+        response = self.__send_command(command)
+
+        max_children = int(get_setting('debugger/max_children'))
+        command = 'feature_set -i %d -n max_children -v %d' % (
+            self.__get_transaction_id(),
+            max_children
+        )
+        response = self.__send_command(command)
+
+        max_data = int(get_setting('debugger/max_data'))
+        command = 'feature_set -i %d -n max_data -v %d' % (
+            self.__get_transaction_id(),
+            max_data
+        )
+        response = self.__send_command(command)
+
+        return True
 
     def __send_command(self, command):
         self.socket.send(bytes(command + '\0', 'utf-8'))
