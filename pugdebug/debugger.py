@@ -322,6 +322,9 @@ class PugdebugDebugger(QObject):
         """Handle when server evaluates a list of expressions"""
         self.expressions_evaluated_signal.emit(results)
 
+    def set_debugger_features(self):
+        self.current_connection.set_debugger_features()
+
     def handle_server_error(self, error):
         """Handle when an error occurs in the server
         """

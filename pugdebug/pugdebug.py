@@ -414,6 +414,13 @@ class Pugdebug(QObject):
         if 'path/project_root' in changed_settings:
             self.handle_project_root_changed()
 
+        features = ['debugger/max_depth',
+                    'debugger/max_children',
+                    'debugger/max_data']
+
+        if any(True for feature in features if feature in changed_settings):
+            self.handle_debugger_features_changed()
+
     def handle_project_root_changed(self):
         """Handle when the project root is changed
 
@@ -425,6 +432,10 @@ class Pugdebug(QObject):
         model.set_path(project_root)
         self.file_browser.setModel(model)
         self.file_browser.setRootIndex(model.start_index)
+
+    def handle_debugger_features_changed(self):
+        if self.debugger.is_connected():
+            self.debugger.set_debugger_features()
 
     def start_debug(self):
         """Start a new debugging session
