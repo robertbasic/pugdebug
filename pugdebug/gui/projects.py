@@ -11,7 +11,8 @@ __author__ = "robertbasic"
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QDialog, QPushButton, QVBoxLayout, QHBoxLayout,
-                             QFormLayout, QLineEdit, QTreeView, QAction, QMenu)
+                             QFormLayout, QLineEdit, QTreeView, QAction, QMenu,
+                             QMessageBox)
 from PyQt5.QtGui import QIcon
 
 from pugdebug.gui.forms import PugdebugSettingsForm
@@ -109,8 +110,20 @@ class PugdebugProjectsBrowser(QTreeView):
         context_menu.popup(point)
 
     def handle_delete_action(self):
-        for index in self.selectedIndexes():
-            project = self.model().get_project_by_index(index)
+        index = self.selectedIndexes().pop()
+
+        project = self.model().get_project_by_index(index)
+
+        messageBox = QMessageBox()
+        text = "Deleting the %s project" % project.get_project_name()
+        messageBox.setText(text)
+        messageBox.setInformativeText("Are you sure you want to delete this"
+                                      " project?")
+
+        messageBox.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        answer = messageBox.exec()
+
+        if answer == QMessageBox.Yes:
             project.delete()
 
-        self.load_projects()
+            self.load_projects()
