@@ -298,14 +298,6 @@ class Pugdebug(QObject):
 
         path = self.__get_path_mapped_to_local(path, map_paths)
 
-        if path is False:
-            self.handle_error(
-                "File does not exist after mapping. "
-                "Is the path map correct?"
-            )
-            self.stop_debug()
-            return
-
         if not self.documents.is_document_open(path):
             document_model = self.documents.open_document(path)
 
@@ -491,6 +483,18 @@ class Pugdebug(QObject):
         self.main_window.set_debugging_status(3)
 
         self.main_window.toggle_actions(True)
+
+        # Check if path to index file is correct after mapping it
+        index_file = self.debugger.get_index_file()
+        path = self.__get_path_mapped_to_local(index_file)
+
+        if path is False:
+            self.handle_error(
+                "File does not exist after mapping. "
+                "Is the path map correct?"
+            )
+            self.stop_debug()
+            return
 
         post_start_data = {
             'init_breakpoints': self.init_breakpoints
