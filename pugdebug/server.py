@@ -150,8 +150,6 @@ class PugdebugServerConnection(QThread):
         if idekey != '' and init_message['idekey'] != idekey:
             return False
 
-        self.__set_debugger_features()
-
         self.init_message = init_message
 
         return True
@@ -280,6 +278,7 @@ class PugdebugServerConnection(QThread):
 
     def __post_start(self, data):
         post_start_response = {
+            'debugger_features': self.__set_debugger_features(),
             'init_breakpoints': self.__set_init_breakpoints(
                 data['init_breakpoints']
             ),
