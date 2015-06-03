@@ -142,6 +142,8 @@ class PugdebugDebugger(QObject):
             self.current_connection.disconnect()
             self.connections.clear()
 
+        self.server.stop()
+
         self.current_connection = None
         self.step_result = ''
         self.current_file = ''
@@ -244,6 +246,7 @@ class PugdebugDebugger(QObject):
             self.start_new_connection()
         else:
             self.cleanup()
+
             self.debugging_stopped_signal.emit()
 
     def run_debug(self):
