@@ -128,21 +128,15 @@ class PugdebugDebugger(QObject):
             self.handle_connection_error
         )
 
-    def cleanup(self):
-        """Cleanup debugger when it's done
+    def cleanup_current_connection(self):
+        """Cleanup the current debugger connection
 
-        If there is an active connection, disconnect from it and clear
-        all the remaining connections.
-
-        Stop the server from listening.
+        If there is an active connection, disconnect from it.
 
         Clean up attributes.
         """
         if self.is_connected():
             self.current_connection.disconnect()
-            self.connections.clear()
-
-        self.server.stop()
 
         self.current_connection = None
         self.step_result = ''
@@ -208,13 +202,9 @@ class PugdebugDebugger(QObject):
 
     def handle_server_stopped(self):
         """Handle when the server is stopped
-
-        If the current connection is terminated, cleanup the debugging
-        session and emit the debugging stopped signal.
         """
         if not self.is_connected():
-            self.cleanup()
-            self.debugging_stopped_signal.emit()
+            pass
 
     def stop_debug(self):
         """Stop a debugging session
@@ -224,8 +214,6 @@ class PugdebugDebugger(QObject):
         """
         if self.is_connected():
             self.current_connection.stop()
-        else:
-            self.server.stop()
 
     def detach_debug(self):
         """Detach the current connection
@@ -238,13 +226,12 @@ class PugdebugDebugger(QObject):
 
         If there are pending connections, start a new one.
 
-        Otherwise clean up and emit a server stopped signal.
+        Otherwise emit a debugging stopped signal.
         """
         if self.has_pending_connections():
             self.start_debugging_new_connection()
         else:
-            self.cleanup()
-
+            self.cleanup_current_connection()
             self.debugging_stopped_signal.emit()
 
     def run_debug(self):
