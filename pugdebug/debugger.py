@@ -28,6 +28,7 @@ class PugdebugDebugger(QObject):
     current_file = ''
     current_line = 0
 
+    server_stopped_signal = pyqtSignal()
     debugging_started_signal = pyqtSignal()
     debugging_post_start_signal = pyqtSignal()
     debugging_stopped_signal = pyqtSignal()
@@ -202,17 +203,18 @@ class PugdebugDebugger(QObject):
 
     def stop_listening(self):
         """Stop listening for new connections
+
+        Clear connections queue, stop debugging the current connection.
         """
+        self.connections.clear()
+        self.stop_debug()
+
         self.server.stop_listening()
 
     def handle_server_stopped(self):
         """Handle when the server stops listening to new connections
         """
-        self.connections.clear()
-        self.stop_debug()
-
-        if not self.is_connected():
-            self.debugging_stopped_signal.emit()
+        self.server_stopped_signal.emit()
 
     def stop_debug(self):
         """Stop a debugging session
