@@ -159,12 +159,10 @@ class PugdebugDebugger(QObject):
         """
         return len(self.connections) > 0
 
-    def start_debug(self):
-        """Start a debugging session
-
-        If the server is not connected, connect it.
+    def start_listening(self):
+        """Start listening to new connections
         """
-        self.server.connect()
+        self.server.start_listening()
 
     def handle_server_connected(self, connection):
         """Handle when the server establishes a new connection

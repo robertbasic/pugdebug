@@ -467,7 +467,7 @@ class Pugdebug(QObject):
 
             self.document_viewer.remove_line_highlights()
 
-            self.debugger.start_debug()
+            self.debugger.start_listening()
             self.main_window.set_debugging_status(1)
 
     def handle_debugging_started(self):
