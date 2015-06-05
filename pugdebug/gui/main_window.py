@@ -147,27 +147,38 @@ class PugdebugMainWindow(QMainWindow):
         self.quit_action.triggered.connect(self.close)
 
     def setup_actions(self):
-        self.start_debug_action = QAction("Start", self)
-        self.start_debug_action.setToolTip("Start server (F1)")
-        self.start_debug_action.setStatusTip(
-            "Start listening to for connections. Shortcut: F1"
+        self.start_listening_action = QAction("Start listening", self)
+        self.start_listening_action.setToolTip(
+            "Start listening for new connections (F1)"
         )
-        self.start_debug_action.setShortcut(QKeySequence("F1"))
+        self.start_listening_action.setStatusTip(
+            "Start listening for incomming connections. Shortcut: F1"
+        )
+        self.start_listening_action.setShortcut(QKeySequence("F1"))
+
+        self.stop_listening_action = QAction("Stop listening", self)
+        self.stop_listening_action.setToolTip(
+            "Stop listening for new connections (F2)"
+        )
+        self.stop_listening_action.setStatusTip(
+            "Stop listening to incomming connections. Shortcut: F2"
+        )
+        self.stop_listening_action.setShortcut(QKeySequence("F2"))
 
         self.stop_debug_action = QAction("Stop", self)
-        self.stop_debug_action.setToolTip("Stop server (F2)")
+        self.stop_debug_action.setToolTip("Stop debugging (F3)")
         self.stop_debug_action.setStatusTip(
-            "Stop listening to for connections. Shortcut: F2"
+            "Stop debugging the current request. Shortcut: F3"
         )
-        self.stop_debug_action.setShortcut(QKeySequence("F2"))
+        self.stop_debug_action.setShortcut(QKeySequence("F3"))
 
         self.detach_debug_action = QAction("Detach", self)
-        self.detach_debug_action.setToolTip("Detach from server (F3)")
+        self.detach_debug_action.setToolTip("Detach debugger (F4)")
         self.detach_debug_action.setStatusTip(
-            "Stop the debugging session, but let the PHP process end normally."
-            " Shortcut: F3"
+            "Detach debugger from the current request."
+            " Shortcut: F4"
         )
-        self.detach_debug_action.setShortcut(QKeySequence("F3"))
+        self.detach_debug_action.setShortcut(QKeySequence("F4"))
 
         self.run_debug_action = QAction("Run", self)
         self.run_debug_action.setToolTip("Start/resume the script (F5)")
@@ -208,7 +219,9 @@ class PugdebugMainWindow(QMainWindow):
         toolbar = QToolBar("Main Toolbar")
         toolbar.setObjectName("main-toolbar")
 
-        toolbar.addAction(self.start_debug_action)
+        toolbar.addAction(self.start_listening_action)
+        toolbar.addAction(self.stop_listening_action)
+        toolbar.addSeparator()
         toolbar.addAction(self.stop_debug_action)
         toolbar.addAction(self.detach_debug_action)
         toolbar.addSeparator()
@@ -235,7 +248,9 @@ class PugdebugMainWindow(QMainWindow):
             view_menu.addAction(widget.toggleViewAction())
 
         debug_menu = menu_bar.addMenu("&Debug")
-        debug_menu.addAction(self.start_debug_action)
+        debug_menu.addAction(self.start_listening_action)
+        debug_menu.addAction(self.stop_listening_action)
+        debug_menu.addSeparator()
         debug_menu.addAction(self.stop_debug_action)
         debug_menu.addAction(self.detach_debug_action)
         debug_menu.addSeparator()
@@ -247,13 +262,14 @@ class PugdebugMainWindow(QMainWindow):
         self.setMenuBar(menu_bar)
 
     def toggle_actions(self, enabled):
+        self.stop_debug_action.setEnabled(enabled)
         self.detach_debug_action.setEnabled(enabled)
         self.run_debug_action.setEnabled(enabled)
         self.step_over_action.setEnabled(enabled)
         self.step_into_action.setEnabled(enabled)
         self.step_out_action.setEnabled(enabled)
 
-        self.start_debug_action.setEnabled(not enabled)
+        self.start_listening_action.setEnabled(not enabled)
 
     def get_file_browser(self):
         return self.file_browser

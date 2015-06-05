@@ -28,6 +28,7 @@ class PugdebugDebugger(QObject):
     current_file = ''
     current_line = 0
 
+    server_stopped_signal = pyqtSignal()
     debugging_started_signal = pyqtSignal()
     debugging_post_start_signal = pyqtSignal()
     debugging_stopped_signal = pyqtSignal()
@@ -58,8 +59,8 @@ class PugdebugDebugger(QObject):
     def connect_server_signals(self):
         """Connect server signals to slots
         """
-        self.server.server_connected_signal.connect(
-            self.handle_server_connected
+        self.server.new_connection_established_signal.connect(
+            self.handle_new_connection_established
         )
         self.server.server_stopped_signal.connect(
             self.handle_server_stopped
@@ -128,21 +129,15 @@ class PugdebugDebugger(QObject):
             self.handle_connection_error
         )
 
-    def cleanup(self):
-        """Cleanup debugger when it's done
+    def cleanup_current_connection(self):
+        """Cleanup the current debugger connection
 
-        If there is an active connection, disconnect from it and clear
-        all the remaining connections.
-
-        Stop the server from listening.
+        If there is an active connection, disconnect from it.
 
         Clean up attributes.
         """
         if self.is_connected():
             self.current_connection.disconnect()
-            self.connections.clear()
-
-        self.server.stop()
 
         self.current_connection = None
         self.step_result = ''
@@ -159,14 +154,12 @@ class PugdebugDebugger(QObject):
         """
         return len(self.connections) > 0
 
-    def start_debug(self):
-        """Start a debugging session
-
-        If the server is not connected, connect it.
+    def start_listening(self):
+        """Start listening to new connections
         """
-        self.server.connect()
+        self.server.start_listening()
 
-    def handle_server_connected(self, connection):
+    def handle_new_connection_established(self, connection):
         """Handle when the server establishes a new connection
 
         Connect the signals for the new connection.
@@ -180,9 +173,9 @@ class PugdebugDebugger(QObject):
         self.connections.append(connection)
 
         if not self.is_connected():
-            self.start_new_connection()
+            self.start_debugging_new_connection()
 
-    def start_new_connection(self):
+    def start_debugging_new_connection(self):
         """Start a new connection
 
         Get the first (oldest) connection from the queue, set it's init
@@ -208,15 +201,20 @@ class PugdebugDebugger(QObject):
         """
         self.debugging_post_start_signal.emit()
 
-    def handle_server_stopped(self):
-        """Handle when the server is stopped
+    def stop_listening(self):
+        """Stop listening for new connections
 
-        If the current connection is terminated, cleanup the debugging
-        session and emit the debugging stopped signal.
+        Clear connections queue, stop debugging the current connection.
         """
-        if not self.is_connected():
-            self.cleanup()
-            self.debugging_stopped_signal.emit()
+        self.connections.clear()
+        self.stop_debug()
+
+        self.server.stop_listening()
+
+    def handle_server_stopped(self):
+        """Handle when the server stops listening to new connections
+        """
+        self.server_stopped_signal.emit()
 
     def stop_debug(self):
         """Stop a debugging session
@@ -226,8 +224,6 @@ class PugdebugDebugger(QObject):
         """
         if self.is_connected():
             self.current_connection.stop()
-        else:
-            self.server.stop()
 
     def detach_debug(self):
         """Detach the current connection
@@ -240,13 +236,12 @@ class PugdebugDebugger(QObject):
 
         If there are pending connections, start a new one.
 
-        Otherwise clean up and emit a server stopped signal.
+        Otherwise emit a debugging stopped signal.
         """
         if self.has_pending_connections():
-            self.start_new_connection()
+            self.start_debugging_new_connection()
         else:
-            self.cleanup()
-
+            self.cleanup_current_connection()
             self.debugging_stopped_signal.emit()
 
     def run_debug(self):

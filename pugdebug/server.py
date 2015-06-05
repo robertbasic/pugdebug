@@ -23,7 +23,7 @@ class PugdebugServer(QThread):
 
     wait_for_accept = True
 
-    server_connected_signal = pyqtSignal(object)
+    new_connection_established_signal = pyqtSignal(object)
     server_stopped_signal = pyqtSignal()
 
     server_error_signal = pyqtSignal(str)
@@ -36,29 +36,41 @@ class PugdebugServer(QThread):
     def run(self):
         self.mutex.lock()
 
-        self.__connect()
+        socket_server = self.__connect()
+
+        if socket_server is not None:
+            self.__listen(socket_server)
 
         self.mutex.unlock()
 
-    def connect(self):
+    def start_listening(self):
         self.wait_for_accept = True
         self.start()
 
-    def stop(self):
+    def stop_listening(self):
         self.wait_for_accept = False
 
     def __connect(self):
-        """Connect to the server and listen to new incomming connections
+        """Connect to the socket server
+        """
+        try:
+            socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            socket_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            socket_server.settimeout(1)
+        except OSError as e:
+            socket_server = None
+            self.server_error_signal.emit(e.strerror)
+
+        return socket_server
+
+    def __listen(self, socket_server):
+        """Listen to new incomming connections
 
         For every accepted connection, see if it is valid and emit a signal
         with that new connection.
 
         Otherwise silently disregard that connection.
         """
-        socket_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        socket_server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        socket_server.settimeout(1)
-
         host = get_setting('debugger/host')
         port_number = int(get_setting('debugger/port_number'))
 
@@ -76,7 +88,9 @@ class PugdebugServer(QThread):
                         is_valid = connection.init_connection()
 
                         if is_valid:
-                            self.server_connected_signal.emit(connection)
+                            self.new_connection_established_signal.emit(
+                                connection
+                            )
                 except socket.timeout:
                     pass
 
