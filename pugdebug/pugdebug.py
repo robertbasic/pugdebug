@@ -155,7 +155,12 @@ class Pugdebug(QObject):
         Connect signals when the run and step continuation commands are
         triggered are connected.
         """
-        self.main_window.start_debug_action.triggered.connect(self.start_debug)
+        self.main_window.start_listening_action.triggered.connect(
+            self.start_listening
+        )
+        self.main_window.stop_listening_action.triggered.connect(
+            self.stop_listening
+        )
         self.main_window.stop_debug_action.triggered.connect(self.stop_debug)
         self.main_window.detach_debug_action.triggered.connect(
             self.detach_debug
@@ -429,8 +434,8 @@ class Pugdebug(QObject):
         if self.debugger.is_connected():
             self.debugger.set_debugger_features()
 
-    def start_debug(self):
-        """Start a new debugging session
+    def start_listening(self):
+        """Start listening to new incomming connections
 
         Clear the variable viewer.
 
@@ -511,6 +516,9 @@ class Pugdebug(QObject):
             self.run_debug()
         else:
             self.step_into()
+
+    def stop_listening(self):
+        pass
 
     def stop_debug(self):
         """Stop a debugging session
