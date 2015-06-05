@@ -23,7 +23,7 @@ class PugdebugServer(QThread):
 
     wait_for_accept = True
 
-    server_connected_signal = pyqtSignal(object)
+    new_connection_established_signal = pyqtSignal(object)
     server_stopped_signal = pyqtSignal()
 
     server_error_signal = pyqtSignal(str)
@@ -88,7 +88,9 @@ class PugdebugServer(QThread):
                         is_valid = connection.init_connection()
 
                         if is_valid:
-                            self.server_connected_signal.emit(connection)
+                            self.new_connection_established_signal.emit(
+                                connection
+                            )
                 except socket.timeout:
                     pass
 

@@ -58,8 +58,8 @@ class PugdebugDebugger(QObject):
     def connect_server_signals(self):
         """Connect server signals to slots
         """
-        self.server.server_connected_signal.connect(
-            self.handle_server_connected
+        self.server.new_connection_established_signal.connect(
+            self.handle_new_connection_established
         )
         self.server.server_stopped_signal.connect(
             self.handle_server_stopped
@@ -164,7 +164,7 @@ class PugdebugDebugger(QObject):
         """
         self.server.start_listening()
 
-    def handle_server_connected(self, connection):
+    def handle_new_connection_established(self, connection):
         """Handle when the server establishes a new connection
 
         Connect the signals for the new connection.
@@ -178,9 +178,9 @@ class PugdebugDebugger(QObject):
         self.connections.append(connection)
 
         if not self.is_connected():
-            self.start_new_connection()
+            self.start_debugging_new_connection()
 
-    def start_new_connection(self):
+    def start_debugging_new_connection(self):
         """Start a new connection
 
         Get the first (oldest) connection from the queue, set it's init
@@ -241,7 +241,7 @@ class PugdebugDebugger(QObject):
         Otherwise clean up and emit a server stopped signal.
         """
         if self.has_pending_connections():
-            self.start_new_connection()
+            self.start_debugging_new_connection()
         else:
             self.cleanup()
 
