@@ -47,7 +47,7 @@ class PugdebugServer(QThread):
         self.wait_for_accept = True
         self.start()
 
-    def stop(self):
+    def stop_listening(self):
         self.wait_for_accept = False
 
     def __connect(self):

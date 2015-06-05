@@ -200,11 +200,19 @@ class PugdebugDebugger(QObject):
         """
         self.debugging_post_start_signal.emit()
 
-    def handle_server_stopped(self):
-        """Handle when the server is stopped
+    def stop_listening(self):
+        """Stop listening for new connections
         """
+        self.server.stop_listening()
+
+    def handle_server_stopped(self):
+        """Handle when the server stops listening to new connections
+        """
+        self.stop_debug()
+        self.connections.clear()
+
         if not self.is_connected():
-            pass
+            self.debugging_stopped_signal.emit()
 
     def stop_debug(self):
         """Stop a debugging session

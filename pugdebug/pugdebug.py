@@ -518,7 +518,7 @@ class Pugdebug(QObject):
             self.step_into()
 
     def stop_listening(self):
-        pass
+        self.debugger.stop_listening()
 
     def stop_debug(self):
         """Stop a debugging session
