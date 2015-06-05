@@ -208,8 +208,8 @@ class PugdebugDebugger(QObject):
     def handle_server_stopped(self):
         """Handle when the server stops listening to new connections
         """
-        self.stop_debug()
         self.connections.clear()
+        self.stop_debug()
 
         if not self.is_connected():
             self.debugging_stopped_signal.emit()
