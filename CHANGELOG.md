@@ -12,7 +12,9 @@
  - Confirm deleting a project
  - Improved support for debugging multiple requests
  - Added the change log file
+
 ### Changed
  - Set debugger features in the post_start action
+
 ### Fixed
  - Non-existent file after mapping
