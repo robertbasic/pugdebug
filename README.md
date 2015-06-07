@@ -14,6 +14,10 @@ unpack it and start pugdebug.
 
 Please report any [issues](https://github.com/robertbasic/pugdebug/issues) you encounter.
 
+## change log
+
+Please take a look at the [change log](./CHANGELOG.md)
+
 ## setting up the environment
 
 > NOTE: Setting up the environment should be needed only when you want to help out with
