@@ -2,9 +2,12 @@
 
 ## [Unreleased][unrealeased]
 ### Added
+
 ### Changed
+
 ### Fixed
  - Tries debugging requests even when the XDEBUG_SESSION_START param is not set
+
 ### Removed
 
 ## [1.0.0-beta] - 2015-06-07
