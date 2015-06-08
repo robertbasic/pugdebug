@@ -91,6 +91,8 @@ class PugdebugServer(QThread):
                             self.new_connection_established_signal.emit(
                                 connection
                             )
+                        else:
+                            connection.disconnect()
                 except socket.timeout:
                     pass
 
