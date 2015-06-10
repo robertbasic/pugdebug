@@ -2,6 +2,7 @@
 
 ## [Unreleased][unrealeased]
 ### Added
+ - Simple build file for Windows
 
 ### Changed
 
