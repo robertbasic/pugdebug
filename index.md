@@ -20,7 +20,7 @@ Please report any [issues](https://github.com/robertbasic/pugdebug/issues) you e
 
 ## change log
 
-Please take a look at the [change log](./CHANGELOG)
+Please take a look at the [change log](./CHANGELOG).
 
 ## setting up the environment
 
