@@ -221,6 +221,6 @@ write code, test it on different platforms ...
 
 ## slack
 
-There's a slack created for pugdebug at https://pugdebug.slack.com/
+There's a slack created for [pugdebug](https://pugdebug.slack.com/).
 
 If you would like access, open a [new ticket](https://github.com/robertbasic/pugdebug/issues).
