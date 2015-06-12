@@ -11,6 +11,11 @@
 
 __author__ = "robertbasic"
 
+# Fix for Gtk-CRITICAL issues on Ubuntu
+# Turn off that stupid overlay scrollbars
+import os
+os.environ['LIBOVERLAY_SCROLLBAR'] = '0'
+
 import sys
 
 from PyQt5.QtWidgets import QApplication

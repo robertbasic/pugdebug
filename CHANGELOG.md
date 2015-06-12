@@ -6,6 +6,7 @@
 ### Changed
 
 ### Fixed
+ - Fix for GTK critical errors on Ubuntu
 
 ### Removed
 
