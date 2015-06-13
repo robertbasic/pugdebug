@@ -4,6 +4,7 @@
 ### Added
 
 ### Changed
+ - Use mono fonts in sub-windows
 
 ### Fixed
  - Fix for GTK critical errors on Ubuntu
