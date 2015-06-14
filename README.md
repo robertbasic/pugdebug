@@ -18,7 +18,7 @@ Please report any [issues](https://github.com/robertbasic/pugdebug/issues) you e
 
 There are executables available for Linux and Windows operating systems.
 Every [release](https://github.com/robertbasic/pugdebug/releases) includes a tar.gz/ZIP package with the
-executables. The executable includes everything needed for pugdebug to work correctly on your system. There
+executables. They include everything needed for pugdebug to work correctly on your system. There
 is no need to install or set up anything else.
 
 ## change log
