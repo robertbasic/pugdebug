@@ -12,11 +12,18 @@ A python 3.4, PyQt5 project.
 
 The current release of pugdebug is [1.0.0-beta.1](https://github.com/robertbasic/pugdebug/releases/tag/v1.0.0-beta.1).
 
-It includes a ZIP package with the binary, for both Linux and Windows. It should include everything
+It includes a tar.gz/ZIP package with the binary, for both Linux and Windows. It should include everything
 needed for pugdebug to work correctly, so just download the package for your operating system,
 unpack it and start pugdebug.
 
 Please report any [issues](https://github.com/robertbasic/pugdebug/issues) you encounter.
+
+## executables
+
+There are executables available for Linux and Windows operating systems.
+Every [release](https://github.com/robertbasic/pugdebug/releases) includes a tar.gz/ZIP package with the
+executables. They include everything needed for pugdebug to work correctly on your system. There
+is no need to install or set up anything else.
 
 ## change log
 
@@ -176,10 +183,6 @@ php script.php
 ```
 
 pugdebug should pick up the debugging session and let you debug your script.
-
-## executables
-
-Take a look at the [releases](https://github.com/robertbasic/pugdebug/releases).
 
 ## todo
 
