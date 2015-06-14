@@ -23,7 +23,7 @@ is no need to install or set up anything else.
 
 ## change log
 
-Please take a look at the [change log](./CHANGELOG.md)
+Please take a look at the [change log](./CHANGELOG.md).
 
 ## setting up the environment
 
