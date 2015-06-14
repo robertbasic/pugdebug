@@ -28,42 +28,13 @@ The main dependencies are Python 3.4,
 [SIP4.6](http://www.riverbankcomputing.com/software/sip/download)
 and [PyQt5.4](http://www.riverbankcomputing.com/software/pyqt/download5).
 
-I wrote a [blog post](http://robertbasic.com/blog/install-pyqt5-in-python-3-virtual-environment)
-about setting up a virtual environment for it.
+There is a wiki page with
+[instructions how to set up the development environment](https://github.com/robertbasic/pugdebug/wiki/Install-pugdebug)
+for Fedora, Ubuntu, Windows and OSX.
 
-Clone this repo and after setting up the virtual environment, install the application
-requirements by running:
 
-```
-pip install -r requirements.txt
-```
-
-After the requirements are installed, start pugdebug with a simple command:
-
-```
-python app.py
-```
-
-[@ihabunek](https://github.com/ihabunek) and [@vranac](https://github.com/vranac)
-report that this process is pretty painless on Ubuntu and OSX machines. Some
-package names might differ from what I used, but a document explaining the venv
-setup process on different systems should be available soon.
-
-### OS X setup with Homebrew
-
-Easiest way to install dependencies on OS X is to use [Homebrew](http://brew.sh/).
-To install the dependencies, execute the following commands from your terminal:
-```
-brew install python3
-brew install qt5 pyqt5 sip
-```
-
-Go to directory where you checked out the pugdebug, and execute
-```
-python3 app.py
-```
-
-At the moment, there seems to be an issue with using virtualenv, python3 and pyqt5 on OS X Yosemite.
+There is also a [blog post](http://robertbasic.com/blog/install-pyqt5-in-python-3-virtual-environment)
+about setting up a virtual environment on a Fedora that goes into bit more details.
 
 ## setting up xdebug
 
