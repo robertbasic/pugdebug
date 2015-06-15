@@ -56,6 +56,9 @@ class PugdebugMainWindow(QMainWindow):
         if has_setting("window/state"):
             self.restoreState(get_setting("window/state"))
 
+        if has_setting("current_project"):
+            self.set_window_title(get_setting("current_project"))
+
     def closeEvent(self, event):
         set_setting("window/geometry", self.saveGeometry())
         set_setting("window/state", self.saveState())
