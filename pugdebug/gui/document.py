@@ -276,7 +276,6 @@ class PugdebugDocumentContents(QPlainTextEdit):
 
         Clear the extra selections in the file.
         """
-        self.move_to_line(0)
         self.setExtraSelections([])
 
     def block_has_breakpoint(self, block):
