@@ -2,6 +2,7 @@
 
 ## [Unreleased][unrealeased]
 ### Added
+ - Display current project name in window title
 
 ### Changed
  - Use mono fonts in sub-windows
