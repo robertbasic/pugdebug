@@ -56,6 +56,9 @@ class PugdebugMainWindow(QMainWindow):
         if has_setting("window/state"):
             self.restoreState(get_setting("window/state"))
 
+        if has_setting("current_project"):
+            self.set_window_title(get_setting("current_project"))
+
     def closeEvent(self, event):
         set_setting("window/geometry", self.saveGeometry())
         set_setting("window/state", self.saveState())
@@ -294,6 +297,10 @@ class PugdebugMainWindow(QMainWindow):
 
     def get_expression_viewer(self):
         return self.expression_viewer
+
+    def set_window_title(self, project_name):
+        title = "pugdebug / %s " % project_name
+        self.setWindowTitle(title)
 
     def set_debugging_status(self, status):
         self.permanent_statusbar.set_debugging_status(status)
