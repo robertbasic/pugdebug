@@ -21,7 +21,7 @@ from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
 from pugdebug.models.file_browser import PugdebugFileBrowser
 from pugdebug.models.projects import PugdebugProjects
-from pugdebug.models.settings import get_setting, save_settings
+from pugdebug.models.settings import get_setting, set_setting, save_settings
 
 
 class Pugdebug(QObject):
@@ -275,6 +275,10 @@ class Pugdebug(QObject):
 
         Get the settings for the project and load them as the current
         application settings.
+
+        Set the current project name in the window title.
+
+        Set the current project name setting in application settings.
         """
         project_settings = project.get_settings()
 
@@ -282,7 +286,11 @@ class Pugdebug(QObject):
 
         self.handle_settings_changed(changed_settings)
 
-        self.main_window.set_window_title(project.get_project_name())
+        project_name = project.get_project_name()
+
+        self.main_window.set_window_title(project_name)
+
+        set_setting('current_project', project_name)
 
     def file_browser_item_activated(self, index):
         """Handle when file browser item gets activated
