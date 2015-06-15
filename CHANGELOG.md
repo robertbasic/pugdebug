@@ -8,6 +8,7 @@
 
 ### Fixed
  - Fix for GTK critical errors on Ubuntu
+ - Do not jump to top of the file every time a debugging session starts
 
 ### Removed
 
