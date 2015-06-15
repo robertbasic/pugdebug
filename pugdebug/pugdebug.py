@@ -282,6 +282,8 @@ class Pugdebug(QObject):
 
         self.handle_settings_changed(changed_settings)
 
+        self.main_window.set_window_title(project.get_project_name())
+
     def file_browser_item_activated(self, index):
         """Handle when file browser item gets activated
 

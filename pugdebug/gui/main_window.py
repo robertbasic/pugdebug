@@ -295,6 +295,10 @@ class PugdebugMainWindow(QMainWindow):
     def get_expression_viewer(self):
         return self.expression_viewer
 
+    def set_window_title(self, project_name):
+        title = "pugdebug / %s " % project_name
+        self.setWindowTitle(title)
+
     def set_debugging_status(self, status):
         self.permanent_statusbar.set_debugging_status(status)
 
