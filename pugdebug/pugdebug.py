@@ -401,12 +401,9 @@ class Pugdebug(QObject):
         current_file = self.debugger.get_current_file()
         current_line = self.debugger.get_current_line()
 
-        self.open_document(current_file)
+        self.jump_to_line_in_file(current_file, current_line, True)
 
-        document_widget = self.document_viewer.get_current_document()
-        document_widget.move_to_line(current_line)
-
-    def jump_to_line_in_file(self, file, line):
+    def jump_to_line_in_file(self, file, line, is_current=False):
         """Jump to a line in a file.
 
         Show the document, and scroll to the given line.
@@ -414,7 +411,7 @@ class Pugdebug(QObject):
         self.open_document(file)
 
         document_widget = self.document_viewer.get_current_document()
-        document_widget.move_to_line(line, False)
+        document_widget.move_to_line(line, is_current)
 
     def handle_settings_changed(self, changed_settings):
         """Handle when settings have changed.
