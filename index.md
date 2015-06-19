@@ -4,7 +4,7 @@ layout: index
 
 # pugdebug
 
-pugdebug is a standalone debugging client for PHP applications that uses XDebug as the debugging engine.
+pugdebug is a standalone debugging client for PHP applications that uses Xdebug as the debugging engine.
 
 A python 3.4, PyQt5 project.
 
@@ -47,60 +47,10 @@ for Fedora, Ubuntu, Windows and OSX.
 There is also a [blog post](http://robertbasic.com/blog/install-pyqt5-in-python-3-virtual-environment)
 about setting up a virtual environment on a Fedora that goes into bit more details.
 
-## setting up xdebug
+## setting up Xdebug
 
-To be able to debug PHP with pugdebug, you need to have [xdebug](http://xdebug.org/docs/remote)
-propely set up for remote debugging.
-
-A minimal configuration would be something like:
-
-```
-xdebug.idekey=pugdebug
-xdebug.remote_enable=1
-xdebug.remote_port=9000
-xdebug.remote_host=127.0.0.1
-```
-
-If the project you want to debug is in a vagrant virtual machine, your xdebug
-config should be something like:
-
-```
-xdebug.idekey=pugdebug
-xdebug.remote_enable=1
-xdebug.remote_port=9000
-xdebug.remote_connect_back=1
-```
-
-Do note that when debugging CLI scripts from a vagrant virtual machine, the
-`remote_connect_back` setting will not work, and we need to use the
-`remote_host` setting. The xdebug configuration should look something like:
-
-```
-xdebug.idekey=pugdebug
-xdebug.remote_enable=1
-xdebug.remote_port=9000
-xdebug.remote_host=33.33.33.1
-```
-
-You can find the IP address to use for the remote host setting by issuing the
-following command on the host machine:
-
-```
-ip addr
-```
-
-and a part of the output will include something like this:
-
-```
-6: vboxnet2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UNKNOWN group default qlen 1000
-    link/ether 0a:00:27:00:00:02 brd ff:ff:ff:ff:ff:ff
-    inet 33.33.33.1/24 brd 33.33.33.255 scope global vboxnet2
-       valid_lft forever preferred_lft forever
-    inet6 fe80::800:27ff:fe00:2/64 scope link
-       valid_lft forever preferred_lft forever
-```
-
-and from there we can see the IP address of `33.33.33.1`.
+There is a wiki page with [simple examples of Xdebug configurations](https://github.com/robertbasic/pugdebug/wiki/Setting-up-Xdebug)
+that should help with setting up Xdebug for remote debugging.
 
 ## using pugdebug
 
@@ -133,15 +83,15 @@ For example, if a project I'm working on is in `/home/robert/wwww/pugdebug` and 
 The `Host` setting should be the IP address of the machine on which pugdebug runs. In most cases
 it is perfectly fine to leave this field blank.
 
-The `Port` setting is the port number on which xdebug will attempt to connect to the machin on
+The `Port` setting is the port number on which Xdebug will attempt to connect to the machin on
 which pugdebug runs. The default port is `9000`.
 
-The `IDE Key` setting allows to filter out messages from xdebug based on this value.
+The `IDE Key` setting allows to filter out messages from Xdebug based on this value.
 
 `Break at first line` tells the debugger should it break on the first line or not.
 
 `Max depth`, `Max children` and `Max data` settings control the amount of information
-about variables is retrieved from xdebug.
+about variables is retrieved from Xdebug.
 
 ## debugging sessions
 
