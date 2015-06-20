@@ -63,6 +63,9 @@ class PugdebugSettings():
     def set(self, key, value):
         return self.application_settings.setValue(key, value)
 
+    def remove(self, key):
+        return self.application_settings.remove(key)
+
     def add_project(self, project):
         index = self.__get_next_index(project)
 
@@ -159,6 +162,10 @@ def has_setting(key):
 
 def set_setting(key, value):
     settings.set(key, value)
+
+
+def remove_setting(key):
+    settings.remove(key)
 
 
 def save_settings(new_settings):

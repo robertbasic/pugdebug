@@ -14,7 +14,9 @@ import os
 from PyQt5.QtCore import QCoreApplication, QSettings
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
-from pugdebug.models.settings import get_projects, has_setting, delete_project
+from pugdebug.models.settings import (get_projects, delete_project,
+                                      get_setting, has_setting,
+                                      remove_setting)
 
 
 class PugdebugProject(QSettings):
@@ -52,6 +54,14 @@ class PugdebugProject(QSettings):
             self.setValue(key, value)
 
     def delete(self):
+        project_name = self.get_project_name()
+
+        if has_setting('current_project'):
+            current_project = get_setting('current_project')
+
+            if project_name == current_project:
+                remove_setting('current_project')
+
         delete_project(self.get_project_name())
 
         filename = self.fileName()
