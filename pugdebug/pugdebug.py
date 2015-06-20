@@ -257,8 +257,7 @@ class Pugdebug(QObject):
         """
         self.projects_browser.load_projects()
 
-        item = self.projects_browser.model().findItems(project_name)[0]
-        project = self.projects_browser.model().get_project_by_item(item)
+        project = self.projects_browser.load_project_by_name(project_name)
 
         self.load_project(project)
 
