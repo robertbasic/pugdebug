@@ -162,13 +162,13 @@ def set_setting(key, value):
 
 
 def save_settings(new_settings):
-    changed_settings = set()
+    changed_settings = {}
 
     for key in new_settings:
         value = new_settings[key]
         if not has_setting(key) or get_setting(key) != value:
             set_setting(key, value)
-            changed_settings.add(key)
+            changed_settings[key] = value
 
     return changed_settings
 

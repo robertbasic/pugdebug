@@ -20,7 +20,7 @@ from pugdebug.models.settings import (get_setting, has_setting,
 
 class PugdebugSettingsWindow(QDialog):
 
-    settings_changed_signal = pyqtSignal(set)
+    settings_changed_signal = pyqtSignal(dict)
 
     def __init__(self, parent):
         super(PugdebugSettingsWindow, self).__init__(parent)

@@ -47,6 +47,10 @@ class PugdebugProject(QSettings):
 
         return project_settings
 
+    def set_settings(self, new_settings):
+        for key, value in new_settings.items():
+            self.setValue(key, value)
+
     def delete(self):
         delete_project(self.get_project_name())
 

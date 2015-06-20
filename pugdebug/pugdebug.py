@@ -21,7 +21,8 @@ from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
 from pugdebug.models.file_browser import PugdebugFileBrowser
 from pugdebug.models.projects import PugdebugProjects
-from pugdebug.models.settings import get_setting, set_setting, save_settings
+from pugdebug.models.settings import (get_setting, set_setting,
+                                      save_settings, has_setting)
 
 
 class Pugdebug(QObject):
@@ -257,10 +258,10 @@ class Pugdebug(QObject):
         """
         self.projects_browser.load_projects()
 
-        item = self.projects_browser.model().findItems(project_name)[0]
-        project = self.projects_browser.model().get_project_by_item(item)
+        project = self.projects_browser.load_project_by_name(project_name)
 
-        self.load_project(project)
+        if project is not None:
+            self.load_project(project)
 
     def projects_browser_item_activated(self, index):
         """Handle when a projects browser item gets activated
@@ -418,14 +419,26 @@ class Pugdebug(QObject):
 
         Given argument is a set of settings's names which have been changed.
         """
-        if 'path/project_root' in changed_settings:
+
+        if has_setting('current_project'):
+            project_name = get_setting('current_project')
+
+            project = self.projects_browser.load_project_by_name(project_name)
+
+            if project is not None:
+                project.set_settings(changed_settings)
+
+        changed_setting_keys = changed_settings.keys()
+
+        if 'path/project_root' in changed_setting_keys:
             self.handle_project_root_changed()
 
         features = ['debugger/max_depth',
                     'debugger/max_children',
                     'debugger/max_data']
 
-        if any(True for feature in features if feature in changed_settings):
+        if any(True for feature in features
+               if feature in changed_setting_keys):
             self.handle_debugger_features_changed()
 
     def handle_project_root_changed(self):
