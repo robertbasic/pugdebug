@@ -417,6 +417,12 @@ class Pugdebug(QObject):
 
         Given argument is a set of settings's names which have been changed.
         """
+
+        project_name = get_setting('current_project')
+        project = self.projects_browser.load_project_by_name(project_name)
+
+        project.set_settings(changed_settings)
+
         changed_setting_keys = changed_settings.keys()
 
         if 'path/project_root' in changed_setting_keys:
