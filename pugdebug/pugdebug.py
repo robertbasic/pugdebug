@@ -21,7 +21,8 @@ from pugdebug.gui.document import PugdebugDocument
 from pugdebug.models.documents import PugdebugDocuments
 from pugdebug.models.file_browser import PugdebugFileBrowser
 from pugdebug.models.projects import PugdebugProjects
-from pugdebug.models.settings import get_setting, set_setting, save_settings
+from pugdebug.models.settings import (get_setting, set_setting,
+                                      save_settings, has_setting)
 
 
 class Pugdebug(QObject):
@@ -418,10 +419,12 @@ class Pugdebug(QObject):
         Given argument is a set of settings's names which have been changed.
         """
 
-        project_name = get_setting('current_project')
-        project = self.projects_browser.load_project_by_name(project_name)
+        if has_setting('current_project'):
+            project_name = get_setting('current_project')
 
-        project.set_settings(changed_settings)
+            project = self.projects_browser.load_project_by_name(project_name)
+
+            project.set_settings(changed_settings)
 
         changed_setting_keys = changed_settings.keys()
 
