@@ -11,6 +11,7 @@
  - Fix for GTK critical errors on Ubuntu
  - Do not jump to top of the file every time a debugging session starts
  - Updating settings now updates current project's settings as well
+ - Deleting current project doesn't break pugdebug any more
 
 ### Removed
 
