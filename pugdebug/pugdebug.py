@@ -417,14 +417,17 @@ class Pugdebug(QObject):
 
         Given argument is a set of settings's names which have been changed.
         """
-        if 'path/project_root' in changed_settings:
+        changed_setting_keys = changed_settings.keys()
+
+        if 'path/project_root' in changed_setting_keys:
             self.handle_project_root_changed()
 
         features = ['debugger/max_depth',
                     'debugger/max_children',
                     'debugger/max_data']
 
-        if any(True for feature in features if feature in changed_settings):
+        if any(True for feature in features
+               if feature in changed_setting_keys):
             self.handle_debugger_features_changed()
 
     def handle_project_root_changed(self):
