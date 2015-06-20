@@ -260,7 +260,8 @@ class Pugdebug(QObject):
 
         project = self.projects_browser.load_project_by_name(project_name)
 
-        self.load_project(project)
+        if project is not None:
+            self.load_project(project)
 
     def projects_browser_item_activated(self, index):
         """Handle when a projects browser item gets activated
@@ -424,7 +425,8 @@ class Pugdebug(QObject):
 
             project = self.projects_browser.load_project_by_name(project_name)
 
-            project.set_settings(changed_settings)
+            if project is not None:
+                project.set_settings(changed_settings)
 
         changed_setting_keys = changed_settings.keys()
 

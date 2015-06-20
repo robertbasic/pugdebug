@@ -109,9 +109,13 @@ class PugdebugProjectsBrowser(QTreeView):
 
     def load_project_by_name(self, project_name):
         model = self.model()
-        item = model.findItems(project_name)[0]
-        project = model.get_project_by_item(item)
-        return project
+        items = model.findItems(project_name)
+        if len(items) > 0:
+            item = items[0]
+            project = model.get_project_by_item(item)
+            return project
+
+        return None
 
     def show_context_menu(self, point):
         context_menu = QMenu(self)
