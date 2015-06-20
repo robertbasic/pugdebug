@@ -59,6 +59,10 @@ class PugdebugMainWindow(QMainWindow):
         if has_setting("current_project"):
             self.set_window_title(get_setting("current_project"))
 
+        self.projects_browser.project_deleted_signal.connect(
+            self.handle_project_deleted
+        )
+
     def closeEvent(self, event):
         set_setting("window/geometry", self.saveGeometry())
         set_setting("window/state", self.saveState())
@@ -298,8 +302,15 @@ class PugdebugMainWindow(QMainWindow):
     def get_expression_viewer(self):
         return self.expression_viewer
 
+    def handle_project_deleted(self, is_project_current):
+        if is_project_current:
+            self.set_window_title(None)
+
     def set_window_title(self, project_name):
-        title = "pugdebug / %s " % project_name
+        if project_name is not None:
+            title = "pugdebug / %s " % project_name
+        else:
+            title = "pugdebug"
         self.setWindowTitle(title)
 
     def set_debugging_status(self, status):

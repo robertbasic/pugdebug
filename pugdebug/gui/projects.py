@@ -9,7 +9,7 @@
 
 __author__ = "robertbasic"
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (QDialog, QPushButton, QVBoxLayout, QHBoxLayout,
                              QFormLayout, QLineEdit, QTreeView, QAction, QMenu,
                              QMessageBox)
@@ -90,6 +90,8 @@ class PugdebugNewProjectWindow(QDialog):
 
 class PugdebugProjectsBrowser(QTreeView):
 
+    project_deleted_signal = pyqtSignal(bool)
+
     def __init__(self):
         super(PugdebugProjectsBrowser, self).__init__()
 
@@ -141,6 +143,10 @@ class PugdebugProjectsBrowser(QTreeView):
         answer = messageBox.exec()
 
         if answer == QMessageBox.Yes:
+            is_project_current = project.is_project_current()
+
             project.delete()
 
             self.load_projects()
+
+            self.project_deleted_signal.emit(is_project_current)
