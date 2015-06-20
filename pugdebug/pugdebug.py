@@ -283,15 +283,15 @@ class Pugdebug(QObject):
         """
         project_settings = project.get_settings()
 
+        project_name = project.get_project_name()
+
+        set_setting('current_project', project_name)
+
         changed_settings = save_settings(project_settings)
 
         self.handle_settings_changed(changed_settings)
 
-        project_name = project.get_project_name()
-
         self.main_window.set_window_title(project_name)
-
-        set_setting('current_project', project_name)
 
     def file_browser_item_activated(self, index):
         """Handle when file browser item gets activated
