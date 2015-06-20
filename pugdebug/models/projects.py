@@ -40,6 +40,15 @@ class PugdebugProject(QSettings):
     def get_project_name(self):
         return self.project_name
 
+    def is_project_current(self):
+        if has_setting('current_project'):
+            current_project = get_setting('current_project')
+
+            if current_project == self.get_project_name():
+                return True
+
+        return False
+
     def get_settings(self):
         project_settings = {}
 
@@ -54,13 +63,8 @@ class PugdebugProject(QSettings):
             self.setValue(key, value)
 
     def delete(self):
-        project_name = self.get_project_name()
-
-        if has_setting('current_project'):
-            current_project = get_setting('current_project')
-
-            if project_name == current_project:
-                remove_setting('current_project')
+        if self.is_project_current():
+            remove_setting('current_project')
 
         delete_project(self.get_project_name())
 
