@@ -27,7 +27,6 @@ from pugdebug.models.settings import (get_setting, set_setting,
 
 class Pugdebug(QObject):
 
-    init_breakpoints = []
     breakpoints = []
 
     def __init__(self):
@@ -472,7 +471,7 @@ class Pugdebug(QObject):
 
         start_debugging = True
 
-        if break_at_first_line == 0 and len(self.init_breakpoints) == 0:
+        if break_at_first_line == 0 and len(self.breakpoints) == 0:
             messageBox = QMessageBox()
             messageBox.setText("There are no breakpoints set and the break at"
                                " first line setting is turned off.")
@@ -525,7 +524,7 @@ class Pugdebug(QObject):
             return
 
         post_start_data = {
-            'init_breakpoints': self.init_breakpoints
+            'init_breakpoints': self.breakpoints
         }
         self.debugger.post_start_command(post_start_data)
 
@@ -563,12 +562,6 @@ class Pugdebug(QObject):
         This handler should be called when the connection to
         xdebug is terminated.
         """
-        # Only set breakpoints as init_breakpoints
-        # if there are any breakpoints set
-        if len(self.breakpoints) > 0:
-            self.init_breakpoints = self.breakpoints
-            self.breakpoints = []
-
         self.main_window.toggle_actions(False)
 
         self.main_window.set_debugging_status(2)
@@ -664,14 +657,14 @@ class Pugdebug(QObject):
         """Set a breakpoint
 
         If there is no active debugging session, add the breakpoint data to
-        the initial breakpoints, highlight the init breakpoints on the line
+        the breakpoints, highlight the breakpoints on the line
         numbers of the documents, and show them in the breakpoint viewer.
 
         If there is an active debugging session, tell the debugger to set the
         breakpoint.
         """
         if not self.debugger.is_connected():
-            self.init_breakpoints.append(breakpoint)
+            self.breakpoints.append(breakpoint)
 
             path = breakpoint['filename']
             path = self.__get_path_mapped_to_local(path)
@@ -679,7 +672,7 @@ class Pugdebug(QObject):
             document_widget = self.document_viewer.get_document_by_path(path)
             document_widget.rehighlight_breakpoint_lines()
 
-            self.breakpoint_viewer.set_breakpoints(self.init_breakpoints)
+            self.breakpoint_viewer.set_breakpoints(self.breakpoints)
 
             return
 
@@ -689,7 +682,7 @@ class Pugdebug(QObject):
         """Remove a breakpoint
 
         If there is no active debugging session, just remove the breakpoint
-        from the initial breakpoints, rehighlight the line numbers for
+        from the breakpoints, rehighlight the line numbers for
         breakpoint markers and update the breakpoint viewer.
 
         If there is an active debugging session, tell the debugger to remove
@@ -699,17 +692,17 @@ class Pugdebug(QObject):
             path = breakpoint['filename']
             line_number = breakpoint['lineno']
 
-            for init_breakpoint in self.init_breakpoints:
-                if (init_breakpoint['filename'] == path and
-                        init_breakpoint['lineno'] == line_number):
-                    self.init_breakpoints.remove(init_breakpoint)
+            for breakpoint in self.breakpoints:
+                if (breakpoint['filename'] == path and
+                        breakpoint['lineno'] == line_number):
+                    self.breakpoints.remove(breakpoint)
 
             path = self.__get_path_mapped_to_local(path)
 
             document_widget = self.document_viewer.get_document_by_path(path)
             document_widget.rehighlight_breakpoint_lines()
 
-            self.breakpoint_viewer.set_breakpoints(self.init_breakpoints)
+            self.breakpoint_viewer.set_breakpoints(self.breakpoints)
 
             return
 
@@ -727,20 +720,11 @@ class Pugdebug(QObject):
         """
         remote_path = self.__get_path_mapped_to_remote(path)
 
-        breakpoints = []
-
-        if self.debugger.is_connected():
-            breakpoints = list(filter(
-                lambda breakpoint: breakpoint['filename'] != remote_path,
-                self.breakpoints
-            ))
-            self.breakpoints = breakpoints
-        else:
-            breakpoints = list(filter(
-                lambda breakpoint: breakpoint['filename'] != remote_path,
-                self.init_breakpoints
-            ))
-            self.init_breakpoints = breakpoints
+        breakpoints = list(filter(
+            lambda breakpoint: breakpoint['filename'] != remote_path,
+            self.breakpoints
+        ))
+        self.breakpoints = breakpoints
 
         self.breakpoint_viewer.set_breakpoints(breakpoints)
 
@@ -779,11 +763,6 @@ class Pugdebug(QObject):
         Finally return None.
         """
         for breakpoint in self.breakpoints:
-            if (breakpoint['filename'] == path and
-                    int(breakpoint['lineno']) == line_number):
-                return breakpoint
-
-        for breakpoint in self.init_breakpoints:
             if (breakpoint['filename'] == path and
                     int(breakpoint['lineno']) == line_number):
                 return breakpoint
