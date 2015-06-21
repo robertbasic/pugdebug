@@ -524,7 +524,7 @@ class Pugdebug(QObject):
             return
 
         post_start_data = {
-            'init_breakpoints': self.breakpoints
+            'breakpoints': self.breakpoints
         }
         self.debugger.post_start_command(post_start_data)
 
