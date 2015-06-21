@@ -12,6 +12,7 @@
  - Do not jump to top of the file every time a debugging session starts
  - Updating settings now updates current project's settings as well
  - Deleting current project doesn't break pugdebug any more
+ - Breakpoints do not dissapear any more when debugging multiple requests
 
 ### Removed
 

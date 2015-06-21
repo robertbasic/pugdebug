@@ -295,8 +295,8 @@ class PugdebugServerConnection(QThread):
     def __post_start(self, data):
         post_start_response = {
             'debugger_features': self.__set_debugger_features(),
-            'init_breakpoints': self.__set_init_breakpoints(
-                data['init_breakpoints']
+            'breakpoints': self.__set_breakpoints(
+                data['breakpoints']
             ),
             'breakpoints': self.__list_breakpoints()
         }
@@ -376,7 +376,7 @@ class PugdebugServerConnection(QThread):
 
         return stacktraces
 
-    def __set_init_breakpoints(self, breakpoints):
+    def __set_breakpoints(self, breakpoints):
         all_successful = True
 
         for breakpoint in breakpoints:
