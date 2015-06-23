@@ -2,6 +2,16 @@
 
 ## [Unreleased][unrealeased]
 ### Added
+
+### Changed
+
+### Fixed
+
+### Removed
+
+## [1.0.0-RC.1] - 2015-06-23
+
+### Added
  - Display current project name in window title
 
 ### Changed
@@ -13,8 +23,6 @@
  - Updating settings now updates current project's settings as well
  - Deleting current project doesn't break pugdebug any more
  - Breakpoints do not dissapear any more when debugging multiple requests
-
-### Removed
 
 ## [1.0.0-beta.1] - 2015-06-10
 
