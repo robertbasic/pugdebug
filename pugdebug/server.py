@@ -87,7 +87,7 @@ class PugdebugServer(QThread):
                         connection = PugdebugServerConnection(sock)
                         is_valid = connection.init_connection()
 
-                        if is_valid:
+                        if is_valid and self.wait_for_accept:
                             self.new_connection_established_signal.emit(
                                 connection
                             )
