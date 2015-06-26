@@ -13,6 +13,11 @@ layout: index
 
 ### Removed
 
+## [1.0.0-RC.2] - 2015-06-26
+
+### Fixed
+ - Correctly stop listening when multiple requests are active
+
 ## [1.0.0-RC.1] - 2015-06-23
 
 ### Added
