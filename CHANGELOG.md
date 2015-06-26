@@ -6,6 +6,7 @@
 ### Changed
 
 ### Fixed
+ - Correctly stop listening when multiple requests are active
 
 ### Removed
 
