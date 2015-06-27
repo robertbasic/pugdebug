@@ -79,7 +79,7 @@ For example, if a project I'm working on is in `/home/robert/wwww/pugdebug` and 
 The `Host` setting should be the IP address of the machine on which pugdebug runs. In most cases
 it is perfectly fine to leave this field blank.
 
-The `Port` setting is the port number on which Xdebug will attempt to connect to the machin on
+The `Port` setting is the port number on which Xdebug will attempt to connect to the machine on
 which pugdebug runs. The default port is `9000`.
 
 The `IDE Key` setting allows to filter out messages from Xdebug based on this value.
@@ -91,44 +91,62 @@ about variables is retrieved from Xdebug.
 
 ## debugging sessions
 
-To start a debugging session, click the "Start" button in the top left corner (Shortcut: F2).
+To start debugging, click the `Start listening` button in the top left corner (shortcut: `F1`).
 
-Load your web project in your browser and start a
+pugdebug then listens to all connections on the `Port` provided, and if the connection has
+the `IDE Key` matching with what is configured, it will start debugging the PHP request from
+that connection.
+
+In the case if there is already a debugging in progress, the new connection will be queued
+and once the debugging of the current connection is done, the new one will be debugged.
+
+This allows pugdebug to debug multiple requests (think ajax).
+
+Load a web project in a browser and start a
 [HTTP debugging session](http://xdebug.org/docs/remote#browser_session).
 
-pugdebug should pick up that session and display the index file of your web
+pugdebug should pick up that request and display the index file of the web
 project, while stopping the execution on the first line.
 
-Using the `Run`, `Over`, `In`, `Out` continuation commands you can step through
-your PHP code.
+Using the `Run` (`F5`), `Over` (`F6`), `In` (`F7`), `Out` (`F8`) continuation commands allows
+stepping through the PHP code.
 
 Setting breakpoints is possible by double clicking the line where a breakpoint
-should be placed.
+is needed.
 
 The correspoding line number should be highlighted and a new breakpoint should
 be listed in the breakpoint viewer (bottom right corner).
 
 Double clicking the line with a breakpoint should remove that breakpoint.
 
+The `Stop` (`F3`) action will stop debugging the current request and tell Xdebug to
+stop further execution of the PHP script that is being debugged.
+
+The `Detach` (`F4`) action will detach the debugger from the current request, which
+allows to stop debugging but also let the PHP script finish as it normally would.
+
+The `Stop listening` (`F2`) action will tell pugdebug to stop listening
+to new incomming connections.
+
 ## debugging cli scripts
 
 It is also possible to debug CLI scripts with pugdebug.
 
-Start pugdebug as stated in the previous section, click `Start` to
-start a debugging session and then in a new terminal type:
+Start pugdebug as stated in the previous section, click `Start listening` to
+start listening to incomming connections and then in a new terminal type:
 
 ```
 export XDEBUG_CONFIG="idekey=pugdebug"
 ```
 
-(or whatever you set the `xdebug.idekey` setting to) and then start
-your PHP CLI script normally:
+(or whatever the `xdebug.idekey` setting is set to) and then start
+the PHP CLI script normally:
 
 ```
 php script.php
 ```
 
-pugdebug should pick up the debugging session and let you debug your script.
+pugdebug should pick up the debugging session and allow the script to be debugged.
 
 ## todo
 
