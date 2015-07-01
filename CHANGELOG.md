@@ -9,6 +9,10 @@
 
 ### Removed
 
+## [1.0.0] - 2015-07-01
+
+No changes were made since 1.0.0-RC.2
+
 ## [1.0.0-RC.2] - 2015-06-26
 
 ### Fixed

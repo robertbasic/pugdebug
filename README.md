@@ -6,7 +6,7 @@ A python 3.4, PyQt5 project.
 
 ## current release
 
-The current release of pugdebug is [1.0.0-RC.2](https://github.com/robertbasic/pugdebug/releases/tag/v1.0.0-RC.2).
+The current release of pugdebug is [1.0.0](https://github.com/robertbasic/pugdebug/releases/tag/v1.0.0).
 
 It includes a tar.gz/ZIP package with the binary, for both Linux and Windows. It should include everything
 needed for pugdebug to work correctly, so just download the package for your operating system,
