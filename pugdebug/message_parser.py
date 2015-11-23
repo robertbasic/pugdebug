@@ -201,7 +201,7 @@ class PugdebugMessageParser():
         if self.typemap:
             self.map_type(var)
 
-        if var['type'] == 'array' or var['type'] == 'object':
+        if var['type'] in ['array', 'object', 'hash']:
             var['variables'] = self.get_variables(xml, [])
         else:
             var['value'] = xml.text
