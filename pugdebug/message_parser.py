@@ -16,6 +16,7 @@ import xml.etree.ElementTree as xml_parser
 class PugdebugMessageParser():
 
     namespace = '{urn:debugger_protocol_v1}'
+    typemap = {}
 
     def __init__(self):
         pass
@@ -42,6 +43,19 @@ class PugdebugMessageParser():
             init_message[tag_name] = tag_value
 
         return init_message
+
+    def parse_typemap_message(self, message):
+        xml = xml_parser.fromstring(message)
+
+        typemap = {}
+
+        attribs = ['name', 'type']
+        for item in xml.getchildren():
+            language, common = item.attrib['name'], item.attrib['type']
+            if language and common:
+                typemap[language] = common
+
+        return typemap
 
     def parse_continuation_message(self, message):
         if not message:
@@ -184,6 +198,8 @@ class PugdebugMessageParser():
         ]
         var = {}
         var = self.get_attribs(xml, attribs, var)
+        if self.typemap:
+            self.map_type(var)
 
         if var['type'] == 'array' or var['type'] == 'object':
             var['variables'] = self.get_variables(xml, [])
@@ -214,3 +230,12 @@ class PugdebugMessageParser():
             return url.replace('file:///', '')
         else:
             return url.replace('file://', '')
+
+    def set_typemap(self, typemap):
+        self.typemap = typemap
+
+    def map_type(self, variable):
+        var_type = variable.get('type')
+
+        if var_type:
+            variable['type'] = self.typemap.get(var_type, var_type)
