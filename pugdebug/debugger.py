@@ -336,12 +336,12 @@ class PugdebugDebugger(QObject):
 
         Kill the current connection and stop debugging.
         """
-        error = error + " during %s action" % action
-        self.error_signal.emit(error)
-
         # The current connection is FUBAR so just set it to None
         self.current_connection = None
         self.stop_debug()
+
+        error = error + " during %s action" % action
+        self.error_signal.emit(error)
 
     def get_current_file(self):
         if 'filename' in self.step_result:
