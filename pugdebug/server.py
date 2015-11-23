@@ -12,7 +12,7 @@ __author__ = "robertbasic"
 from base64 import b64encode
 import socket
 
-from PyQt5.QtCore import QThread, QMutex, pyqtSignal
+from PyQt5.QtCore import QObject, QThread, QThreadPool, QRunnable, QMutex, pyqtSignal
 
 from pugdebug.message_parser import PugdebugMessageParser
 from pugdebug.models.settings import get_setting
@@ -105,16 +105,25 @@ class PugdebugServer(QThread):
             self.server_stopped_signal.emit()
 
 
-class PugdebugServerConnection(QThread):
+class PugdebugAsyncTask(QRunnable):
+    def __init__(self, connection, action, data):
+        super(PugdebugAsyncTask, self).__init__()
+
+        self.connection = connection
+        self.action = action
+        self.data = data
+
+    def run(self):
+        self.connection.perform(self.action, self.data)
+
+
+class PugdebugServerConnection(QObject):
 
     socket = None
 
     mutex = None
 
     parser = None
-
-    action = None
-    data = None
 
     is_valid = False
     init_message = None
@@ -170,11 +179,13 @@ class PugdebugServerConnection(QThread):
 
         return True
 
-    def run(self):
-        self.mutex.lock()
+    def start(self, action, data=None):
+        QThreadPool.globalInstance().start(
+            PugdebugAsyncTask(self, action, data)
+        )
 
-        data = self.data
-        action = self.action
+    def perform(self, action, data):
+        self.mutex.lock()
 
         try:
             if action == 'post_start':
@@ -236,61 +247,43 @@ class PugdebugServerConnection(QThread):
             self.socket.close()
 
     def post_start_command(self, post_start_data):
-        self.data = post_start_data
-        self.action = 'post_start'
-        self.start()
+        self.start('post_start', post_start_data)
 
     def stop(self):
-        self.action = 'stop'
-        self.start()
+        self.start('stop')
 
     def detach(self):
-        self.action = 'detach'
-        self.start()
+        self.start('detach')
 
     def step_run(self):
-        self.action = 'step_run'
-        self.start()
+        self.start('step_run')
 
     def step_into(self):
-        self.action = 'step_into'
-        self.start()
+        self.start('step_into')
 
     def step_over(self):
-        self.action = 'step_over'
-        self.start()
+        self.start('step_over')
 
     def step_out(self):
-        self.action = 'step_out'
-        self.start()
+        self.start('step_out')
 
     def post_step_command(self, post_step_data):
-        self.data = post_step_data
-        self.action = 'post_step'
-        self.start()
+        self.start('post_step', post_step_data)
 
     def set_breakpoint(self, breakpoint):
-        self.action = 'breakpoint_set'
-        self.data = breakpoint
-        self.start()
+        self.start('breakpoint_set', breakpoint)
 
     def remove_breakpoint(self, breakpoint_id):
-        self.action = 'breakpoint_remove'
-        self.data = breakpoint_id
-        self.start()
+        self.start('breakpoint_remove', breakpoint_id)
 
     def list_breakpoints(self):
-        self.action = 'breakpoint_list'
-        self.start()
+        self.start('breakpoint_list')
 
     def evaluate_expression(self, index, expression):
-        self.action = 'evaluate_expression'
-        self.data = (index, expression)
-        self.start()
+        self.start('evaluate_expression', (index, expression))
 
     def set_debugger_features(self):
-        self.action = 'set_debugger_features'
-        self.start()
+        self.start('set_debugger_features')
 
     def __post_start(self, data):
         post_start_response = {
