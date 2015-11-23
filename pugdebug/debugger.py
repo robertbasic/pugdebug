@@ -339,6 +339,7 @@ class PugdebugDebugger(QObject):
         # The current connection is FUBAR so just set it to None
         self.current_connection = None
         self.stop_debug()
+        self.debugging_stopped_signal.emit()
 
         error = error + " during %s action" % action
         self.error_signal.emit(error)
