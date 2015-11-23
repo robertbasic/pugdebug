@@ -344,6 +344,9 @@ class PugdebugDebugger(QObject):
         error = error + " during %s action" % action
         self.error_signal.emit(error)
 
+        if self.has_pending_connections():
+            self.start_debugging_new_connection()
+
     def get_current_file(self):
         if 'filename' in self.step_result:
             self.current_file = self.step_result['filename']
