@@ -55,8 +55,10 @@ class PugdebugBreakpointViewer(QTreeWidget):
     def __cut_filename(self, filename):
         path_map = get_setting('path/path_mapping')
         if len(path_map) > 0:
+            path_map = path_map.rstrip('/')
             filename = filename[len(path_map):]
         else:
             root = get_setting('path/project_root')
+            root = root.rstrip('/')
             filename = filename[len(root):]
         return "~%s" % filename

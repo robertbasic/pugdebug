@@ -816,6 +816,7 @@ class Pugdebug(QObject):
         if (len(path_map) > 0 and
                 map_paths is True and
                 path.find(path_map) == 0):
+            path_map = path_map.rstrip('/')
             path = path[len(path_map):]
             path = "%s%s" % (self.file_browser.model().rootPath(), path)
 
@@ -833,6 +834,8 @@ class Pugdebug(QObject):
         root_path = self.file_browser.model().rootPath()
 
         if len(path_map) > 0 and path.find(root_path) == 0:
+            path_map = path_map.rstrip('/')
+            root_path = root_path.rstrip('/')
             path = path[len(root_path):]
             path = "%s%s" % (path_map, path)
 
