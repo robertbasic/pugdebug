@@ -92,7 +92,7 @@ class PugdebugVariableViewer(QTabWidget):
         if type == 'object':
             type = variable['classname']
 
-        if type == 'array' and 'numchildren' in variable:
+        if (type == 'array' or type == 'hash') and 'numchildren' in variable:
             type = "%s {%d}" % (type, int(variable['numchildren']))
 
         if type == 'string' and 'size' in variable:

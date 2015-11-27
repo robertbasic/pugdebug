@@ -292,6 +292,13 @@ class PugdebugServerConnection(QThread):
         self.action = 'set_debugger_features'
         self.start()
 
+    def load_typemap(self):
+        command = 'typemap_get -i %d' % self.__get_transaction_id()
+        response = self.__send_command(command)
+        self.parser.set_typemap(self.parser.parse_typemap_message(response))
+
+        return True
+
     def __post_start(self, data):
         post_start_response = {
             'debugger_features': self.__set_debugger_features(),

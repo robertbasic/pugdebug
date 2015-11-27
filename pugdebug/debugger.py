@@ -168,6 +168,8 @@ class PugdebugDebugger(QObject):
 
         If there is no active connection, start the new connection.
         """
+        connection.load_typemap()
+
         self.connect_connection_signals(connection)
 
         self.connections.append(connection)
