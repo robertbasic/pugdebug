@@ -85,7 +85,13 @@ class PugdebugServer(QThread):
 
                     if sock is not None:
                         connection = PugdebugServerConnection(sock)
-                        is_valid = connection.init_connection()
+
+                        try:
+                            is_valid = connection.init_connection()
+                        except OSError as e:
+                            # in case the debugged program closes the connection
+                            is_valid = False
+                            self.server_error_signal.emit('%s (during connection initialization)' % e.strerror)
 
                         if is_valid and self.wait_for_accept:
                             self.new_connection_established_signal.emit(
