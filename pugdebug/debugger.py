@@ -224,7 +224,9 @@ class PugdebugDebugger(QObject):
         If there is an active connection, stop only that one, otherwise
         stop the server from listening to new connections.
         """
-        if self.is_connected():
+        if self.is_stopped():
+            self.handle_stopped()
+        elif self.is_connected():
             self.current_connection.stop()
 
     def detach_debug(self):
