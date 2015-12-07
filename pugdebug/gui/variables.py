@@ -103,7 +103,11 @@ class PugdebugVariableViewer(QTabWidget):
             value = variable['value']
 
             if 'encoding' in variable and value is not None:
-                value = base64.b64decode(value).decode()
+                value = base64.b64decode(value)
+                try:
+                    value = value.decode()
+                except:
+                    value = repr(value)
 
             if value is None:
                 value = 'NULL'
