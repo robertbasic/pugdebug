@@ -1,3 +1,5 @@
+sip
+PyQt5
 flake8
 Pygments
 pyinstaller
