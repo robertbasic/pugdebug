@@ -2,7 +2,7 @@
 
 pugdebug is a standalone debugging client for PHP applications that uses Xdebug as the debugging engine.
 
-A python 3.4, PyQt5 project.
+A python 3.5, PyQt5 project.
 
 ## current release
 
@@ -30,15 +30,14 @@ Please take a look at the [change log](./CHANGELOG.md).
 > NOTE: Setting up the environment should be needed only when you want to help out with
 > developing pugdebug itself. And for OS X as there are no current builds for it yet.
 
-The main dependencies are Python 3.4,
-[QT5.4](http://doc.qt.io/qt-5/gettingstarted.html),
-[SIP4.6](http://www.riverbankcomputing.com/software/sip/download)
-and [PyQt5.4](http://www.riverbankcomputing.com/software/pyqt/download5).
+The main dependencies are Python 3.5,
+[QT5.7](http://doc.qt.io/qt-5/gettingstarted.html),
+[SIP4.9](http://www.riverbankcomputing.com/software/sip/download)
+and [PyQt5.7](http://www.riverbankcomputing.com/software/pyqt/download5).
 
 There is a wiki page with
 [instructions how to set up the development environment](https://github.com/robertbasic/pugdebug/wiki/Install-pugdebug)
 for Fedora, Ubuntu, Windows and OSX.
-
 
 There is also a [blog post](http://robertbasic.com/blog/install-pyqt5-in-python-3-virtual-environment)
 about setting up a virtual environment on a Fedora that goes into bit more details.
