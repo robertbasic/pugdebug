@@ -25,6 +25,8 @@ class PugdebugDocuments(QObject):
 
     document_changed = pyqtSignal(object)
 
+    document_removed = pyqtSignal(object)
+
     def __init__(self):
         super(PugdebugDocuments, self).__init__()
 
@@ -101,7 +103,9 @@ class PugdebugDocuments(QObject):
                 self.refresh_document(path)
             else:
                 # file got deleted?
-                pass
+                path_key = self.get_path_key(path)
+                document = self.open_documents[path_key]
+                self.document_removed.emit(document)
         elif self.__is_path_watched(path):
             self.refresh_document(path)
 
