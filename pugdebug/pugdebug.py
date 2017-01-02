@@ -97,6 +97,7 @@ class Pugdebug(QObject):
         self.connect_projects_browser_signals()
         self.connect_settings_signals()
         self.connect_document_viewer_signals()
+        self.connect_documents_signals()
         self.connect_toolbar_action_signals()
         self.connect_debugger_signals()
         self.connect_expression_viewer_signals()
@@ -142,6 +143,21 @@ class Pugdebug(QObject):
         It will call the method that will close the document.
         """
         self.document_viewer.tabCloseRequested.connect(self.close_document)
+
+    def connect_documents_signals(self):
+        """Connect documents signals
+        Connects the signals that gets fired when a document model signal happens.
+        Either when a document gets changed, or when a document gets removed.
+        """
+        # Handle when a document gets changed outside of pugdebug
+        self.documents.document_changed.connect(
+            self.handle_document_changed
+        )
+
+        # Handle when a document gets removed outside of pugdebug
+        self.documents.document_removed.connect(
+            self.handle_document_removed
+        )
 
     def connect_toolbar_action_signals(self):
         """Connect toolbar action signals
@@ -327,15 +343,6 @@ class Pugdebug(QObject):
             # clicked signal of that document
             document_widget.document_double_clicked_signal.connect(
                 self.handle_document_double_click
-            )
-
-            # Handle when a document gets changed outside of pugdebug
-            self.documents.document_changed.connect(
-                self.handle_document_changed
-            )
-
-            self.documents.document_removed.connect(
-                self.handle_document_removed
             )
 
             # Add the newly opened document to the document viewer's tab stack
