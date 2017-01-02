@@ -102,6 +102,8 @@ class PugdebugDocuments(QObject):
             else:
                 # file got deleted?
                 pass
+        elif self.__is_path_watched(path):
+            self.refresh_document(path)
 
     def get_path_key(self, path):
         path_key = hashlib.md5(path.encode('utf-8'))
