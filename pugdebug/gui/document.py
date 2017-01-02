@@ -175,6 +175,8 @@ class PugdebugDocumentContents(QPlainTextEdit):
 
         self.syntaxer = PugdebugSyntaxer(self.document(), formatter)
 
+        self.viewport().setCursor(Qt.ArrowCursor)
+
     def update_contents(self, document_model):
         """Update the contents of the document
 
