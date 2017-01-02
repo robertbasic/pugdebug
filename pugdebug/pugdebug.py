@@ -334,6 +334,10 @@ class Pugdebug(QObject):
                 self.handle_document_changed
             )
 
+            self.documents.document_removed.connect(
+                self.handle_document_removed
+            )
+
             # Add the newly opened document to the document viewer's tab stack
             self.document_viewer.add_tab(
                 document_widget,
@@ -376,6 +380,11 @@ class Pugdebug(QObject):
         document_widget.handle_document_changed(document_model)
 
         self.remove_stale_breakpoints(path)
+
+    def handle_document_removed(self, document_model):
+        path = document_model.path
+        tab_index = self.document_viewer.find_tab_index_by_path(path)
+        self.close_document(tab_index)
 
     def close_document(self, tab_index):
         """Close a document
