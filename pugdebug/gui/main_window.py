@@ -12,7 +12,7 @@ __author__ = "robertbasic"
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (QMainWindow, QToolBar, QMenuBar, QDockWidget,
                              QAction, QApplication)
-from PyQt5.QtGui import QFont, QKeySequence, QCursor
+from PyQt5.QtGui import QFont, QKeySequence
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
 from pugdebug.gui.settings import PugdebugSettingsWindow
@@ -81,12 +81,6 @@ class PugdebugMainWindow(QMainWindow):
         self.setup_toolbar()
         self.setup_menubar()
         self.setup_statusbar()
-
-        self.setup_mouse_cursor()
-
-    def setup_mouse_cursor(self):
-        cursor = QCursor(Qt.ArrowCursor)
-        QApplication.setOverrideCursor(cursor)
 
     def setup_statusbar(self):
         self.permanent_statusbar = PugdebugStatusBar()
