@@ -456,6 +456,13 @@ class Pugdebug(QObject):
                if feature in changed_setting_keys):
             self.handle_debugger_features_changed()
 
+        features = ['editor/tab_width',
+                    'editor/font_size']
+
+        if any(True for feature in features
+                if feature in changed_setting_keys):
+            self.handle_editor_features_changed()
+
     def handle_project_root_changed(self):
         """Handle when the project root is changed
 
@@ -471,6 +478,10 @@ class Pugdebug(QObject):
     def handle_debugger_features_changed(self):
         if self.debugger.is_connected():
             self.debugger.set_debugger_features()
+
+    def handle_editor_features_changed(self):
+        for document in self.document_viewer.get_all_documents():
+            document.handle_editor_features_changed()
 
     def start_listening(self):
         """Start listening to new incomming connections

@@ -62,6 +62,9 @@ class PugdebugDocument(QWidget):
         """
         self.document_contents.update_contents(document_model)
 
+    def handle_editor_features_changed(self):
+        self.document_contents.set_editor_features()
+
     def handle_document_contents_update_request(self, rect, dy):
         """Handle the update request for document contents
 
