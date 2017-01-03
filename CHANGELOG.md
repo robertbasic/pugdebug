@@ -1,6 +1,7 @@
 # Change Log
 
 ## [Unreleased][unrealeased]
+
 ### Added
  - Document is closed if underlying file is deleted
  - Editor settings allowing to set tab width and font size
@@ -47,6 +48,7 @@ No changes were made since 1.0.0-RC.2
  - Tries debugging requests even when the XDEBUG_SESSION_START param is not set
 
 ## [1.0.0-beta] - 2015-06-07
+
 ### Added
  - Set debugger features during an active debugging session
  - Confirm deleting a project
