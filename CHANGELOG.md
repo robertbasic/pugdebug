@@ -1,3 +1,7 @@
+---
+layout: index
+---
+
 # Change Log
 
 ## [Unreleased][unrealeased]
