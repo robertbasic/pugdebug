@@ -28,7 +28,7 @@ class PugdebugSettings():
         'path/project_root': os.path.expanduser('~'),
         'path/path_mapping': '',
 
-        'editor/tab_width': 20,
+        'editor/tab_width': 80,
         'editor/font_size': 12
     }
 

@@ -33,7 +33,7 @@ class PugdebugSettingsForm():
 
         # Widget settings
         self.widgets['debugger/port_number'].setRange(1, 65535)
-        self.widgets['editor/tab_width'].setRange(1, 60)
+        self.widgets['editor/tab_width'].setRange(1, 120)
         self.widgets['editor/font_size'].setRange(8, 24)
 
         self.setup_path_widgets()
