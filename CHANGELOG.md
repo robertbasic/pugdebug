@@ -1,17 +1,22 @@
----
-layout: index
----
-
 # Change Log
 
 ## [Unreleased][unrealeased]
 ### Added
+ - Document is closed if underlying file is deleted
+ - Editor settings allowing to set tab width and font size
 
 ### Changed
+ - Cursor in editor is now a regular arrow, read-only cursor
 
 ### Fixed
+ - File watching for Windows OS
+ - Connecting to document signals when document is changed or removed
 
 ### Removed
+
+## [1.0.0] - 2015-07-01
+
+No changes were made since 1.0.0-RC.2
 
 ## [1.0.0-RC.2] - 2015-06-26
 
