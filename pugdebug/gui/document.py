@@ -14,9 +14,10 @@ import math
 from PyQt5.QtCore import pyqtSignal, Qt, QRect
 from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QTextEdit, QGridLayout
 from PyQt5.QtGui import (QColor, QTextFormat, QTextCursor, QPainter,
-                         QTextBlockUserData)
+                         QTextBlockUserData, QFont)
 
 from pugdebug.syntaxer import PugdebugSyntaxer
+from pugdebug.models.settings import get_setting
 
 
 class PugdebugDocument(QWidget):
@@ -60,6 +61,10 @@ class PugdebugDocument(QWidget):
         Set the new document contents.
         """
         self.document_contents.update_contents(document_model)
+
+    def handle_editor_features_changed(self):
+        self.document_contents.set_editor_features()
+        self.line_numbers.set_font_size()
 
     def handle_document_contents_update_request(self, rect, dy):
         """Handle the update request for document contents
@@ -177,6 +182,8 @@ class PugdebugDocumentContents(QPlainTextEdit):
 
         self.viewport().setCursor(Qt.ArrowCursor)
 
+        self.set_editor_features()
+
     def update_contents(self, document_model):
         """Update the contents of the document
 
@@ -187,6 +194,13 @@ class PugdebugDocumentContents(QPlainTextEdit):
         self.setPlainText(document_model.contents)
         self.syntaxer.setDocument(self.document())
         self.syntaxer.highlight()
+
+    def set_editor_features(self):
+        self.setTabStopWidth(int(get_setting('editor/tab_width')))
+
+        font = QFont('mono')
+        font.setPixelSize(int(get_setting('editor/font_size')))
+        self.setFont(font)
 
     def mousePressEvent(self, event):
         pass
@@ -318,6 +332,11 @@ class PugdebugLineNumbers(QWidget):
         super(PugdebugLineNumbers, self).__init__()
 
         self.document_widget = document_widget
+
+    def set_font_size(self):
+        font = QFont()
+        font.setPixelSize(int(get_setting('editor/font_size')))
+        self.setFont(font)
 
     def set_numbers_width(self, number_of_lines):
         digits = int(math.log10(number_of_lines) + 1)

@@ -52,6 +52,7 @@ class PugdebugSettingsWindow(QDialog):
         box_layout = QVBoxLayout()
         box_layout.addWidget(self.form.path_group)
         box_layout.addWidget(self.form.debugger_group)
+        box_layout.addWidget(self.form.editor_group)
         box_layout.addLayout(button_layout)
 
         self.setLayout(box_layout)

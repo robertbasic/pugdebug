@@ -72,6 +72,12 @@ class PugdebugDocumentViewer(QTabWidget):
         index = self.find_tab_index_by_path(path)
         return self.widget(index)
 
+    def get_all_documents(self):
+        documents = []
+        for i, p in self.tabs.items():
+            documents.append(self.widget(i))
+        return documents
+
     def remove_line_highlights(self):
         for index, path in self.tabs.items():
             self.widget(index).remove_line_highlights()

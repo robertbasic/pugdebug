@@ -27,13 +27,18 @@ class PugdebugSettingsForm():
             'debugger/max_depth': QLineEdit(),
             'debugger/max_children': QLineEdit(),
             'debugger/max_data': QLineEdit(),
+            'editor/tab_width': QSpinBox(),
+            'editor/font_size': QSpinBox(),
         }
 
         # Widget settings
         self.widgets['debugger/port_number'].setRange(1, 65535)
+        self.widgets['editor/tab_width'].setRange(1, 120)
+        self.widgets['editor/font_size'].setRange(8, 24)
 
         self.setup_path_widgets()
         self.setup_debugger_widgets()
+        self.setup_editor_widgets()
 
     def setup_path_widgets(self):
         path_layout = QFormLayout()
@@ -61,6 +66,14 @@ class PugdebugSettingsForm():
 
         self.debugger_group = QGroupBox("Debugger")
         self.debugger_group.setLayout(debugger_layout)
+
+    def setup_editor_widgets(self):
+        editor_layout = QFormLayout()
+        editor_layout.addRow("Tab width", self.widgets['editor/tab_width'])
+        editor_layout.addRow("Font size", self.widgets['editor/font_size'])
+
+        self.editor_group = QGroupBox("Editor")
+        self.editor_group.setLayout(editor_layout)
 
     def set_widget_value(self, widget, value):
         """A generic method which can set the value of any of the used widgets.

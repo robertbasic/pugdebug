@@ -26,7 +26,10 @@ class PugdebugSettings():
         'debugger/max_data': '512',
 
         'path/project_root': os.path.expanduser('~'),
-        'path/path_mapping': ''
+        'path/path_mapping': '',
+
+        'editor/tab_width': 80,
+        'editor/font_size': 12
     }
 
     def __init__(self):
