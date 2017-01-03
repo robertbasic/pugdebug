@@ -64,6 +64,7 @@ class PugdebugDocument(QWidget):
 
     def handle_editor_features_changed(self):
         self.document_contents.set_editor_features()
+        self.line_numbers.set_font_size()
 
     def handle_document_contents_update_request(self, rect, dy):
         """Handle the update request for document contents
@@ -331,6 +332,11 @@ class PugdebugLineNumbers(QWidget):
         super(PugdebugLineNumbers, self).__init__()
 
         self.document_widget = document_widget
+
+    def set_font_size(self):
+        font = QFont()
+        font.setPixelSize(int(get_setting('editor/font_size')))
+        self.setFont(font)
 
     def set_numbers_width(self, number_of_lines):
         digits = int(math.log10(number_of_lines) + 1)
