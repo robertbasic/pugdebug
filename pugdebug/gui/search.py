@@ -31,10 +31,12 @@ class PugdebugFileSearchWindow(QDialog):
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.search_files)
 
+        self.setup_layout()
+
+    def exec(self):
         project_root = get_setting('path/project_root')
         self.file_search = PugdebugFileSearch(self, project_root)
-
-        self.setup_layout()
+        super(PugdebugFileSearchWindow, self).exec()
 
     def setup_layout(self):
         self.file_name = QLineEdit()
