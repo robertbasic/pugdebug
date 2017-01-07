@@ -12,6 +12,7 @@
 ### Fixed
  - File watching for Windows OS
  - Connecting to document signals when document is changed or removed
+ - Focus of buttons in the New Project window, save has focus by default
 
 ### Removed
 

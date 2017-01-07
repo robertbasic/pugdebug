@@ -50,8 +50,8 @@ class PugdebugNewProjectWindow(QDialog):
         cancel_button.clicked.connect(self.reject)
 
         button_layout = QHBoxLayout()
-        button_layout.addWidget(cancel_button)
         button_layout.addWidget(save_button)
+        button_layout.addWidget(cancel_button)
 
         box_layout = QVBoxLayout()
         box_layout.addLayout(project_name_layout)
