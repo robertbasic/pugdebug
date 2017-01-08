@@ -11,7 +11,7 @@ __author__ = "robertbasic"
 
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import (QDialog, QLineEdit, QVBoxLayout, QFormLayout,
-                             QListWidget)
+                             QListWidget, QAbstractItemView)
 
 from pugdebug.models.file_search import PugdebugFileSearch
 from pugdebug.models.settings import get_setting
@@ -43,6 +43,7 @@ class PugdebugFileSearchWindow(QDialog):
         self.file_name.textEdited.connect(self.start_timer)
 
         self.files = QListWidget()
+        self.files.setSelectionMode(QAbstractItemView.SingleSelection)
         self.files.itemActivated.connect(self.file_selected)
 
         search_layout = QFormLayout()
