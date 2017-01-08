@@ -9,7 +9,7 @@
 
 __author__ = "robertbasic"
 
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QEvent
 from PyQt5.QtWidgets import (QDialog, QLineEdit, QVBoxLayout, QFormLayout,
                              QListWidget, QAbstractItemView)
 
@@ -37,9 +37,10 @@ class PugdebugFileSearchWindow(QDialog):
         super(PugdebugFileSearchWindow, self).exec()
 
     def setup_layout(self):
-        self.file_name = QLineEdit()
+        self.file_name = PugdebugSearchFileLineEdit(self)
         self.file_name.textEdited.connect(self.start_timer)
         self.file_name.returnPressed.connect(self.select_file)
+        self.file_name.up_or_down_pressed_signal.connect(self.select_index)
 
         self.files = QListWidget()
         self.files.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -67,8 +68,35 @@ class PugdebugFileSearchWindow(QDialog):
         selected_item = self.files.currentItem()
         self.file_selected(selected_item)
 
+    def select_index(self, direction):
+        current_index = self.files.currentRow()
+        next_index = current_index
+        min_index = 0
+        max_index = self.files.count() - 1
+        if direction == 'up' and current_index > 0:
+            next_index = current_index - 1
+        elif direction == 'down' and current_index < max_index:
+            next_index = current_index + 1
+        self.files.setCurrentRow(next_index)
+
     def file_selected(self, item):
         path = item.data(Qt.DisplayRole)
         full_path = "%s/%s" % (self.project_root, path)
         self.parent.search_file_selected_signal.emit(full_path)
         self.accept()
+
+class PugdebugSearchFileLineEdit(QLineEdit):
+
+    up_or_down_pressed_signal = pyqtSignal(str)
+
+    def __init__(self, parent):
+        super(PugdebugSearchFileLineEdit, self).__init__()
+
+    def event(self, event):
+        if event.type() == QEvent.KeyPress:
+            if event.key() == Qt.Key_Up:
+                self.up_or_down_pressed_signal.emit('up')
+            elif event.key() == Qt.Key_Down:
+                self.up_or_down_pressed_signal.emit('down')
+
+        return QLineEdit.event(self, event)
