@@ -27,6 +27,8 @@ class PugdebugNewProjectWindow(QDialog):
 
         self.parent = parent
 
+        self.setWindowTitle("New project")
+
         self.form = PugdebugSettingsForm()
 
         self.project_name = QLineEdit()

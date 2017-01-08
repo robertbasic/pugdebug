@@ -25,6 +25,8 @@ class PugdebugSettingsWindow(QDialog):
     def __init__(self, parent):
         super(PugdebugSettingsWindow, self).__init__(parent)
 
+        self.setWindowTitle("Settings")
+
         self.form = PugdebugSettingsForm()
 
         # Save values on accepted (clicked Save button)

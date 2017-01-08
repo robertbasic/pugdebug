@@ -6,6 +6,7 @@
  - Document is closed if underlying file is deleted
  - Editor settings allowing to set tab width and font size
  - A simple file search dialog
+ - Titles for project and settings dialogs
 
 ### Changed
  - Cursor in editor is now a regular arrow, read-only cursor
