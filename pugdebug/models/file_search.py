@@ -10,7 +10,7 @@
 __author__ = "robertbasic"
 
 from PyQt5.QtCore import QDir
-from fuzzywuzzy import fuzz
+from fuzzywuzzy import fuzz, process
 
 
 class PugdebugFileSearch():
@@ -22,7 +22,9 @@ class PugdebugFileSearch():
     def search(self, search_string):
         if len(search_string) < 3:
             return []
-        return self.recursive(self.root, search_string, [])
+        search_results = self.recursive(self.root, search_string, [])
+        search_results = process.extract(search_string, search_results, limit=10)
+        return [r[0] for r in search_results]
 
     def recursive(self, path, search_string, paths):
         directory = QDir(path)
@@ -41,4 +43,4 @@ class PugdebugFileSearch():
         return paths
 
     def is_fuzzy(self, current_path, search_string):
-        return fuzz.token_set_ratio(search_string, current_path) > 80
+        return fuzz.partial_ratio(search_string, current_path) > 50
