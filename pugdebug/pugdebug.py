@@ -95,6 +95,7 @@ class Pugdebug(QObject):
 
         self.connect_file_browser_signals()
         self.connect_projects_browser_signals()
+        self.connect_search_files_signals()
         self.connect_settings_signals()
         self.connect_document_viewer_signals()
         self.connect_documents_signals()
@@ -126,6 +127,16 @@ class Pugdebug(QObject):
         )
         self.main_window.new_project_created_signal.connect(
             self.handle_new_project_created
+        )
+
+    def connect_search_files_signals(self):
+        """Connect search for files signals
+
+        Connects the signal that is emited when a file search result
+        is selected from the search for files dialog.
+        """
+        self.main_window.search_file_selected_signal.connect(
+            self.open_document
         )
 
     def connect_settings_signals(self):

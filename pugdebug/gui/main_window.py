@@ -18,6 +18,7 @@ from pugdebug.gui.file_browser import PugdebugFileBrowser
 from pugdebug.gui.settings import PugdebugSettingsWindow
 from pugdebug.gui.projects import (PugdebugNewProjectWindow,
                                    PugdebugProjectsBrowser)
+from pugdebug.gui.search import PugdebugFileSearchWindow
 from pugdebug.gui.documents import PugdebugDocumentViewer
 from pugdebug.gui.variables import PugdebugVariableViewer
 from pugdebug.gui.stacktraces import PugdebugStacktraceViewer
@@ -30,6 +31,7 @@ from pugdebug.models.settings import get_setting, set_setting, has_setting
 class PugdebugMainWindow(QMainWindow):
 
     new_project_created_signal = pyqtSignal(str)
+    search_file_selected_signal = pyqtSignal(str)
 
     def __init__(self):
         super(PugdebugMainWindow, self).__init__()
@@ -48,6 +50,7 @@ class PugdebugMainWindow(QMainWindow):
         self.breakpoint_viewer = PugdebugBreakpointViewer()
         self.stacktrace_viewer = PugdebugStacktraceViewer()
         self.expression_viewer = PugdebugExpressionViewer()
+        self.file_search_window = PugdebugFileSearchWindow(self)
 
         self.setCentralWidget(self.document_viewer)
 
@@ -77,6 +80,8 @@ class PugdebugMainWindow(QMainWindow):
 
         self.setup_actions()
         self.toggle_actions(False)
+
+        self.setup_search_actions()
 
         self.setup_toolbar()
         self.setup_menubar()
@@ -222,6 +227,15 @@ class PugdebugMainWindow(QMainWindow):
         )
         self.step_out_action.setShortcut(QKeySequence("F8"))
 
+    def setup_search_actions(self):
+        self.file_search_action = QAction("&File search...", self)
+        self.file_search_action.setToolTip("Search for files in the current project")
+        self.file_search_action.setStatusTip(
+            "Search for files. Shortcut: Ctrl+T"
+        )
+        self.file_search_action.setShortcut(QKeySequence("Ctrl+T"))
+        self.file_search_action.triggered.connect(self.file_search_window.exec)
+
     def setup_toolbar(self):
         toolbar = QToolBar("Main Toolbar")
         toolbar.setObjectName("main-toolbar")
@@ -265,6 +279,9 @@ class PugdebugMainWindow(QMainWindow):
         debug_menu.addAction(self.step_over_action)
         debug_menu.addAction(self.step_into_action)
         debug_menu.addAction(self.step_out_action)
+
+        search_menu = menu_bar.addMenu("&Search")
+        search_menu.addAction(self.file_search_action)
 
         self.setMenuBar(menu_bar)
 

@@ -3,3 +3,5 @@ PyQt5
 flake8
 Pygments
 pyinstaller
+fuzzywuzzy
+python-Levenshtein
