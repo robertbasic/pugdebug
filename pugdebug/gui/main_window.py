@@ -31,6 +31,7 @@ from pugdebug.models.settings import get_setting, set_setting, has_setting
 class PugdebugMainWindow(QMainWindow):
 
     new_project_created_signal = pyqtSignal(str)
+    search_file_selected_signal = pyqtSignal(str)
 
     def __init__(self):
         super(PugdebugMainWindow, self).__init__()

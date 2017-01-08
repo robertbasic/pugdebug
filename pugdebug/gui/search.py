@@ -25,8 +25,6 @@ class PugdebugFileSearchWindow(QDialog):
 
         self.setWindowTitle("Search for files ...")
 
-        self.accepted.connect(self.open_file)
-
         self.timer = QTimer()
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.search_files)
@@ -34,8 +32,8 @@ class PugdebugFileSearchWindow(QDialog):
         self.setup_layout()
 
     def exec(self):
-        project_root = get_setting('path/project_root')
-        self.file_search = PugdebugFileSearch(self, project_root)
+        self.project_root = get_setting('path/project_root')
+        self.file_search = PugdebugFileSearch(self, self.project_root)
         super(PugdebugFileSearchWindow, self).exec()
 
     def setup_layout(self):
@@ -64,7 +62,7 @@ class PugdebugFileSearchWindow(QDialog):
         self.files.addItems(files)
 
     def file_selected(self, item):
-        print(item.data(Qt.DisplayRole))
-
-    def open_file(self):
-        pass
+        path = item.data(Qt.DisplayRole)
+        full_path = "%s/%s" % (self.project_root, path)
+        self.parent.search_file_selected_signal.emit(full_path)
+        self.accept()
