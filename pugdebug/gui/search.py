@@ -39,6 +39,7 @@ class PugdebugFileSearchWindow(QDialog):
     def setup_layout(self):
         self.file_name = QLineEdit()
         self.file_name.textEdited.connect(self.start_timer)
+        self.file_name.returnPressed.connect(self.select_file)
 
         self.files = QListWidget()
         self.files.setSelectionMode(QAbstractItemView.SingleSelection)
@@ -61,6 +62,10 @@ class PugdebugFileSearchWindow(QDialog):
         files = self.file_search.search(self.file_name.text())
         self.files.addItems(files)
         self.files.setCurrentRow(0)
+
+    def select_file(self):
+        selected_item = self.files.currentItem()
+        self.file_selected(selected_item)
 
     def file_selected(self, item):
         path = item.data(Qt.DisplayRole)
