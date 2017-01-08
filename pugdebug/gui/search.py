@@ -48,10 +48,10 @@ class PugdebugFileSearchWindow(QDialog):
 
         search_layout = QFormLayout()
         search_layout.addRow("Search for:", self.file_name)
-        search_layout.addRow(self.files)
 
         box_layout = QVBoxLayout()
         box_layout.addLayout(search_layout)
+        box_layout.addWidget(self.files)
 
         self.setLayout(box_layout)
 
