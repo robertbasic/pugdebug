@@ -60,6 +60,7 @@ class PugdebugFileSearchWindow(QDialog):
         self.files.clear()
         files = self.file_search.search(self.file_name.text())
         self.files.addItems(files)
+        self.files.setCurrentRow(0)
 
     def file_selected(self, item):
         path = item.data(Qt.DisplayRole)
