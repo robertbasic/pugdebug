@@ -32,8 +32,9 @@ class PugdebugFileSearch():
         directory.setSorting(QDir.DirsLast)
 
         for entry in directory.entryInfoList():
-            if entry.isFile() and entry.completeSuffix().find("php") != -1:
-                current_path = entry.filePath()[len(self.root)+1:]
+            if (entry.isFile() and
+                    self.should_exclude_by_extension(entry.completeSuffix())):
+                current_path = entry.filePath()[len(self.root) + 1:]
 
                 if self.is_fuzzy(current_path, search_string):
                     paths.append(current_path)
@@ -44,3 +45,10 @@ class PugdebugFileSearch():
 
     def is_fuzzy(self, current_path, search_string):
         return fuzz.partial_ratio(search_string, current_path) > 50
+
+    def should_exclude_by_extension(self, extension):
+        if (extension.find("php") != -1 and
+                extension.find("html") == -1 and
+                extension.find("xml") == -1):
+            return True
+        return False
