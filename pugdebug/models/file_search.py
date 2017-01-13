@@ -10,7 +10,7 @@
 __author__ = "robertbasic"
 
 from PyQt5.QtCore import QDir
-from fuzzywuzzy import fuzz, process
+from fuzzywuzzy import fuzz, process, utils
 
 
 class PugdebugFileSearch():
@@ -23,8 +23,9 @@ class PugdebugFileSearch():
         if len(search_string) < 3:
             return []
         search_results = self.recursive(self.root, search_string, [])
-        search_results = process.extract(search_string, search_results, limit=10)
-        return [r[0] for r in search_results]
+        search_results = sorted(search_results, key=lambda r: r[1], reverse=True)
+        search_results = [r[0] for r in search_results]
+        return search_results[:10]
 
     def recursive(self, path, search_string, paths):
         directory = QDir(path)
@@ -36,12 +37,52 @@ class PugdebugFileSearch():
                     self.should_exclude_by_extension(entry.completeSuffix())):
                 current_path = entry.filePath()[len(self.root) + 1:]
 
-                if self.is_fuzzy(current_path, search_string):
-                    paths.append(current_path)
+                score = self.score_path(current_path, search_string)
+
+                paths.append((current_path, score))
+                #if self.is_fuzzy(current_path, search_string):
+                    #paths.append(current_path)
             elif entry.isDir():
                 paths = self.recursive(entry.filePath(), search_string, paths)
 
         return paths
+
+    def score_path(self, current_path, search_string):
+        search_string = utils.full_process(search_string)
+        current_path = utils.full_process(current_path)
+
+        weighted_search_strings = self.weight_search_string(search_string)
+
+        current_path = current_path.split(' ')
+        path_parts = current_path[:-2]
+        file_parts = current_path[-2:]
+
+        path_weight = 0.5
+        file_weight = 1
+
+        score = 0
+
+        for w, s in weighted_search_strings:
+            for p in path_parts:
+                score = score + (w * fuzz.ratio(s, p) * path_weight)
+            for f in file_parts:
+                score = score + (w * fuzz.ratio(s, f) * file_weight)
+
+        return score
+
+    def weight_search_string(self, search_string):
+        words = search_string.split(' ')
+        words.reverse()
+        nw = len(words)
+
+        d = 0
+        weighted_words = []
+        for word in words:
+            weight = 1 - (d / nw)
+            weighted_words.append((weight, word))
+            d = d + 1
+
+        return weighted_words
 
     def is_fuzzy(self, current_path, search_string):
         return fuzz.partial_ratio(search_string, current_path) > 50
