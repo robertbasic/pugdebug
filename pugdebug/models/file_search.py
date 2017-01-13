@@ -24,8 +24,9 @@ class PugdebugFileSearch():
             return []
         search_results = self.recursive(self.root, search_string, [])
         search_results = sorted(search_results, key=lambda r: r[1], reverse=True)
-        search_results = [r[0] for r in search_results]
-        return search_results[:10]
+        search_results = [("(%s) %s" % (r[1], r[0])) for r in search_results]
+        search_results = process.extract(search_string, search_results, limit=10, scorer=fuzz.partial_ratio)
+        return [r[0] for r in search_results]
 
     def recursive(self, path, search_string, paths):
         directory = QDir(path)
@@ -55,7 +56,9 @@ class PugdebugFileSearch():
 
         current_path = current_path.split(' ')
         path_parts = current_path[:-2]
-        file_parts = current_path[-2:]
+        file_parts = current_path[-2:-1]
+        p = ' '.join(path_parts)
+        f = ' '.join(file_parts)
 
         path_weight = 0.5
         file_weight = 1
@@ -63,10 +66,8 @@ class PugdebugFileSearch():
         score = 0
 
         for w, s in weighted_search_strings:
-            for p in path_parts:
-                score = score + (w * fuzz.ratio(s, p) * path_weight)
-            for f in file_parts:
-                score = score + (w * fuzz.ratio(s, f) * file_weight)
+            score = score + (w * fuzz.partial_ratio(s, p) * path_weight)
+            score = score + (w * fuzz.partial_ratio(s, f) * file_weight)
 
         return score
 
