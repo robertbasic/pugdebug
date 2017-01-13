@@ -5,3 +5,4 @@ Pygments
 pyinstaller
 fuzzywuzzy
 python-Levenshtein
+fuzzyfinder
