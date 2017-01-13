@@ -49,6 +49,7 @@ class PugdebugFileSearch():
     def should_exclude_by_extension(self, extension):
         if (extension.find("php") != -1 and
                 extension.find("html") == -1 and
-                extension.find("xml") == -1):
+                extension.find("xml") == -1 and
+                extension.find("phpt") == -1):
             return True
         return False
