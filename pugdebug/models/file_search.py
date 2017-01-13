@@ -64,10 +64,18 @@ class PugdebugFileSearch():
         file_weight = 1
 
         score = 0
+        p_score = 0
+        f_score = 0
 
         for w, s in weighted_search_strings:
-            score = score + (w * fuzz.partial_ratio(s, p) * path_weight)
-            score = score + (w * fuzz.partial_ratio(s, f) * file_weight)
+            p_ratio = fuzz.partial_ratio(s, p)
+            f_ratio = fuzz.partial_ratio(s, f)
+            pw = path_weight
+            if p_ratio == 100:
+                pw = 1
+            p_score = p_score + (w * p_ratio * pw)
+            f_score = f_score + (w * f_ratio * file_weight)
+            score = score + p_score + f_score
 
         return score
 
