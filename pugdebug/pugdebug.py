@@ -11,6 +11,8 @@ __author__ = "robertbasic"
 
 import os
 
+import logging
+
 from PyQt5.QtCore import QObject
 from PyQt5.QtWidgets import QErrorMessage, QMessageBox
 
@@ -282,6 +284,7 @@ class Pugdebug(QObject):
 
         Find the project that was just created and load it.
         """
+        logging.debug("Creating new project %s" % project_name)
         self.projects_browser.load_projects()
 
         project = self.projects_browser.load_project_by_name(project_name)
@@ -311,6 +314,8 @@ class Pugdebug(QObject):
 
         project_name = project.get_project_name()
 
+        logging.debug("Loading project %s" % project_name)
+
         set_setting('current_project', project_name)
 
         changed_settings = save_settings(project_settings)
@@ -325,6 +330,9 @@ class Pugdebug(QObject):
         Find the path of the activated item and open that document.
         """
         path = self.file_browser.model().get_file_path(index)
+
+        logging.debug("Trying to open path %s" % path)
+
         if path is not None:
             self.open_document(path, False)
 
@@ -343,7 +351,10 @@ class Pugdebug(QObject):
 
         path = self.__get_path_mapped_to_local(path, map_paths)
 
+        logging.debug("Opening document for path %s" % path)
+
         if not self.documents.is_document_open(path):
+            logging.debug("Opening new document")
             document_model = self.documents.open_document(path)
 
             document_widget = PugdebugDocument(
@@ -363,6 +374,7 @@ class Pugdebug(QObject):
                 path
             )
         else:
+            logging.debug("Focusing opened document")
             # Just focus the tab that has the opened document
             index = self.document_viewer.find_tab_index_by_path(path)
             self.document_viewer.setCurrentIndex(index)
@@ -378,12 +390,16 @@ class Pugdebug(QObject):
         """
         path = self.__get_path_mapped_to_remote(path)
 
+        logging.debug("Getting a breakpoint on %s:%s" % (path, line_number))
+
         breakpoint = self.get_breakpoint(path, line_number)
 
         if breakpoint is None:
+            logging.debug("Setting breakpoint")
             breakpoint = {'filename': path, 'lineno': line_number}
             self.set_breakpoint(breakpoint)
         else:
+            logging.debug("Removing breakpoint")
             self.remove_breakpoint(breakpoint)
 
     def handle_document_changed(self, document_model):
@@ -394,13 +410,21 @@ class Pugdebug(QObject):
         Remove stale breakpoints.
         """
         path = document_model.path
+
+        logging.debug("Document changed: %s" % path)
+
         document_widget = self.document_viewer.get_document_by_path(path)
         document_widget.handle_document_changed(document_model)
 
         self.remove_stale_breakpoints(path)
 
     def handle_document_removed(self, document_model):
+        """Handle when a document gets removed outside of pugdebug
+        """
         path = document_model.path
+
+        logging.debug("Document removed: %s" % path)
+
         tab_index = self.document_viewer.find_tab_index_by_path(path)
         self.close_document(tab_index)
 
@@ -413,6 +437,9 @@ class Pugdebug(QObject):
         """
         document_widget = self.document_viewer.get_document(tab_index)
         path = document_widget.get_path()
+
+        logging.debug("Closing document: %s" % path)
+
         self.documents.close_document(path)
         document_widget.deleteLater()
         self.document_viewer.close_tab(tab_index)
@@ -428,6 +455,8 @@ class Pugdebug(QObject):
         current_file = self.debugger.get_current_file()
         current_line = self.debugger.get_current_line()
 
+        logging.debug("Focusing current line: %s:%s" % (current_file, current_line))
+
         self.jump_to_line_in_file(current_file, current_line, True)
 
     def jump_to_line_in_file(self, file, line, is_current=False):
@@ -437,6 +466,9 @@ class Pugdebug(QObject):
         """
         self.open_document(file)
 
+        current = 'current ' if is_current else ''
+        logging.debug("Jumping to %sline in file: %s:%s" % (current, file, line))
+
         document_widget = self.document_viewer.get_current_document()
         document_widget.move_to_line(line, is_current)
 
@@ -445,6 +477,7 @@ class Pugdebug(QObject):
 
         Given argument is a set of settings's names which have been changed.
         """
+        logging.debug("Settings changed")
 
         if has_setting('current_project'):
             project_name = get_setting('current_project')
@@ -481,16 +514,21 @@ class Pugdebug(QObject):
         """
         project_root = get_setting('path/project_root')
 
+        logging.debug("Project root changed: %s" % project_root)
+
         model = self.file_browser.model()
         model.set_path(project_root)
         self.file_browser.setModel(model)
         self.file_browser.setRootIndex(model.start_index)
 
     def handle_debugger_features_changed(self):
+        logging.debug("Debugger features changed")
         if self.debugger.is_connected():
+            logging.debug("Setting debugger features")
             self.debugger.set_debugger_features()
 
     def handle_editor_features_changed(self):
+        logging.debug("Editor features changed")
         for document in self.document_viewer.get_all_documents():
             document.handle_editor_features_changed()
 
@@ -505,7 +543,11 @@ class Pugdebug(QObject):
 
         Start a debugging session.
         """
+        logging.debug("Start listening")
+
         break_at_first_line = int(get_setting('debugger/break_at_first_line'))
+
+        logging.debug("Break at first line: %s" % ('Yes' if break_at_first_line == 1 else 'No'))
 
         start_debugging = True
 
@@ -520,6 +562,7 @@ class Pugdebug(QObject):
 
             if answer == QMessageBox.No:
                 start_debugging = False
+                logging.debug("Don't start debugging, no breakpoints")
 
         if start_debugging:
             self.variable_viewer.clear()
@@ -545,6 +588,8 @@ class Pugdebug(QObject):
 
         Open the index file in the document viewer.
         """
+        logging.debug("Debugging started")
+
         self.main_window.set_debugging_status(3)
 
         self.main_window.toggle_actions(True)
@@ -553,7 +598,11 @@ class Pugdebug(QObject):
         index_file = self.debugger.get_index_file()
         path = self.__get_path_mapped_to_local(index_file)
 
+        logging.debug("Index file: %s" % index_file)
+        logging.debug("Mapped path: %s" % path)
+
         if path is False:
+            logging.debug("Index file not mapped")
             self.handle_error(
                 "File does not exist after mapping. "
                 "Is the path map correct?"
@@ -571,16 +620,26 @@ class Pugdebug(QObject):
 
         If the code should not break at first line, run the debugger.
         """
+        logging.debug("Post start")
         break_at_first_line = int(get_setting('debugger/break_at_first_line'))
+
+        logging.debug("Break at first line: %s" % 'Yes' if break_at_first_line == 1 else 'No')
+
         if break_at_first_line == 0:
             self.run_debug()
         else:
             self.step_into()
 
     def stop_listening(self):
+        """Stop listening to connections
+        """
+        logging.debug("Stop listening")
         self.debugger.stop_listening()
 
     def handle_server_stopped_listening(self):
+        """Handle server stopped listening
+        """
+        logging.debug("Server stopped listening")
         self.main_window.set_debugging_status(0)
 
     def stop_debug(self):
@@ -592,6 +651,8 @@ class Pugdebug(QObject):
         If there is no active connections, the debugging session will
         tell the server to stop listening to new connections.
         """
+        logging.debug("Stop debugging")
+
         self.debugger.stop_debug()
 
     def handle_debugging_stopped(self):
@@ -600,6 +661,8 @@ class Pugdebug(QObject):
         This handler should be called when the connection to
         xdebug is terminated.
         """
+        logging.debug("Debugging stopped")
+
         self.main_window.toggle_actions(False)
 
         self.main_window.set_debugging_status(2)
@@ -612,6 +675,7 @@ class Pugdebug(QObject):
         The debugging session will end, but the debuged script
         will terminate normally.
         """
+        logging.debug("Detach debugger")
         self.debugger.detach_debug()
 
     def handle_step_command(self):
@@ -626,10 +690,13 @@ class Pugdebug(QObject):
 
         If the debugger is in a stopping state, stop the debugging session.
         """
+        logging.debug("Step command")
 
         self.main_window.set_debugging_status(3)
 
         if self.debugger.is_breaking():
+            logging.debug("Debugger is breaking")
+
             self.focus_current_line()
 
             post_step_data = {
@@ -637,8 +704,10 @@ class Pugdebug(QObject):
             }
             self.debugger.post_step_command(post_step_data)
         elif self.debugger.is_stopped():
+            logging.debug("Debugger is stopped")
             self.stop_debug()
         elif self.debugger.is_stopping():
+            logging.debug("Debugger is stopping")
             self.stop_debug()
 
     def run_debug(self):
@@ -646,6 +715,7 @@ class Pugdebug(QObject):
 
         This gets called when the "Run" action button is pressed.
         """
+        logging.debug("Run command")
         self.main_window.set_debugging_status(4)
 
         self.debugger.run_debug()
@@ -655,6 +725,8 @@ class Pugdebug(QObject):
 
         This gets called when the "Step over" action button is pressed.
         """
+        logging.debug("Step over command")
+
         self.main_window.set_debugging_status(4)
 
         self.debugger.step_over()
@@ -664,6 +736,8 @@ class Pugdebug(QObject):
 
         This gets called when the "Step into" action button is pressed.
         """
+        logging.debug("Step into command")
+
         self.main_window.set_debugging_status(4)
 
         self.debugger.step_into()
@@ -673,6 +747,8 @@ class Pugdebug(QObject):
 
         This gets called when the "Step out" action button is pressed.
         """
+        logging.debug("Step out command")
+
         self.main_window.set_debugging_status(4)
 
         self.debugger.step_out()
@@ -682,6 +758,8 @@ class Pugdebug(QObject):
 
         Set the variables on the variable viewer.
         """
+        logging.debug("Setting variables received from debugger")
+
         self.variable_viewer.set_variables(variables)
 
     def handle_got_stacktraces(self, stacktraces):
@@ -689,6 +767,8 @@ class Pugdebug(QObject):
 
         Set the stacktraces on the stacktrace viewer.
         """
+        logging.debug("Setting stacktraces received from debugger")
+
         self.stacktrace_viewer.set_stacktraces(stacktraces)
 
     def set_breakpoint(self, breakpoint):
@@ -701,7 +781,11 @@ class Pugdebug(QObject):
         If there is an active debugging session, tell the debugger to set the
         breakpoint.
         """
+        logging.debug("Set a breakpoint")
+
         if not self.debugger.is_connected():
+            logging.debug("Debugger is not connected, appending breakpoint")
+
             self.breakpoints.append(breakpoint)
 
             path = breakpoint['filename']
@@ -713,6 +797,8 @@ class Pugdebug(QObject):
             self.breakpoint_viewer.set_breakpoints(self.breakpoints)
 
             return
+
+        logging.debug("Setting a breakpoint on the debugger")
 
         self.debugger.set_breakpoint(breakpoint)
 
@@ -726,7 +812,11 @@ class Pugdebug(QObject):
         If there is an active debugging session, tell the debugger to remove
         the breakpoint.
         """
+        logging.debug("Remove a breakpoint")
+
         if not self.debugger.is_connected():
+            logging.debug("Debugger is not connected, removing breakpoint")
+
             path = breakpoint['filename']
             line_number = breakpoint['lineno']
 
@@ -746,6 +836,7 @@ class Pugdebug(QObject):
 
         if 'id' in breakpoint:
             breakpoint_id = int(breakpoint['id'])
+            logging.debug("Removing breakpoint: %s" % breakpoint_id)
             self.debugger.remove_breakpoint(breakpoint_id)
 
     def remove_stale_breakpoints(self, path):
@@ -757,6 +848,8 @@ class Pugdebug(QObject):
         outside of the application.
         """
         remote_path = self.__get_path_mapped_to_remote(path)
+
+        logging.debug("Removing stale breakpoints: %s" % remote_path)
 
         breakpoints = list(filter(
             lambda breakpoint: breakpoint['filename'] != remote_path,
@@ -777,12 +870,18 @@ class Pugdebug(QObject):
         path = None
         line_number = None
 
+        logging.debug("Breakpoint removed")
+
         for breakpoint in self.breakpoints:
             if int(breakpoint['id']) == breakpoint_id:
+                logging.debug("Found removed breakpoint: %s" % breakpoint_id)
+
                 path = breakpoint['filename']
                 line_number = breakpoint['lineno']
 
                 self.debugger.list_breakpoints()
+
+        logging.debug("%s:%s" % (path, line_number))
 
         if path is not None and line_number is not None:
             path = self.__get_path_mapped_to_local(path)
@@ -813,6 +912,8 @@ class Pugdebug(QObject):
         Show the breakpoints in the breakpoint viewer and rehighlight the
         breakpoint markers.
         """
+        logging.debug("Breakpoints listed")
+
         self.breakpoints = breakpoints
 
         self.breakpoint_viewer.set_breakpoints(breakpoints)
@@ -824,16 +925,22 @@ class Pugdebug(QObject):
 
     def handle_expression_evaluated(self, index, result):
         """Handle when an expression is evaluated"""
+        logging.debug("Expression evaluated")
+
         self.expression_viewer.set_evaluated(index, result)
 
     def handle_expressions_evaluated(self, results):
         """Handle when a list of expressions is evaluated"""
+        logging.debug("Expressions evaluated")
+
         for index, result in enumerate(results):
             self.expression_viewer.set_evaluated(index, result)
 
     def handle_expression_added_or_changed(self, index, expression):
         """Handle when an expression is added, or an existing one is changed.
         """
+        logging.debug("Expression added or modified")
+
         if self.debugger.is_connected():
             self.debugger.evaluate_expression(index, expression)
 
