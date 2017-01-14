@@ -9,6 +9,9 @@ layout: index
 ### Added
  - Document is closed if underlying file is deleted
  - Editor settings allowing to set tab width and font size
+ - A simple file search dialog
+ - Titles for project and settings dialogs
+ - Simple logging, appending to ~/pugdebug.log
 
 ### Changed
  - Cursor in editor is now a regular arrow, read-only cursor
@@ -16,6 +19,7 @@ layout: index
 ### Fixed
  - File watching for Windows OS
  - Connecting to document signals when document is changed or removed
+ - Focus of buttons in the New Project window, save has focus by default
 
 ### Removed
 
