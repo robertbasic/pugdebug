@@ -35,7 +35,7 @@ if __name__ == "__main__":
                 'class': 'logging.FileHandler',
                 'level': logging.DEBUG,
                 'formatter': 'f',
-                'filename': 'pugdebug.log'
+                'filename': os.path.expanduser('~') + '/pugdebug.log'
             }
         },
         root = {
