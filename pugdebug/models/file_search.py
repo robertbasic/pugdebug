@@ -11,7 +11,7 @@ __author__ = "robertbasic"
 
 import os
 from PyQt5.QtCore import QDir
-from fuzzywuzzy import fuzz, process, utils
+from fuzzywuzzy import fuzz, process
 
 
 class PugdebugFileSearch():
@@ -44,7 +44,8 @@ class PugdebugFileSearch():
 
         files = self.recursive(self.root, search_string, [])
 
-        files = process.extract(search_string, files, limit=10, scorer=fuzz.token_sort_ratio)
+        scorer = fuzz.token_sort_ratio
+        files = process.extract(search_string, files, limit=10, scorer=scorer)
 
         return [f[0] for f in files]
 
@@ -54,14 +55,15 @@ class PugdebugFileSearch():
         directory.setSorting(QDir.DirsLast)
 
         for entry in directory.entryInfoList():
-            ignored = self.is_ignored(entry.absoluteFilePath())
-            if not ignored and entry.isFile() and entry.completeSuffix().endswith('php'):
-                current_path = entry.absoluteFilePath()[len(self.root) + 1:]
+            entry_path = entry.absoluteFilePath()
+            ignored = self.is_ignored(entry_path)
+            if not ignored and entry.isFile() and entry_path.endswith('php'):
+                current_path = entry_path[len(self.root) + 1:]
 
                 if self.is_fuzzy(current_path, search_string):
                     paths.append(current_path)
             elif not ignored and entry.isDir():
-                paths = self.recursive(entry.absoluteFilePath(), search_string, paths)
+                paths = self.recursive(entry_path, search_string, paths)
 
         return paths
 
