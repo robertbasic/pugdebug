@@ -9,6 +9,7 @@
 
 __author__ = "robertbasic"
 
+import os
 from PyQt5.QtCore import QDir
 from fuzzywuzzy import fuzz, process, utils
 
@@ -19,14 +20,33 @@ class PugdebugFileSearch():
         self.parent = parent
         self.root = path
 
+    def ignored_paths(self):
+        ignored = []
+        ignores = []
+        ignore_file = "%s/%s" % (self.root, ".gitignore")
+
+        if os.path.exists(ignore_file) and os.path.isfile(ignore_file):
+            fd = open(ignore_file)
+            ignores = fd.read().rstrip("\n").split("\n")
+            fd.close()
+
+        if len(ignores) > 0:
+            ignores = list(map(lambda i: self.root + '/' + i, ignores))
+            ignored = list(filter(lambda i: os.path.isdir(i), ignores))
+
+        return ignored
+
     def search(self, search_string):
         if len(search_string) < 3:
             return []
-        search_results = self.recursive(self.root, search_string, [])
-        search_results = sorted(search_results, key=lambda r: r[1], reverse=True)
-        search_results = [("(%s) %s" % (r[1], r[0])) for r in search_results]
-        search_results = process.extract(search_string, search_results, limit=10, scorer=fuzz.partial_ratio)
-        return [r[0] for r in search_results]
+
+        self.ignored = self.ignored_paths()
+
+        files = self.recursive(self.root, search_string, [])
+
+        files = process.extract(search_string, files, limit=10, scorer=fuzz.token_sort_ratio)
+
+        return [f[0] for f in files]
 
     def recursive(self, path, search_string, paths):
         directory = QDir(path)
@@ -34,72 +54,22 @@ class PugdebugFileSearch():
         directory.setSorting(QDir.DirsLast)
 
         for entry in directory.entryInfoList():
-            if (entry.isFile() and
-                    self.should_exclude_by_extension(entry.completeSuffix())):
-                current_path = entry.filePath()[len(self.root) + 1:]
+            ignored = self.is_ignored(entry.absoluteFilePath())
+            if not ignored and entry.isFile() and entry.completeSuffix().endswith('php'):
+                current_path = entry.absoluteFilePath()[len(self.root) + 1:]
 
-                score = self.score_path(current_path, search_string)
-
-                paths.append((current_path, score))
-                #if self.is_fuzzy(current_path, search_string):
-                    #paths.append(current_path)
-            elif entry.isDir():
-                paths = self.recursive(entry.filePath(), search_string, paths)
+                if self.is_fuzzy(current_path, search_string):
+                    paths.append(current_path)
+            elif not ignored and entry.isDir():
+                paths = self.recursive(entry.absoluteFilePath(), search_string, paths)
 
         return paths
 
-    def score_path(self, current_path, search_string):
-        search_string = utils.full_process(search_string)
-        current_path = utils.full_process(current_path)
-
-        weighted_search_strings = self.weight_search_string(search_string)
-
-        current_path = current_path.split(' ')
-        path_parts = current_path[:-2]
-        file_parts = current_path[-2:-1]
-        p = ' '.join(path_parts)
-        f = ' '.join(file_parts)
-
-        path_weight = 0.5
-        file_weight = 1
-
-        score = 0
-        p_score = 0
-        f_score = 0
-
-        for w, s in weighted_search_strings:
-            p_ratio = fuzz.partial_ratio(s, p)
-            f_ratio = fuzz.partial_ratio(s, f)
-            pw = path_weight
-            if p_ratio == 100:
-                pw = 1
-            p_score = p_score + (w * p_ratio * pw)
-            f_score = f_score + (w * f_ratio * file_weight)
-            score = score + p_score + f_score
-
-        return score
-
-    def weight_search_string(self, search_string):
-        words = search_string.split(' ')
-        words.reverse()
-        nw = len(words)
-
-        d = 0
-        weighted_words = []
-        for word in words:
-            weight = 1 - (d / nw)
-            weighted_words.append((weight, word))
-            d = d + 1
-
-        return weighted_words
+    def is_ignored(self, path):
+        for ignored in self.ignored:
+            if path.startswith(ignored):
+                return True
+        return False
 
     def is_fuzzy(self, current_path, search_string):
         return fuzz.partial_ratio(search_string, current_path) > 50
-
-    def should_exclude_by_extension(self, extension):
-        if (extension.find("php") != -1 and
-                extension.find("html") == -1 and
-                extension.find("xml") == -1 and
-                extension.find("phpt") == -1):
-            return True
-        return False
