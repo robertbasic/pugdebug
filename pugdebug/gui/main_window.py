@@ -11,7 +11,7 @@ __author__ = "robertbasic"
 
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (QMainWindow, QToolBar, QMenuBar, QDockWidget,
-                             QAction, QApplication)
+                             QAction)
 from PyQt5.QtGui import QFont, QKeySequence
 
 from pugdebug.gui.file_browser import PugdebugFileBrowser
@@ -229,7 +229,9 @@ class PugdebugMainWindow(QMainWindow):
 
     def setup_search_actions(self):
         self.file_search_action = QAction("&File search...", self)
-        self.file_search_action.setToolTip("Search for files in the current project")
+        self.file_search_action.setToolTip(
+            "Search for files in the current project"
+        )
         self.file_search_action.setStatusTip(
             "Search for files. Shortcut: Ctrl+T"
         )

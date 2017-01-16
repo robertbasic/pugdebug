@@ -123,7 +123,7 @@ class PugdebugDocument(QWidget):
                 else:
                     brush.setColor(Qt.darkGreen)
                 painter.setBrush(brush)
-                rect = QRect(0, block_top+2, 7, 7)
+                rect = QRect(0, block_top + 2, 7, 7)
                 painter.drawRect(rect)
 
             # Convert the line number to string so we can paint it

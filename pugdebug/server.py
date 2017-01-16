@@ -12,7 +12,8 @@ __author__ = "robertbasic"
 from base64 import b64encode
 import socket
 
-from PyQt5.QtCore import QObject, QThread, QThreadPool, QRunnable, QMutex, pyqtSignal
+from PyQt5.QtCore import (QObject, QThread, QThreadPool, QRunnable,
+                          QMutex, pyqtSignal)
 
 from pugdebug.message_parser import PugdebugMessageParser
 from pugdebug.models.settings import get_setting
@@ -89,9 +90,12 @@ class PugdebugServer(QThread):
                         try:
                             is_valid = connection.init_connection()
                         except OSError as e:
-                            # in case the debugged program closes the connection
+                            # in case the debugged program closes
+                            # the connection
                             is_valid = False
-                            self.server_error_signal.emit('%s (during connection initialization)' % e.strerror)
+                            self.server_error_signal.emit(
+                                '%s (during connection initialization)' % e.strerror
+                            )
 
                         if is_valid and self.wait_for_accept:
                             self.new_connection_established_signal.emit(
@@ -299,11 +303,10 @@ class PugdebugServerConnection(QObject):
         return True
 
     def __post_start(self, data):
+        self.__set_breakpoints(data['breakpoints'])
+
         post_start_response = {
             'debugger_features': self.__set_debugger_features(),
-            'breakpoints': self.__set_breakpoints(
-                data['breakpoints']
-            ),
             'breakpoints': self.__list_breakpoints()
         }
 
@@ -443,21 +446,21 @@ class PugdebugServerConnection(QObject):
             self.__get_transaction_id(),
             max_depth
         )
-        response = self.__send_command(command)
+        self.__send_command(command)
 
         max_children = int(get_setting('debugger/max_children'))
         command = 'feature_set -i %d -n max_children -v %d' % (
             self.__get_transaction_id(),
             max_children
         )
-        response = self.__send_command(command)
+        self.__send_command(command)
 
         max_data = int(get_setting('debugger/max_data'))
         command = 'feature_set -i %d -n max_data -v %d' % (
             self.__get_transaction_id(),
             max_data
         )
-        response = self.__send_command(command)
+        self.__send_command(command)
 
         return True
 
