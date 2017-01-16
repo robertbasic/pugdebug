@@ -26,11 +26,11 @@ from pugdebug.pugdebug import Pugdebug
 
 if __name__ == "__main__":
     config = dict(
-        version = 1,
-        formatters = {
-            'f': {'format': '%(levelname)s %(asctime)s %(message)s' }
+        version=1,
+        formatters={
+            'f': {'format': '%(levelname)s %(asctime)s %(message)s'}
         },
-        handlers = {
+        handlers={
             'h': {
                 'class': 'logging.FileHandler',
                 'level': logging.DEBUG,
@@ -38,7 +38,7 @@ if __name__ == "__main__":
                 'filename': os.path.expanduser('~') + '/pugdebug.log'
             }
         },
-        root = {
+        root={
             'handlers': ['h'],
             'level': logging.DEBUG
         }

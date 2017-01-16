@@ -11,7 +11,6 @@ __author__ = "robertbasic"
 
 from pygments import highlight, formatter
 from pygments.lexers.php import PhpLexer
-from pygments.styles.default import DefaultStyle
 
 from PyQt5.QtGui import QSyntaxHighlighter, QColor, QTextCharFormat
 
@@ -125,7 +124,7 @@ class PugdebugFormatter(formatter.Formatter):
             format = QTextCharFormat()
 
             if style['color']:
-                color = QColor('#'+style['color'])
+                color = QColor('#' + style['color'])
                 format.setForeground(color)
 
             self.styles[str(token)] = format

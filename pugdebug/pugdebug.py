@@ -159,8 +159,9 @@ class Pugdebug(QObject):
 
     def connect_documents_signals(self):
         """Connect documents signals
-        Connects the signals that gets fired when a document model signal happens.
-        Either when a document gets changed, or when a document gets removed.
+        Connects the signals that get fired when a document model signal
+        happens. Either when a document gets changed, or when a document gets
+        removed.
         """
         # Handle when a document gets changed outside of pugdebug
         self.documents.document_changed.connect(
@@ -455,7 +456,9 @@ class Pugdebug(QObject):
         current_file = self.debugger.get_current_file()
         current_line = self.debugger.get_current_line()
 
-        logging.debug("Focusing current line: %s:%s" % (current_file, current_line))
+        logging.debug("Focusing current line: %s:%s" % (
+            current_file, current_line
+        ))
 
         self.jump_to_line_in_file(current_file, current_line, True)
 
@@ -467,7 +470,9 @@ class Pugdebug(QObject):
         self.open_document(file)
 
         current = 'current ' if is_current else ''
-        logging.debug("Jumping to %sline in file: %s:%s" % (current, file, line))
+        logging.debug("Jumping to %sline in file: %s:%s" % (
+            current, file, line
+        ))
 
         document_widget = self.document_viewer.get_current_document()
         document_widget.move_to_line(line, is_current)
@@ -547,7 +552,9 @@ class Pugdebug(QObject):
 
         break_at_first_line = int(get_setting('debugger/break_at_first_line'))
 
-        logging.debug("Break at first line: %s" % ('Yes' if break_at_first_line == 1 else 'No'))
+        logging.debug("Break at first line: %s" % (
+            'Yes' if break_at_first_line != 0 else 'No'
+        ))
 
         start_debugging = True
 
@@ -623,7 +630,9 @@ class Pugdebug(QObject):
         logging.debug("Post start")
         break_at_first_line = int(get_setting('debugger/break_at_first_line'))
 
-        logging.debug("Break at first line: %s" % 'Yes' if break_at_first_line == 1 else 'No')
+        logging.debug("Break at first line: %s" % (
+            'Yes' if break_at_first_line != 0 else 'No'
+        ))
 
         if break_at_first_line == 0:
             self.run_debug()

@@ -49,7 +49,6 @@ class PugdebugMessageParser():
 
         typemap = {}
 
-        attribs = ['name', 'type']
         for item in xml.getchildren():
             language, common = item.attrib['name'], item.attrib['type']
             if language and common:

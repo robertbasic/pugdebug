@@ -17,6 +17,7 @@ from pugdebug.models.file_search import PugdebugFileSearch
 from pugdebug.models.settings import get_setting
 from PyQt5.QtGui import QFont
 
+
 class PugdebugFileSearchWindow(QDialog):
 
     def __init__(self, parent):
@@ -77,7 +78,6 @@ class PugdebugFileSearchWindow(QDialog):
     def select_index(self, direction):
         current_index = self.files.currentRow()
         next_index = current_index
-        min_index = 0
         max_index = self.files.count() - 1
         if direction == 'up' and current_index > 0:
             next_index = current_index - 1
@@ -90,6 +90,7 @@ class PugdebugFileSearchWindow(QDialog):
         full_path = "%s/%s" % (self.project_root, path)
         self.parent.search_file_selected_signal.emit(full_path)
         self.accept()
+
 
 class PugdebugSearchFileLineEdit(QLineEdit):
 
