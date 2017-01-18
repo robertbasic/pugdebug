@@ -4,6 +4,20 @@ pugdebug is a standalone debugging client for PHP applications that uses Xdebug 
 
 A python 3.5, PyQt5 project.
 
+## running pugdebug
+
+Running pugdebug is quite easy.
+
+There are [executables available](https://github.com/robertbasic/pugdebug/releases/tag/v1.0.0) for Linux and Windows
+operating systems.
+
+Every [release](https://github.com/robertbasic/pugdebug/releases) includes a tar.gz/ZIP package with the
+executables. They include everything needed for pugdebug to work correctly on your system.
+
+Download and extract the archive, run the `pugdebug` binary file.
+
+That's it. No need to set up or install anything.
+
 ## current release
 
 The current release of pugdebug is [1.0.0](https://github.com/robertbasic/pugdebug/releases/tag/v1.0.0).
@@ -14,38 +28,9 @@ unpack it and start pugdebug.
 
 Please report any [issues](https://github.com/robertbasic/pugdebug/issues) you encounter.
 
-## executables
-
-There are executables available for Linux and Windows operating systems.
-Every [release](https://github.com/robertbasic/pugdebug/releases) includes a tar.gz/ZIP package with the
-executables. They include everything needed for pugdebug to work correctly on your system. There
-is no need to install or set up anything else.
-
 ## change log
 
 Please take a look at the [change log](./CHANGELOG.md).
-
-## setting up the environment
-
-> NOTE: Setting up the environment should be needed only when you want to help out with
-> developing pugdebug itself. And for OS X as there are no current builds for it yet.
-
-The main dependencies are Python 3.5,
-[QT5.7](http://doc.qt.io/qt-5/gettingstarted.html),
-[SIP4.9](http://www.riverbankcomputing.com/software/sip/download)
-and [PyQt5.7](http://www.riverbankcomputing.com/software/pyqt/download5).
-
-There is a wiki page with
-[instructions how to set up the development environment](https://github.com/robertbasic/pugdebug/wiki/Install-pugdebug)
-for Fedora, Ubuntu, Windows and OSX.
-
-There is also a [blog post](http://robertbasic.com/blog/install-pyqt5-in-python-3-virtual-environment)
-about setting up a virtual environment on a Fedora that goes into bit more details.
-
-## setting up Xdebug
-
-There is a wiki page with [simple examples of Xdebug configurations](https://github.com/robertbasic/pugdebug/wiki/Setting-up-Xdebug)
-that should help with setting up Xdebug for remote debugging.
 
 ## using pugdebug
 
@@ -146,6 +131,29 @@ php script.php
 ```
 
 pugdebug should pick up the debugging session and allow the script to be debugged.
+
+## setting up Xdebug
+
+There is a wiki page with [simple examples of Xdebug configurations](https://github.com/robertbasic/pugdebug/wiki/Setting-up-Xdebug)
+that should help with setting up Xdebug for remote debugging.
+
+## setting up the development environment
+
+Setting up the development environment should be needed only when you want to help out with
+developing pugdebug itself. And for OS X as there are no current builds for it yet.
+
+The main dependencies are Python 3.5,
+[QT5.7](http://doc.qt.io/qt-5/gettingstarted.html),
+[SIP4.9](http://www.riverbankcomputing.com/software/sip/download)
+and [PyQt5.7](http://www.riverbankcomputing.com/software/pyqt/download5).
+
+There is a wiki page with
+[instructions how to set up the development environment](https://github.com/robertbasic/pugdebug/wiki/Install-pugdebug)
+for Fedora, Ubuntu, Windows and OSX.
+
+There is also a [blog post](http://robertbasic.com/blog/install-pyqt5-in-python-3-virtual-environment)
+about setting up a virtual environment on a Fedora that goes into bit more details.
+
 
 ## todo
 
