@@ -12,9 +12,10 @@ __author__ = "robertbasic"
 import math
 
 from PyQt5.QtCore import pyqtSignal, Qt, QRect
-from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QTextEdit, QGridLayout
+from PyQt5.QtWidgets import (QWidget, QPlainTextEdit, QTextEdit, QGridLayout,
+                             QShortcut, QInputDialog)
 from PyQt5.QtGui import (QColor, QTextFormat, QTextCursor, QPainter,
-                         QTextBlockUserData, QFont)
+                         QTextBlockUserData, QFont, QKeySequence)
 
 from pugdebug.syntaxer import PugdebugSyntaxer
 from pugdebug.models.settings import get_setting
@@ -54,6 +55,19 @@ class PugdebugDocument(QWidget):
         self.layout = QGridLayout(self)
         self.layout.addWidget(self.line_numbers, 0, 0, 1, 1)
         self.layout.addWidget(self.document_contents, 0, 1, 1, 1)
+        
+        self.shortcut_search = QShortcut(QKeySequence("Ctrl+F"), self)
+        self.shortcut_search.activated.connect(self.show_search_modal)
+        
+        self.shortcut_move_to_line = QShortcut(QKeySequence("Ctrl+G"), self)
+        self.shortcut_move_to_line.activated.connect(self.show_move_to_line)
+        
+    def show_search_modal(self):
+        text, ok = QInputDialog.getText(self, 'Search', 'Insert word')
+        
+    def show_move_to_line(self):
+        text, ok = QInputDialog.getText(self, 'Line Number', 'Insert line number')
+        self.document_contents.move_to_line(int(text), True)
 
     def handle_document_changed(self, document_model):
         """Handle when a document gets changed
