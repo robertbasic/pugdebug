@@ -64,7 +64,7 @@ class Pugdebug(QObject):
         self.setup_projects_browser()
 
         self.connect_signals()
-        
+
         signal.signal(signal.SIGINT, signal.SIG_DFL)
 
     def setup_file_browser(self):
