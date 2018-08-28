@@ -64,6 +64,7 @@ class PugdebugDocument(QWidget):
         
     def show_search_modal(self):
         text, ok = QInputDialog.getText(self, 'Search', 'Insert word')
+        self.document_contents.find(text)
         
     def show_move_to_line(self):
         text, ok = QInputDialog.getText(self, 'Line Number', 'Insert line number')
