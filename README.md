@@ -4,7 +4,7 @@ pugdebug is a standalone debugging client for PHP applications that uses Xdebug 
 
 A python 3.5, PyQt5 project.
 
-**NOTE**: Not maintained!
+**NOTE**: Not maintained! Check this [fork](https://github.com/mte90/pugdebug) instead!
 
 ## running pugdebug
 
